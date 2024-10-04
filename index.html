@@ -1,79 +1,115 @@
-<!DOCTYPE html>
-<html lang="en" >
-<head>
-  <script src="https://alwingulla.com/88/tag.min.js" data-zone="105845" async data-cfasync="false"></script>
-  <meta charset="UTF-8">
-  <title>Busfahrer</title>
-  <link rel="stylesheet" href="./style.css">
+// Define the card deck
+const suits = ['hearts', 'diamonds', 'spades', 'clubs'];
+const values = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
 
-</head>
-<body>
-<!-- partial:index.partial.html -->
-<!DOCTYPE html>
-<html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <title>Busfahrer Kartenspiel</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <div id="game-container">
-        <h1>Busfahrer Kartenspiel</h1>
+// Function to generate the deck based on the selected size (32 or 52 cards)
+function generateDeck(deckSize) {
+    let deck = [];
+    for (let suit of suits) {
+        for (let value of values) {
+            deck.push({ suit: suit, value: value });
+        }
+    }
+    // If deckSize is 32, we remove cards 2 to 6
+    if (deckSize === 32) {
+        deck = deck.filter(card => ['7', '8', '9', '10', 'J', 'Q', 'K', 'A'].includes(card.value));
+    }
+    return deck;
+}
 
-        <div id="setup">
-            <div class="setup-item">
-                <label for="deckSize">Kartendeck wählen:</label>
-                <select id="deckSize">
-                    <option value="32">Kleines Deck (32 Karten)</option>
-                    <option value="52">Großes Deck (52 Karten)</option>
-                </select>
-            </div>
+// Function to shuffle the deck
+function shuffle(deck) {
+    for (let i = deck.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [deck[i], deck[j]] = [deck[j], deck[i]];
+    }
+    return deck;
+}
 
-            <div class="setup-item">
-                <label for="pyramidRows">Anzahl der Reihen in der Pyramide:</label>
-                <input type="number" id="pyramidRows" min="1" max="10" value="5">
-            </div>
+// Function to start the game
+function startGame() {
+    const deckSize = parseInt(document.getElementById('deckSize').value);
+    const pyramidRows = parseInt(document.getElementById('pyramidRows').value);
+    const playerNames = document.getElementById('playerNames').value.split(',').map(name => name.trim());
 
-            <div class="setup-item">
-                <label for="playerNames">Spielernamen (kommagetrennt):</label>
-                <input type="text" id="playerNames" placeholder="z.B. Anna, Ben, Cara">
-            </div>
+    const deck = shuffle(generateDeck(deckSize));
 
-            <button id="startGame">Spiel Starten</button>
-        </div>
+    // Hide the setup and show the game area
+    document.getElementById('setup').style.display = 'none';
+    document.getElementById('gameArea').style.display = 'block';
 
-        <div id="gameArea" style="display: none;">
-            <h2>Pyramide</h2>
-            <div id="pyramid"></div>
+    createPyramid(pyramidRows, deck);
+    createPlayers(playerNames);
+}
 
-            <h2>Spieler</h2>
-            <div id="players"></div>
+// Function to create the pyramid of cards
+function createPyramid(rows, deck) {
+    const pyramid = document.getElementById('pyramid');
+    pyramid.innerHTML = ''; // Clear previous pyramid if any
+    let cardsUsed = 0;
 
-            <div id="actions">
-                <!-- "Spiel Neu Starten" Button -->
-                <button id="restartGame">Spiel Neu Starten</button>
-                <!-- "Runde Beenden" Button -->
-                <button id="endRound">Runde Beenden</button>
-            </div>
-            <!-- Bereich für Aktionen oder Nachrichten -->
-            <div id="messageArea"></div>
-        </div>
+    for (let i = 1; i <= rows; i++) {
+        const row = document.createElement('div');
+        row.classList.add('pyramid-row');
 
-        <!-- Modal für Empfängerauswahl -->
-        <div id="recipientModal" class="modal" style="display: none;">
-            <div class="modal-content">
-                <span id="closeModal" class="close">&times;</span>
-                <h3 id="modalTitle">Empfänger auswählen</h3>
-                <ul id="recipientList"></ul>
-            </div>
-        </div>
+        for (let j = 0; j < i; j++) {
+            const card = deck[cardsUsed];
+            cardsUsed++;
+            const cardElement = document.createElement('div');
+            cardElement.classList.add('card', card.suit);
 
-        <script src="script.js"></script>
-    </div>
-</body>
-</html>
-<!-- partial -->
-  <script  src="./script.js"></script>
+            // Display the card's value and suit
+            cardElement.innerHTML = `<span>${card.value}</span> <span>${getSuitSymbol(card.suit)}</span>`;
+            
+            // Apply red or black color to the card based on the suit
+            if (card.suit === 'hearts' || card.suit === 'diamonds') {
+                cardElement.style.color = 'red';
+            } else {
+                cardElement.style.color = 'black';
+            }
 
-</body>
-</html>
+            row.appendChild(cardElement);
+        }
+        pyramid.appendChild(row);
+    }
+}
+
+// Function to get the suit symbol (♠, ♥, ♣, ♦)
+function getSuitSymbol(suit) {
+    switch (suit) {
+        case 'hearts':
+            return '♥';
+        case 'diamonds':
+            return '♦';
+        case 'spades':
+            return '♠';
+        case 'clubs':
+            return '♣';
+    }
+}
+
+// Function to create players
+function createPlayers(playerNames) {
+    const playersDiv = document.getElementById('players');
+    playersDiv.innerHTML = ''; // Clear previous players if any
+    playerNames.forEach(name => {
+        const playerDiv = document.createElement('div');
+        playerDiv.classList.add('player');
+        playerDiv.innerText = name;
+        playersDiv.appendChild(playerDiv);
+    });
+}
+
+// Event listener for starting the game
+document.getElementById('startGame').addEventListener('click', startGame);
+
+// Event listener for restarting the game
+document.getElementById('restartGame').addEventListener('click', () => {
+    document.getElementById('setup').style.display = 'block';
+    document.getElementById('gameArea').style.display = 'none';
+});
+
+// Event listener for ending the round
+document.getElementById('endRound').addEventListener('click', () => {
+    document.getElementById('messageArea').innerText = 'Runde beendet!';
+});

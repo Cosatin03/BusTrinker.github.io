@@ -23,8 +23,8 @@ function startGame() {
 
     const playerNames = document.getElementById('playerNames').value.split(',').map(name => name.trim()).filter(name => name);
 
-    if (playerNames.length === 0) {
-        alert('Bitte geben Sie mindestens einen Spielernamen ein.');
+    if (playerNames.length < 0) {
+        alert('Bitte geben Sie mindestens zwei Spielernamen ein.');
         return;
     }
 

@@ -63,7 +63,7 @@ function generateDeck(deckSize) {
     }
 
     // Deck mischen
-    return newDeck.sort(() => Math.random() - 0.7);
+    return newDeck.sort(() => Math.random() - 0.2);
 }
 
 function buildPyramid(rows) {

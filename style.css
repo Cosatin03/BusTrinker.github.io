@@ -4,49 +4,54 @@ body {
     color: #ecf0f1;
     margin: 0;
     padding: 0;
+    font-size: 2vw; /* Anpassung der Schriftgröße an die Bildschirmbreite */
 }
 
 #game-container {
-    max-width: 800px;
+    max-width: 100%;
+    width: 90vw; /* Dynamische Breite */
     margin: 0 auto;
-    padding: 20px;
+    padding: 2vw; /* Dynamisches Padding */
 }
 
 h1, h2 {
     text-align: center;
     color: #e74c3c;
+    font-size: 3vw; /* Dynamische Schriftgröße */
 }
 
 #setup, #gameArea {
-    margin-top: 20px;
+    margin-top: 2vw;
 }
 
 .setup-item {
-    margin-bottom: 15px;
+    margin-bottom: 2vw; /* Dynamischer Abstand */
 }
 
 label {
     display: block;
-    margin-bottom: 5px;
+    margin-bottom: 1vw;
     font-weight: bold;
+    font-size: 2vw; /* Dynamische Schriftgröße */
 }
 
 input[type="text"], input[type="number"], select {
     width: 100%;
-    padding: 8px;
-    border: 1px solid #34495e;
-    border-radius: 4px;
+    padding: 1vw;
+    border: 0.1vw solid #34495e;
+    border-radius: 0.5vw;
     background-color: #34495e;
     color: #ecf0f1;
+    font-size: 2vw; /* Dynamische Schriftgröße */
 }
 
 button {
-    padding: 10px 20px;
+    padding: 1.5vw 3vw;
     background-color: #e74c3c;
     border: none;
-    border-radius: 4px;
+    border-radius: 0.5vw;
     color: #ecf0f1;
-    font-size: 16px;
+    font-size: 2vw; /* Dynamische Schriftgröße */
     cursor: pointer;
 }
 
@@ -58,25 +63,23 @@ button:hover {
     display: flex;
     flex-direction: column;
     align-items: center;
+    width: 100%;
 }
 
 .row {
     display: flex;
     justify-content: center;
-    margin-top: -35px; /* Überlappende Reihen für Pyramiden-Effekt */
-}
-
-.row:first-child {
-    margin-top: 0; /* Erste Reihe nicht überlappen */
+    flex-wrap: wrap;
+    margin-top: 1vw;
 }
 
 .card {
-    width: 80px;
-    height: 120px;
-    border-radius: 10px;
-    margin: 0 5px;
+    width: 12vw; /* Dynamische Breite */
+    height: 18vw; /* Dynamische Höhe */
+    border-radius: 1vw; /* Dynamisches Radius */
+    margin: 0 0.5vw;
     position: relative;
-    box-shadow: 0 5px 10px rgba(0,0,0,0.3);
+    box-shadow: 0 0.5vw 1vw rgba(0,0,0,0.3);
     cursor: pointer;
     transform-style: preserve-3d;
     transition: transform 0.6s;
@@ -88,15 +91,15 @@ button:hover {
     position: absolute;
     width: 100%;
     height: 100%;
-    border-radius: 10px;
+    border-radius: 1vw; /* Dynamisches Radius */
 }
 
 .card .front {
     background-color: #ecf0f1;
     color: #2c3e50;
     text-align: center;
-    line-height: 120px;
-    font-size: 24px;
+    line-height: 18vw; /* Anpassung an Kartenhöhe */
+    font-size: 2.5vw; /* Dynamische Schriftgröße */
     transform: rotateY(180deg);
 }
 
@@ -105,7 +108,7 @@ button:hover {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 36px;
+    font-size: 3vw; /* Dynamische Schriftgröße */
     color: #ecf0f1;
 }
 
@@ -121,12 +124,13 @@ button:hover {
 
 .player {
     background-color: #34495e;
-    padding: 10px 15px;
-    margin: 10px;
-    border-radius: 5px;
+    padding: 1vw;
+    margin: 1vw;
+    border-radius: 1vw;
     cursor: pointer;
     position: relative;
-    min-width: 150px;
+    min-width: 25vw;
+    font-size: 2vw; /* Dynamische Schriftgröße */
 }
 
 .player:hover {
@@ -134,13 +138,13 @@ button:hover {
 }
 
 .player .received-cards {
-    margin-top: 5px;
-    font-size: 14px;
+    margin-top: 0.5vw;
+    font-size: 1.8vw; /* Dynamische Schriftgröße */
     color: #ecf0f1;
 }
 
 #actions {
-    margin-top: 20px;
+    margin-top: 2vw;
     text-align: center;
 }
 
@@ -158,21 +162,21 @@ button:hover {
 
 .modal-content {
     background-color: #34495e;
-    margin: 15% auto;
-    padding: 20px;
-    border: 1px solid #888;
+    margin: 10% auto;
+    padding: 2vw;
+    border: 0.2vw solid #888;
     width: 80%;
     color: #ecf0f1;
-    border-radius: 10px;
+    border-radius: 1vw;
     position: relative;
 }
 
 .close {
     color: #ecf0f1;
     position: absolute;
-    right: 20px;
-    top: 10px;
-    font-size: 28px;
+    right: 2vw;
+    top: 1vw;
+    font-size: 3vw;
     font-weight: bold;
     cursor: pointer;
 }
@@ -183,14 +187,25 @@ button:hover {
 }
 
 #recipientList li {
-    padding: 10px;
+    padding: 1vw;
     background-color: #3b5998;
-    margin: 5px 0;
-    border-radius: 5px;
+    margin: 0.5vw 0;
+    border-radius: 1vw;
     cursor: pointer;
     text-align: center;
+    font-size: 2vw; /* Dynamische Schriftgröße */
 }
 
 #recipientList li:hover {
     background-color: #2e4372;
+}
+
+@media (max-width: 600px) {
+    body {
+        font-size: 3vw; /* Größere Schriftgröße auf sehr kleinen Bildschirmen */
+    }
+    .card {
+        width: 25vw; /* Vergrößert die Karten auf kleinen Bildschirmen */
+        height: 35vw; /* Vergrößert die Kartenhöhe auf kleinen Bildschirmen */
+    }
 }

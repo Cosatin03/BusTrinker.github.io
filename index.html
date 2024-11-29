@@ -4,7 +4,7 @@
     <script async="async" data-cfasync="false" src="//thubanoa.com/1?z=8208427"></script>
     <script>(function(d,z,s){s.src='https://'+d+'/401/'+z;try{(document.body||document.documentElement).appendChild(s)}catch(e){}})('cimtaiphos.com',8208393,document.createElement('script'))</script>
     <meta charset="UTF-8">
-    <meta name="description" content="Busfahrer Kartenspiel - Das beliebte Trinkspiel für Partys! Kombiniere Strategie und Glück und genieße eine lustige Zeit mit Freunden. Erfahre die Regeln und starte das Spiel!">
+    <meta name="description" content="Busfahrer Kartenspiel - Das beliebte Trinkspiel für Partys! Kombiniere Strategie und Glück und genieße eine lustige Zeit mit Freunden. Erfahre die Regeln und starte das Spiel! Es wird euch Umhauen">
     <title>Busfahrer Kartenspiel</title>
     <link rel="stylesheet" href="style.css">
     <link rel="icon" href="Icon.jpeg" type="image/x-icon">
@@ -12,9 +12,20 @@
 </head>
 <body>
     <div id="game-container">
-        <h1>Busfahrer Kartenspiel</h1>
+        <!-- Startmenü -->
+        <div id="startMenu">
+            <h1>Trinkspiel</h1>
+            <p>Willkommen zum Trinkspiel! Wählen Sie einen Spielmodus und haben Sie Spaß.</p>
+            <div class="game-mode-selection">
+                <button id="busfahrerMode">Busfahrer</button>
+                <button id="zugfahrerMode">Zugfahrer</button>
+            </div>
+        </div>
 
-        <div id="setup">
+        <!-- Spielsetup -->
+        <div id="setup" style="display: none;">
+            <h2>Spiel Einstellungen</h2>
+            <button id="openSettingsSetup">⚙️</button>
             <div class="setup-item">
                 <label for="deckSize">Kartendeck wählen:</label>
                 <select id="deckSize">
@@ -23,9 +34,14 @@
                 </select>
             </div>
 
-            <div class="setup-item">
-                <label for="pyramidRows">Anzahl der Reihen in der Pyramide (3-7):</label>
+            <div class="setup-item" id="busfahrerRowsContainer">
+                <label for="pyramidRows">Anzahl der Reihen (3-7):</label>
                 <input type="number" id="pyramidRows" min="3" max="7" step="1" value="5">
+            </div>
+
+            <div class="setup-item" id="zugfahrerRowsContainer" style="display: none;">
+                <label for="zugfahrerRows">Anzahl der Reihen (10-15):</label>
+                <input type="number" id="zugfahrerRows" min="10" max="15" step="1" value="12">
             </div>
 
             <div class="setup-item">
@@ -36,30 +52,61 @@
             <button id="startGame">Spiel Starten</button>
         </div>
 
+        <!-- Spielbereich -->
         <div id="gameArea" style="display: none;">
-            <h2>Pyramide</h2>
-            <div id="pyramid"></div>
+            <div id="gameHeader">
+                <h2 id="gameTitle">Pyramide</h2>
+                <button id="openSettings">⚙️</button>
+            </div>
+            <div id="cardLayout"></div>
 
             <h2>Spieler</h2>
             <div id="players"></div>
 
             <div id="actions">
-                <button id="restartGame">Spiel Neu Starten</button>
-                <button id="endRound">Runde Beenden</button>
+                <button id="endRound">Spiel Neu Starten</button>
+                <button id="restartGame">Runde Beenden</button>
             </div>
 
             <div id="messageArea"></div>
         </div>
 
-        <div id="recipientModal" class="modal" style="display: none;">
+        <!-- Einstellungen Modal -->
+        <div id="settingsModal" class="modal" style="display: none;">
             <div class="modal-content">
-                <span id="closeModal" class="close">&times;</span>
-                <h3 id="modalTitle">Empfänger auswählen</h3>
-                <ul id="recipientList"></ul>
+                <span id="closeSettingsModal" class="close">&times;</span>
+                <h3>Einstellungen</h3>
+                <div class="setup-item">
+                    <label for="cardSizeInGame">Kartengröße anpassen:</label>
+                    <input type="range" id="cardSizeInGame" min="80" max="150" step="5" value="120">
+                </div>
             </div>
         </div>
 
-        <script src="script.js"></script>
+        <!-- Empfängerauswahl Modal -->
+        <div id="recipientModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <h3 id="modalTitle">Karten verteilen</h3>
+                <div id="distributionArea"></div>
+                <button id="distributeCardsButton">Karten Verteilen</button>
+            </div>
+        </div>
+
+        <!-- Allgemeine Nachricht Modal -->
+        <div id="generalMessageModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <div id="generalMessageContent"></div>
+            </div>
+        </div>
+
+        <!-- Handkarten Modal -->
+        <div id="handCardsModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <h3 id="handCardsTitle">Deine Handkarten</h3>
+                <div id="handCardsContainer"></div>
+            </div>
+        </div>
     </div>
+    <script src="script.js"></script>
 </body>
 </html>

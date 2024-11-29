@@ -1,85 +1,122 @@
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #2c3e50;
-    color: #ecf0f1;
+/* Grundlegende Stil-Resets */
+* {
+    box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-size: 2vw; /* Anpassung der Schriftgröße an die Bildschirmbreite */
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(to right, #141e30, #243b55);
+    color: #ecf0f1;
 }
 
 #game-container {
-    max-width: 100%;
-    width: 90vw; /* Dynamische Breite */
+    max-width: 1200px;
     margin: 0 auto;
-    padding: 2vw; /* Dynamisches Padding */
+    padding: 20px;
 }
 
 h1, h2 {
     text-align: center;
     color: #e74c3c;
-    font-size: 3vw; /* Dynamische Schriftgröße */
+    margin-bottom: 20px;
+}
+
+#startMenu {
+    text-align: center;
+    margin-top: 50px;
+}
+
+#startMenu p {
+    font-size: 18px;
+    margin-bottom: 30px;
+}
+
+.game-mode-selection {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.game-mode-selection button {
+    padding: 15px 30px;
+    font-size: 18px;
 }
 
 #setup, #gameArea {
-    margin-top: 2vw;
+    margin-top: 20px;
 }
 
 .setup-item {
-    margin-bottom: 2vw; /* Dynamischer Abstand */
+    margin-bottom: 15px;
 }
 
 label {
     display: block;
-    margin-bottom: 1vw;
+    margin-bottom: 5px;
     font-weight: bold;
-    font-size: 2vw; /* Dynamische Schriftgröße */
 }
 
-input[type="text"], input[type="number"], select {
+input[type="text"], input[type="number"], select, input[type="range"] {
     width: 100%;
-    padding: 1vw;
-    border: 0.1vw solid #34495e;
-    border-radius: 0.5vw;
+    padding: 10px;
+    border: 1px solid #34495e;
+    border-radius: 5px;
     background-color: #34495e;
     color: #ecf0f1;
-    font-size: 2vw; /* Dynamische Schriftgröße */
 }
 
 button {
-    padding: 1.5vw 3vw;
+    padding: 10px 20px;
     background-color: #e74c3c;
     border: none;
-    border-radius: 0.5vw;
+    border-radius: 5px;
     color: #ecf0f1;
-    font-size: 2vw; /* Dynamische Schriftgröße */
     cursor: pointer;
+    margin-top: 10px;
 }
 
 button:hover {
     background-color: #c0392b;
 }
 
-#pyramid {
+#gameHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#openSettings, #openSettingsSetup {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #ecf0f1;
+}
+
+#cardLayout {
     display: flex;
     flex-direction: column;
     align-items: center;
     width: 100%;
+    overflow-x: auto;
 }
 
 .row {
     display: flex;
     justify-content: center;
-    flex-wrap: wrap;
-    margin-top: 1vw;
+    flex-wrap: nowrap;
+    margin-bottom: 10px;
 }
 
 .card {
-    width: 12vw; /* Dynamische Breite */
-    height: 18vw; /* Dynamische Höhe */
-    border-radius: 1vw; /* Dynamisches Radius */
-    margin: 0 0.5vw;
+    width: var(--card-width, 120px);
+    height: calc(var(--card-width, 120px) * 1.5);
+    border-radius: 10px;
+    margin: 5px;
     position: relative;
-    box-shadow: 0 0.5vw 1vw rgba(0,0,0,0.3);
+    box-shadow: 0 5px 10px rgba(0,0,0,0.3);
     cursor: pointer;
     transform-style: preserve-3d;
     transition: transform 0.6s;
@@ -91,15 +128,16 @@ button:hover {
     position: absolute;
     width: 100%;
     height: 100%;
-    border-radius: 1vw; /* Dynamisches Radius */
+    border-radius: 10px;
 }
 
 .card .front {
     background-color: #ecf0f1;
     color: #2c3e50;
-    text-align: center;
-    line-height: 18vw; /* Anpassung an Kartenhöhe */
-    font-size: 2.5vw; /* Dynamische Schriftgröße */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: calc(var(--card-width, 120px) / 4);
     transform: rotateY(180deg);
 }
 
@@ -108,7 +146,7 @@ button:hover {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 3vw; /* Dynamische Schriftgröße */
+    font-size: calc(var(--card-width, 120px) / 3);
     color: #ecf0f1;
 }
 
@@ -124,13 +162,14 @@ button:hover {
 
 .player {
     background-color: #34495e;
-    padding: 1vw;
-    margin: 1vw;
-    border-radius: 1vw;
+    padding: 10px;
+    margin: 10px;
+    border-radius: 10px;
     cursor: pointer;
     position: relative;
-    min-width: 25vw;
-    font-size: 2vw; /* Dynamische Schriftgröße */
+    min-width: 200px;
+    text-align: center;
+    transition: background-color 0.3s;
 }
 
 .player:hover {
@@ -138,20 +177,25 @@ button:hover {
 }
 
 .player .received-cards {
-    margin-top: 0.5vw;
-    font-size: 1.8vw; /* Dynamische Schriftgröße */
+    margin-top: 5px;
     color: #ecf0f1;
 }
 
 #actions {
-    margin-top: 2vw;
+    margin-top: 20px;
     text-align: center;
+}
+
+#messageArea {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 18px;
 }
 
 .modal {
     display: none;
     position: fixed;
-    z-index: 1;
+    z-index: 1000;
     left: 0;
     top: 0;
     width: 100%;
@@ -163,49 +207,109 @@ button:hover {
 .modal-content {
     background-color: #34495e;
     margin: 10% auto;
-    padding: 2vw;
-    border: 0.2vw solid #888;
+    padding: 20px;
+    border: 2px solid #888;
     width: 80%;
     color: #ecf0f1;
-    border-radius: 1vw;
+    border-radius: 10px;
     position: relative;
 }
 
 .close {
     color: #ecf0f1;
     position: absolute;
-    right: 2vw;
-    top: 1vw;
-    font-size: 3vw;
+    right: 20px;
+    top: 10px;
+    font-size: 30px;
     font-weight: bold;
     cursor: pointer;
 }
 
-#recipientList {
-    list-style-type: none;
-    padding: 0;
+#distributionArea {
+    margin-top: 20px;
 }
 
-#recipientList li {
-    padding: 1vw;
+#distributionArea .distribution-item {
+    margin-bottom: 20px;
+}
+
+#distributionArea label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+#distributionArea .recipient-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.recipient-button {
+    padding: 10px;
     background-color: #3b5998;
-    margin: 0.5vw 0;
-    border-radius: 1vw;
+    color: #ecf0f1;
+    border: none;
+    border-radius: 5px;
     cursor: pointer;
+    transition: border 0.3s;
+}
+
+.recipient-button.selected {
+    border: 2px solid #e74c3c;
+    box-shadow: 0 0 10px #e74c3c;
+}
+
+#generalMessageModal .modal-content {
     text-align: center;
-    font-size: 2vw; /* Dynamische Schriftgröße */
+    cursor: pointer;
 }
 
-#recipientList li:hover {
-    background-color: #2e4372;
+/* Handkarten Modal */
+#handCardsModal .modal-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-@media (max-width: 600px) {
-    body {
-        font-size: 3vw; /* Größere Schriftgröße auf sehr kleinen Bildschirmen */
-    }
+#handCardsContainer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.hand-card {
+    width: var(--card-width, 100px);
+    height: calc(var(--card-width, 100px) * 1.5);
+    border-radius: 10px;
+    margin: 5px;
+    background-color: #ecf0f1;
+    color: #2c3e50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: calc(var(--card-width, 100px) / 4);
+    box-shadow: 0 5px 10px rgba(0,0,0,0.3);
+}
+
+/* Responsives Design */
+@media (max-width: 768px) {
     .card {
-        width: 25vw; /* Vergrößert die Karten auf kleinen Bildschirmen */
-        height: 35vw; /* Vergrößert die Kartenhöhe auf kleinen Bildschirmen */
+        --card-width: 100px;
+    }
+}
+
+@media (max-width: 480px) {
+    .card {
+        --card-width: 80px;
+    }
+    .player {
+        min-width: 100%;
+    }
+    #players {
+        flex-direction: column;
+    }
+    #game-container {
+        padding: 10px;
     }
 }

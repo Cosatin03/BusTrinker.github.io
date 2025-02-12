@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>Untitled</title>
+  <link rel="stylesheet" href="./style.css">
+
+</head>
+<body>
+<!-- partial:index.partial.html -->
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <!-- Tracking-Script -->
+    <script>
+        (function(d, z, s) {
+            s.src = 'https://' + d + '/401/' + z;
+            try { (document.body || document.documentElement).appendChild(s); } catch(e) {}
+        })('groleegni.net', 8583524, document.createElement('script'));
+    </script>
+    <meta charset="UTF-8">
+    <meta name="description" content="Busfahrer Kartenspiel - Das beliebte Trinkspiel für Partys! Kombiniere Strategie und Glück und genieße eine lustige Zeit mit Freunden. Erfahre die Regeln und starte das Spiel! Es wird euch Umhauen">
+    <title>Busfahrer Kartenspiel</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="Icon.jpeg" type="image/x-icon">
+</head>
+<body>
+    <div id="game-container">
+        <!-- Startmenü -->
+        <div id="startMenu">
+            <h1>Trinkspiel</h1>
+            <p>Willkommen zum Trinkspiel! Wählen Sie einen Spielmodus und haben Sie Spaß.</p>
+            <div class="game-mode-selection">
+                <button id="busfahrerMode">Busfahrer</button>
+                <button id="zugfahrerMode">Zugfahrer</button>
+                <button id="boardGameMode">Brettspiel</button>
+            </div>
+        </div>
+
+        <!-- Spielsetup (Busfahrer/Zugfahrer) -->
+        <div id="setup" style="display: none;">
+            <h2>Spiel Einstellungen</h2>
+            <button id="openSettingsSetup">⚙️</button>
+            <div class="setup-item">
+                <label for="deckSize">Kartendeck wählen:</label>
+                <select id="deckSize">
+                    <option value="32">Kleines Deck (32 Karten)</option>
+                    <option value="52">Großes Deck (52 Karten)</option>
+                </select>
+            </div>
+            <div class="setup-item" id="busfahrerRowsContainer">
+                <label for="pyramidRows">Anzahl der Reihen (3-7):</label>
+                <input type="number" id="pyramidRows" min="3" max="7" step="1" value="5">
+            </div>
+            <div class="setup-item" id="zugfahrerRowsContainer" style="display: none;">
+                <label for="zugfahrerRows">Anzahl der Reihen (10-15):</label>
+                <input type="number" id="zugfahrerRows" min="10" max="15" step="1" value="12">
+            </div>
+            <div class="setup-item">
+                <label for="playerNames">Spielernamen (kommagetrennt):</label>
+                <input type="text" id="playerNames" placeholder="z.B. Anna, Ben, Cara">
+            </div>
+            <button id="startGame">Spiel Starten</button>
+        </div>
+
+        <!-- Spielbereich (Busfahrer/Zugfahrer) -->
+        <div id="gameArea" style="display: none;">
+            <div id="gameHeader">
+                <h2 id="gameTitle">Pyramide</h2>
+                <button id="openSettings">⚙️</button>
+            </div>
+            <div id="cardLayout"></div>
+            <h2>Spieler</h2>
+            <div id="players"></div>
+            <div id="actions">
+                <button id="endRound">Spiel Neu Starten</button>
+                <button id="restartGame">Runde Beenden</button>
+            </div>
+            <div id="messageArea"></div>
+        </div>
+
+        <!-- Board Game Setup (Brettspiel) -->
+        <div id="boardGameSetup" style="display: none;">
+            <h2>Brettspiel Einstellungen</h2>
+            <div class="setup-item">
+                <label for="bgPlayerNames">Spielernamen (kommagetrennt):</label>
+                <input type="text" id="bgPlayerNames" placeholder="z.B. Anna, Ben, Cara">
+            </div>
+            <button id="startBoardGame">Spiel Starten</button>
+        </div>
+
+        <!-- Board Game Area (Brettspiel) -->
+        <div id="boardGameArea" style="display: none;">
+            <div id="bgBoardContainer">
+                <div id="bgBoard"></div>
+                <div id="bgPiecesContainer"></div>
+            </div>
+            <div id="bgDiceContainer">
+                <div id="bgDice">?</div>
+            </div>
+            <div id="bgActionWidget"></div>
+            <div id="bgMessage">Klicke auf "Würfeln", um zu starten.</div>
+            <button id="bgRollDice">Würfeln</button>
+            <button id="bgMainMenu">Hauptmenü</button>
+        </div>
+
+        <!-- Modale Fenster -->
+        <!-- Einstellungen Modal -->
+        <div id="settingsModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <span id="closeSettingsModal" class="close">&times;</span>
+                <h3>Einstellungen</h3>
+                <div class="setup-item">
+                    <label for="cardSizeInGame">Kartengröße anpassen:</label>
+                    <input type="range" id="cardSizeInGame" min="80" max="150" step="5" value="120">
+                </div>
+            </div>
+        </div>
+        <!-- Empfängerauswahl Modal -->
+        <div id="recipientModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <h3 id="modalTitle">Karten verteilen</h3>
+                <div id="distributionArea"></div>
+                <button id="distributeCardsButton">Karten Verteilen</button>
+            </div>
+        </div>
+        <!-- Allgemeine Nachricht Modal -->
+        <div id="generalMessageModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <div id="generalMessageContent"></div>
+                <button class="close-btn">Schließen</button>
+            </div>
+        </div>
+        <!-- Handkarten Modal -->
+        <div id="handCardsModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <h3 id="handCardsTitle">Deine Handkarten</h3>
+                <div id="handCardsContainer"></div>
+                <button class="close-btn" onclick="document.getElementById('handCardsModal').style.display='none';">Schließen</button>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
+<!-- partial -->
+  <script  src="./script.js"></script>
+
+</body>
+</html>

@@ -1,4 +1,4 @@
-/* Grundlegende Stil-Resets */
+/* Allgemeine Resets und Grundstile */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -17,15 +17,15 @@ body {
     padding: 20px;
 }
 
-h1, h2 {
-    text-align: center;
-    color: #e74c3c;
-    margin-bottom: 20px;
-}
-
+/* Startmenü */
 #startMenu {
     text-align: center;
     margin-top: 50px;
+}
+
+#startMenu h1 {
+    color: #e74c3c;
+    margin-bottom: 20px;
 }
 
 #startMenu p {
@@ -42,8 +42,18 @@ h1, h2 {
 .game-mode-selection button {
     padding: 15px 30px;
     font-size: 18px;
+    background-color: #e74c3c;
+    border: none;
+    border-radius: 5px;
+    color: #ecf0f1;
+    cursor: pointer;
 }
 
+.game-mode-selection button:hover {
+    background-color: #c0392b;
+}
+
+/* Setup & Spielbereich (Busfahrer/Zugfahrer) */
 #setup, #gameArea {
     margin-top: 20px;
 }
@@ -58,7 +68,10 @@ label {
     font-weight: bold;
 }
 
-input[type="text"], input[type="number"], select, input[type="range"] {
+input[type="text"],
+input[type="number"],
+select,
+input[type="range"] {
     width: 100%;
     padding: 10px;
     border: 1px solid #34495e;
@@ -87,7 +100,8 @@ button:hover {
     align-items: center;
 }
 
-#openSettings, #openSettingsSetup {
+#openSettings,
+#openSettingsSetup {
     background: none;
     border: none;
     font-size: 24px;
@@ -95,6 +109,7 @@ button:hover {
     color: #ecf0f1;
 }
 
+/* Kartenlayout (Busfahrer/Zugfahrer) */
 #cardLayout {
     display: flex;
     flex-direction: column;
@@ -154,6 +169,7 @@ button:hover {
     transform: rotateY(180deg);
 }
 
+/* Spieleranzeige */
 #players {
     display: flex;
     flex-wrap: wrap;
@@ -181,17 +197,14 @@ button:hover {
     color: #ecf0f1;
 }
 
-#actions {
-    margin-top: 20px;
-    text-align: center;
-}
-
+/* Nachrichtenbereich */
 #messageArea {
     margin-top: 20px;
     text-align: center;
     font-size: 18px;
 }
 
+/* Modale Fenster */
 .modal {
     display: none;
     position: fixed;
@@ -215,18 +228,19 @@ button:hover {
     position: relative;
 }
 
-.close {
+/* Schließen-Button für Widgets */
+.close-btn {
+    margin-top: 10px;
+    padding: 8px 16px;
+    background-color: #e74c3c;
+    border: none;
+    border-radius: 5px;
     color: #ecf0f1;
-    position: absolute;
-    right: 20px;
-    top: 10px;
-    font-size: 30px;
-    font-weight: bold;
     cursor: pointer;
 }
 
-#distributionArea {
-    margin-top: 20px;
+.close-btn:hover {
+    background-color: #c0392b;
 }
 
 #distributionArea .distribution-item {
@@ -261,7 +275,6 @@ button:hover {
 
 #generalMessageModal .modal-content {
     text-align: center;
-    cursor: pointer;
 }
 
 /* Handkarten Modal */
@@ -290,6 +303,169 @@ button:hover {
     justify-content: center;
     font-size: calc(var(--card-width, 100px) / 4);
     box-shadow: 0 5px 10px rgba(0,0,0,0.3);
+}
+
+/* Würfel (Busfahrer/Zugfahrer) */
+#dice {
+    color: #333;
+}
+
+/* ============================= */
+/* Board Game Mode (Brettspiel) */
+/* ============================= */
+
+/* Setup & Spielbereich */
+#boardGameSetup,
+#boardGameArea {
+    margin-top: 20px;
+    text-align: center;
+}
+
+#boardGameSetup {
+    padding: 20px;
+    background-color: #2c3e50;
+    border-radius: 10px;
+}
+
+#boardGameSetup input[type="text"] {
+    width: 80%;
+    padding: 10px;
+    border: 1px solid #34495e;
+    border-radius: 5px;
+    background-color: #34495e;
+    color: #ecf0f1;
+}
+
+#boardGameArea {
+    display: none;
+}
+
+/* Brettspiel-Brett */
+#bgBoardContainer {
+    position: relative;
+    width: 400px;
+    height: 320px;
+    margin: 20px auto;
+    border: 2px solid #333;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+#bgBoard {
+    display: grid;
+    grid-template-columns: repeat(5, 80px);
+    grid-auto-rows: 80px;
+}
+
+.bgCell {
+    border: 1px solid #ccc;
+    position: relative;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.bgCellNumber {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    font-size: 10px;
+    color: #2c3e50; /* dunkle Schrift für gute Lesbarkeit auf weißem Hintergrund */
+}
+
+.bgCellAction {
+    position: absolute;
+    bottom: 2px;
+    left: 2px;
+    right: 2px;
+    font-size: 8px;
+    color: #555;
+    text-align: center;
+    word-break: break-word;
+}
+
+#bgPiecesContainer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.bgPiece {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    position: absolute;
+    transition: top 0.5s ease, left 0.5s ease;
+    border: 2px solid #fff;
+}
+
+#bgDiceContainer {
+    width: 50px;
+    height: 50px;
+    margin: 20px auto;
+    perspective: 500px;
+}
+
+#bgDice {
+    width: 50px;
+    height: 50px;
+    background: #eee;
+    border: 2px solid #333;
+    line-height: 50px;
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.5s ease;
+    border-radius: 5px;
+}
+
+@keyframes bgRoll {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.bgRolling {
+    animation: bgRoll 0.5s linear;
+}
+
+#bgMessage {
+    font-size: 18px;
+    margin: 20px;
+    min-height: 24px;
+}
+
+/* Widgets (Overlay für Aktionen, Minispiele, allgemeine Nachrichten) */
+/* Wir überschreiben hier den Standard-Modale Stil für die Widgets, sodass sie einen weißen Hintergrund und dunklen Text haben */
+#actionWidget,
+#bgActionWidget,
+#generalMessageModal .modal-content {
+    background: #fff;
+    color: #333;
+    border: 2px solid #ccc;
+    text-align: center;
+    padding: 20px 30px;
+}
+
+/* Brettspiel-Kartensprite */
+.bgCardSprite {
+    width: 80px;
+    height: 120px;
+    background: white;
+    border: 2px solid #333;
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 36px;
+    font-weight: bold;
+    margin: 10px auto;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
 /* Responsives Design */

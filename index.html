@@ -110,12 +110,16 @@
             box-shadow: 0 0 5px rgba(255, 0, 255, 0.3), inset 0 0 5px rgba(255, 0, 255, 0.2);
         }
         .secondary-button:hover { background: rgba(255, 0, 255, 0.15); box-shadow: 0 0 15px rgba(255, 0, 255, 0.7); }
-        button[style*="background-color:#fd7e14"] {
+        
+        .warning-button {
             color: var(--warning-glow);
             border-color: var(--warning-glow);
             box-shadow: 0 0 5px rgba(255, 193, 7, 0.3), inset 0 0 5px rgba(255, 193, 7, 0.2);
         }
-        button[style*="background-color:#fd7e14"]:hover { background: rgba(255, 193, 7, 0.15); box-shadow: 0 0 15px rgba(255, 193, 7, 0.7); }
+        .warning-button:hover {
+            background: rgba(255, 193, 7, 0.15);
+            box-shadow: 0 0 15px rgba(255, 193, 7, 0.7);
+        }
 
         ul { list-style: none; padding: 0; text-align: left; margin-top: 20px; border-top: 1px solid var(--border-color); }
         li { padding: 12px; border-bottom: 1px solid var(--border-color); font-size: 16px; transition: background-color 0.3s; }
@@ -287,7 +291,8 @@
         <button class="secondary-button" onclick="joinGame()">Spiel beitreten</button>
         <hr>
         <input type="text" id="display-code-input" placeholder="Display-Code">
-        <button style="background-color:#fd7e14" onclick="joinAsDisplay()">Als Display beitreten</button>
+        <button class="warning-button" onclick="joinAsDisplay()">Als Display beitreten</button>
+        <button class="warning-button" style="margin-top: 20px;" onclick="window.open('rules.html', '_blank');">Regeln & Anleitung</button>
     </div>
 
     <!-- Screen 2: Lobby -->

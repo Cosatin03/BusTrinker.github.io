@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Bustrinker - Regeln</title>
+    <link rel="icon" href="icon.jpeg" type="image/jpeg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-glow: #00ffff;
+            --secondary-glow: #ff00ff;
+            --warning-glow: #ffc107;
+            --dark-bg: #0a0f1a;
+            --dark-bg-translucent: rgba(10, 20, 40, 0.75);
+            --light-text: #e0e0e0;
+            --highlight-text: #ffffff;
+            --border-color: rgba(0, 255, 255, 0.3);
+        }
+
+        body {
+            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            background: var(--dark-bg) url('data:image/svg+xml,%3Csvg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="%230f1a2e" fill-opacity="0.4" fill-rule="evenodd"%3E%3Cpath d="M0 38.59l2.83-2.83 1.41 1.41L1.41 40H0v-1.41zM0 1.4l2.83 2.83 1.41-1.41L1.41 0H0v1.41zM38.59 40l-2.83-2.83 1.41-1.41L40 38.59V40h-1.41zM40 1.41l-2.83 2.83-1.41-1.41L38.59 0H40v1.41zM20 18.6l2.83-2.83 1.41 1.41L21.41 20l2.83 2.83-1.41 1.41L20 21.41l-2.83 2.83-1.41-1.41L18.59 20l-2.83-2.83 1.41-1.41L20 18.59z"/%3E%3C/g%3E%3C/svg%3E');
+            color: var(--light-text);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        .container {
+            background: var(--dark-bg-translucent);
+            padding: 30px 40px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 0 25px rgba(0, 255, 255, 0.2), inset 0 0 10px rgba(0, 255, 255, 0.1);
+            width: 100%;
+            max-width: 800px;
+            text-align: left;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            margin-top: 20px;
+        }
+        .rules-content { display: none; }
+        .rules-content.active { display: block; animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        h1, h2, h3 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--primary-glow);
+            margin-top: 0;
+            margin-bottom: 20px;
+            text-shadow: 0 0 8px rgba(0, 255, 255, 0.7);
+            letter-spacing: 1px;
+            text-align: center;
+        }
+        h3 {
+            color: var(--secondary-glow);
+            text-shadow: 0 0 8px rgba(255, 0, 255, 0.7);
+            margin-top: 30px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+        hr { border: 0; height: 1px; background: var(--border-color); margin: 25px 0; }
+
+        p, li {
+            line-height: 1.6;
+            font-size: 16px;
+        }
+        ul {
+            list-style-type: disc;
+            padding-left: 25px;
+        }
+        strong {
+            color: var(--highlight-text);
+            font-weight: 700;
+        }
+        code {
+            background-color: rgba(0, 255, 255, 0.1);
+            color: var(--primary-glow);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        .lang-switcher {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .lang-switcher button, .back-button {
+            background: transparent;
+            color: var(--primary-glow);
+            border: 1px solid var(--primary-glow);
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+        .lang-switcher button:hover, .back-button:hover {
+            background: rgba(0, 255, 255, 0.15);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.7);
+        }
+        .lang-switcher button.active {
+            background: rgba(0, 255, 255, 0.2);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.7);
+            color: var(--highlight-text);
+        }
+        .back-button {
+            display: inline-block;
+            text-decoration: none;
+            margin-top: 30px;
+            width: auto;
+            color: var(--warning-glow);
+            border-color: var(--warning-glow);
+        }
+        .back-button:hover {
+            background: rgba(255, 193, 7, 0.15);
+            box-shadow: 0 0 15px rgba(255, 193, 7, 0.7);
+        }
+        .center-text {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Spielregeln</h1>
+
+    <div class="lang-switcher">
+        <button id="lang-de-btn" class="active" onclick="switchLang('de')">Deutsch</button>
+        <button id="lang-en-btn" onclick="switchLang('en')">English</button>
+    </div>
+
+    <!-- German Rules -->
+    <div id="rules-de" class="rules-content active">
+        <h3>Das Ziel</h3>
+        <p>Das Ziel von <strong>Bustrinker</strong> ist es, das Spiel mit der <strong>niedrigsten Punktzahl</strong> zu beenden. Punkte erhält man, wenn andere Spieler einem Karten geben. In einem Trinkspiel entspricht jeder Punkt einem Schluck.</p>
+
+        <h3>Vorbereitung</h3>
+        <ol>
+            <li><strong>Spiel hosten oder beitreten:</strong> Ein Spieler wählt "Spiel hosten", um einen neuen Raum zu erstellen. Die anderen Spieler treten bei, indem sie den 6-stelligen <code>Raum-Code</code> eingeben. Jeder Spieler benötigt einen einzigartigen Nickname.</li>
+            <li><strong>Einstellungen:</strong> Der Host kann die Anzahl der Karten im Deck (32 oder 52) und die Anzahl der Reihen in der Pyramide einstellen.</li>
+            <li><strong>Spiel starten:</strong> Sobald mindestens zwei Spieler in der Lobby sind, kann der Host das Spiel starten.</li>
+        </ol>
+
+        <h3>Spielablauf</h3>
+        <p>Das Spiel ist in zwei Hauptphasen unterteilt: die Pyramiden-Phase und die Reststapel-Phase.</p>
+        
+        <h4>Phase 1: Die Pyramide</h4>
+        <ul>
+            <li>Auf dem Spielfeld wird eine Pyramide aus verdeckten Karten aufgebaut. Jede Reihe hat einen Punktwert: Die unterste Reihe ist <strong>1 Punkt</strong> wert, die Reihe darüber <strong>2 Punkte</strong>, und so weiter bis zur Spitze.</li>
+            <li>Eine Karte aus der Pyramide wird aufgedeckt, beginnend in der untersten Reihe von rechts nach links.</li>
+            <li>Der Rang der aufgedeckten Karte (z.B. "König") wird zum <strong>aktiven Auslöser</strong>.</li>
+            <li><strong>Karten abgeben:</strong> Jeder Spieler, der eine oder mehrere Karten mit demselben Rang in seiner Hand hat, <strong>muss</strong> diese an andere Spieler seiner Wahl abgeben.</li>
+            <li><strong>Punkte erhalten:</strong> Der Spieler, der die Karten erhält, bekommt Punkte. Die Punktzahl berechnet sich aus: <code>(Anzahl der erhaltenen Karten) x (Punktwert der Reihe)</code>.</li>
+            <li><strong>Bestätigen:</strong> Spieler, die Karten erhalten haben, müssen den Erhalt bestätigen, bevor die nächste Karte aufgedeckt werden kann.</li>
+            <li>Dieser Vorgang wird wiederholt, bis alle Karten der Pyramide aufgedeckt sind.</li>
+        </ul>
+
+        <h4>Phase 2: Der Reststapel</h4>
+        <ul>
+            <li>Nachdem die Pyramide vollständig aufgedeckt ist, werden die restlichen Karten aus dem Deck nacheinander aufgedeckt.</li>
+            <li>Jede dieser Karten ist immer <strong>1 Punkt</strong> wert.</li>
+            <li>Der Spielablauf ist derselbe: Spieler mit passenden Karten müssen diese abgeben, und die Empfänger erhalten Punkte.</li>
+        </ul>
+
+        <h3>Spielende</h3>
+        <p>Das Spiel endet, wenn alle Karten vom Reststapel aufgedeckt wurden. Der Spieler mit der <strong>höchsten Gesamtpunktzahl</strong> ist der "Busfahrer" und hat das Spiel verloren.</p>
+    </div>
+
+    <!-- English Rules -->
+    <div id="rules-en" class="rules-content">
+        <h3>The Objective</h3>
+        <p>The goal of <strong>Bustrinker</strong> is to finish the game with the <strong>lowest score</strong>. You get points when other players give you cards. In a drinking game context, each point corresponds to one sip.</p>
+
+        <h3>Setup</h3>
+        <ol>
+            <li><strong>Host or Join:</strong> One player selects "Host Game" to create a new room. The other players join by entering the 6-digit <code>Room Code</code>. Every player needs a unique nickname.</li>
+            <li><strong>Settings:</strong> The host can configure the number of cards in the deck (32 or 52) and the number of rows in the pyramid.</li>
+            <li><strong>Start Game:</strong> Once at least two players are in the lobby, the host can start the game.</li>
+        </ol>
+
+        <h3>Gameplay</h3>
+        <p>The game is divided into two main phases: the Pyramid phase and the Discard Pile phase.</p>
+        
+        <h4>Phase 1: The Pyramid</h4>
+        <ul>
+            <li>A pyramid of face-down cards is built on the game board. Each row has a point value: the bottom row is worth <strong>1 point</strong>, the row above it is worth <strong>2 points</strong>, and so on to the top.</li>
+            <li>A card from the pyramid is revealed, starting on the bottom row from right to left.</li>
+            <li>The rank of the revealed card (e.g., "King") becomes the <strong>active trigger</strong>.</li>
+            <li><strong>Giving Cards:</strong> Any player who has one or more cards of the same rank in their hand <strong>must</strong> give them to other players of their choice.</li>
+            <li><strong>Receiving Points:</strong> The player who receives the cards gets points. The score is calculated as: <code>(Number of cards received) x (Point value of the row)</code>.</li>
+            <li><strong>Confirmation:</strong> Players who received cards must confirm the action before the next card can be revealed.</li>
+            <li>This process is repeated until all cards in the pyramid have been turned over.</li>
+        </ul>
+
+        <h4>Phase 2: The Discard Pile</h4>
+        <ul>
+            <li>After the pyramid is fully revealed, the remaining cards from the deck are turned over one by one.</li>
+            <li>Each of these cards is always worth <strong>1 point</strong>.</li>
+            <li>The gameplay is the same: players with matching cards must give them away, and the recipients get points.</li>
+        </ul>
+
+        <h3>End of the Game</h3>
+        <p>The game ends when all cards from the discard pile have been revealed. The player with the <strong>highest total score</strong> is the "Bus Driver" and loses the game.</p>
+    </div>
+
+    <div class="center-text">
+        <a href="index.html" class="back-button">Zurück zum Spiel</a>
+    </div>
+</div>
+
+<script>
+    function switchLang(lang) {
+        // Hide all content
+        document.getElementById('rules-de').classList.remove('active');
+        document.getElementById('rules-en').classList.remove('active');
+        
+        // Deactivate all buttons
+        document.getElementById('lang-de-btn').classList.remove('active');
+        document.getElementById('lang-en-btn').classList.remove('active');
+
+        // Show selected content and activate button
+        if (lang === 'de') {
+            document.getElementById('rules-de').classList.add('active');
+            document.getElementById('lang-de-btn').classList.add('active');
+            document.documentElement.lang = 'de';
+        } else {
+            document.getElementById('rules-en').classList.add('active');
+            document.getElementById('lang-en-btn').classList.add('active');
+            document.documentElement.lang = 'en';
+        }
+    }
+</script>
+
+</body>
+</html>

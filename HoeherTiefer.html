@@ -138,6 +138,7 @@
             transition: all 0.3s ease;
             text-shadow: 0 0 5px var(--neon-green);
             box-shadow: 0 0 10px var(--neon-green) inset, 0 0 10px var(--neon-green);
+            text-decoration: none;
         }
         .btn:hover:not(:disabled) {
             background-color: var(--neon-green);
@@ -180,6 +181,19 @@
         #player-scores h3 { margin-bottom: 10px; color: var(--neon-pink); }
         .score-list { display: flex; justify-content: center; flex-wrap: wrap; gap: 20px; }
         .score-item { background-color: var(--card-bg); padding: 5px 15px; border-radius: 8px; }
+
+        .footer-controls { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; margin-top: 10px; }
+        #rules-btn {
+            border-color: var(--neon-cyan);
+            text-shadow: 0 0 5px var(--neon-cyan);
+            box-shadow: 0 0 10px var(--neon-cyan) inset, 0 0 10px var(--neon-cyan);
+            font-size: 1rem;
+            padding: 10px 20px;
+        }
+        #rules-btn:hover {
+            background-color: var(--neon-cyan);
+            box-shadow: 0 0 15px var(--neon-cyan) inset, 0 0 25px var(--neon-cyan);
+        }
 
         /* --- Responsive Design --- */
         @media (max-width: 600px) {
@@ -232,7 +246,10 @@
                 <div class="score-list"></div>
             </div>
 
-            <button id="restart-btn" class="btn">Neues Spiel</button>
+            <div class="footer-controls">
+                <button id="restart-btn" class="btn">Neues Spiel</button>
+                <a href="https://bustrinker.de" target="_blank" id="rules-btn" class="btn">Regeln auf bustrinker.de</a>
+            </div>
         </div>
     </div>
 
@@ -399,7 +416,6 @@
                 pileContainers.forEach((p, i) => p.classList.toggle('selected', i === index));
                 messageElement.textContent = 'Höher, Tiefer oder Gleich?';
                 
-                // Enable/disable "Gleich" button
                 const pile = piles[index];
                 const values = pile.map(c => c.value);
                 const minVal = Math.min(...values);
@@ -452,7 +468,7 @@
                     } else {
                         let sips = 0;
                         if (guess === 'equal') {
-                            sips = 5; // Feste Strafe für falschen "Gleich"-Tipp
+                            sips = 5;
                             messageElement.textContent = `Pech! Trink 5 Schlücke Strafe!`;
                         } else {
                             sips = pile.length;
@@ -490,7 +506,7 @@
                 messageElement.style.color = 'var(--neon-pink)';
                 toggleGuessButtons(true);
                 togglePileSelection(false);
-                renderScores(); // Final score update
+                renderScores();
             }
 
             // --- Event Listeners ---

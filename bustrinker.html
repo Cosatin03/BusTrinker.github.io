@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#142b26" />
+    <title>BusTrinker · Lobby & Spiel</title>
+    <link rel="icon" href="Icon.jpeg" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Zum Inhalt</a>
+    <div class="shell game-shell">
+      <header class="site-header">
+        <a class="brand" href="index.html"
+          ><span class="brand-mark" aria-hidden="true">B<span>♣</span></span
+          >BusTrinker</a
+        >
+        <nav aria-label="Spielnavigation">
+          <a class="nav-link" href="index.html">← Spiele</a
+          ><a class="nav-link" href="rules.html#bustrinker">Regeln</a>
+        </nav>
+      </header>
+      <div class="connection-bar">
+        <span id="connection-status" role="status"
+          >Verbindung wird vorbereitet …</span
+        ><button id="retry-connection" class="text-button" hidden>
+          Erneut verbinden
+        </button>
+      </div>
+      <main id="main">
+        <div id="notice" class="notice" role="alert" hidden></div>
+        <section id="entry-view" class="view entry-layout">
+          <div class="entry-intro">
+            <p class="eyebrow">DER KLASSIKER · 2–10 SPIELER</p>
+            <h1>Alle<br />an Bord.</h1>
+            <p class="intro-copy">
+              Eine Pyramide. Eure Handkarten.<br />Und die Frage: Wer fährt den
+              Bus?
+            </p>
+            <div class="entry-pyramid" aria-hidden="true">
+              <span>♠</span><span>♥</span><span>♣</span>
+            </div>
+            <p class="muted">
+              Jeder spielt am eigenen Handy.<br />Ein zusätzlicher Bildschirm
+              ist optional.
+            </p>
+          </div>
+          <div class="panel entry-panel">
+            <div id="saved-session" class="saved-session" hidden>
+              <p class="eyebrow">DEINE LETZTE RUNDE</p>
+              <h2 id="saved-room"></h2>
+              <button id="resume-button" class="primary">
+                Runde fortsetzen
+              </button>
+              <p class="muted">
+                Deine Karten und Punkte bleiben beim Seitenwechsel erhalten.
+              </p>
+            </div>
+            <div class="mode-tabs" role="group" aria-label="Zugang auswählen">
+              <button class="active" data-entry="host" aria-pressed="true">
+                Erstellen</button
+              ><button data-entry="join" aria-pressed="false">Beitreten</button
+              ><button data-entry="display" aria-pressed="false">
+                Display
+              </button>
+            </div>
+            <form id="entry-form">
+              <div id="nickname-field">
+                <label for="nickname-input">Dein Name</label
+                ><input
+                  id="nickname-input"
+                  type="text"
+                  autocomplete="nickname"
+                  maxlength="24"
+                  placeholder="Wie heißt du?"
+                  required
+                />
+              </div>
+              <div id="room-code-field" hidden>
+                <label for="room-code-input">Raum-Code</label
+                ><input
+                  id="room-code-input"
+                  class="code-input"
+                  type="text"
+                  autocomplete="off"
+                  autocapitalize="characters"
+                  spellcheck="false"
+                  maxlength="12"
+                  placeholder="z. B. K7F2WM"
+                />
+              </div>
+              <div id="display-code-field" hidden>
+                <label for="display-code-input">Display-Code</label
+                ><input
+                  id="display-code-input"
+                  class="code-input"
+                  type="text"
+                  autocomplete="off"
+                  autocapitalize="characters"
+                  spellcheck="false"
+                  maxlength="14"
+                  placeholder="z. B. D-K7F2WM"
+                />
+                <p class="muted">
+                  Der Host findet den Code in den Lobby-Einstellungen.
+                </p>
+              </div>
+              <button id="entry-submit" class="primary" type="submit">
+                Lobby erstellen →
+              </button>
+            </form>
+            <p id="entry-hint" class="muted">
+              Du legst Deck und Pyramide fest. Die anderen kommen per Raum-Code
+              dazu.
+            </p>
+          </div>
+        </section>
+        <section id="lobby-view" class="view" hidden>
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">BUSTRINKER · LOBBY</p>
+              <h1>Wer ist dabei?</h1>
+            </div>
+            <button id="leave-lobby" class="text-button">
+              Lobby verlassen
+            </button>
+          </div>
+          <div class="lobby-grid">
+            <div class="panel">
+              <div class="section-heading">
+                <h2>
+                  Eure Runde <span id="player-count" class="count-badge"></span>
+                </h2>
+                <span class="small muted">max. 10</span>
+              </div>
+              <div class="room-code-box">
+                <span class="eyebrow">RAUM-CODE</span
+                ><strong id="room-code-display"></strong
+                ><button id="invite-button" class="secondary compact">
+                  Einladen ↗
+                </button>
+              </div>
+              <ul id="player-list" class="player-list"></ul>
+            </div>
+            <div class="panel">
+              <p class="eyebrow">VOR DER ABFAHRT</p>
+              <h2>So spielt ihr</h2>
+              <div id="host-controls">
+                <div class="settings-grid">
+                  <div>
+                    <label for="card-count-select">Kartendeck</label
+                    ><select id="card-count-select">
+                      <option value="32">32 Karten · 7 bis Ass</option>
+                      <option value="52">52 Karten · 2 bis Ass</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label for="row-count-select">Pyramidenreihen</label
+                    ><select id="row-count-select">
+                      <option>3</option>
+                      <option>4</option>
+                      <option>5</option>
+                      <option>6</option>
+                      <option>7</option>
+                      <option>8</option>
+                    </select>
+                  </div>
+                </div>
+                <p id="deal-preview" class="muted"></p>
+                <label class="check-row"
+                  ><input type="checkbox" id="external-display-checkbox" /><span
+                    >Externen Bildschirm verwenden<small
+                      >Für Tablet, Laptop oder Fernseher</small
+                    ></span
+                  ></label
+                >
+              </div>
+              <p id="guest-settings" class="muted" hidden></p>
+              <div id="display-code-area" class="display-code-box" hidden>
+                <span class="eyebrow">DISPLAY-CODE</span
+                ><strong id="display-code-display"></strong>
+                <p id="display-presence" class="muted"></p>
+              </div>
+              <p id="lobby-start-hint" class="muted" role="status"></p>
+              <button id="start-game-button" class="primary" data-game-action>
+                Runde starten →
+              </button>
+            </div>
+          </div>
+        </section>
+        <section id="game-view" class="view" hidden>
+          <div class="section-heading game-heading">
+            <div>
+              <p id="game-room-label" class="eyebrow"></p>
+              <h1 id="game-title">Die Runde läuft.</h1>
+            </div>
+            <span id="round-badge" class="pill"></span>
+          </div>
+          <div id="display-wait" class="panel empty-state" hidden>
+            <h2>Bildschirm verbunden.</h2>
+            <p>Die Pyramide erscheint, sobald der Host die Runde startet.</p>
+            <strong id="display-wait-code"></strong>
+          </div>
+          <div id="result-panel" class="result-panel" hidden>
+            <p class="eyebrow">ALLE KARTEN AUF DEM TISCH</p>
+            <h2 id="result-title"></h2>
+            <p id="result-description"></p>
+            <button
+              id="new-round-button"
+              class="primary compact"
+              data-game-action
+            >
+              Neue Runde mit dieser Gruppe
+            </button>
+          </div>
+          <div id="active-game-layout" class="active-game-layout">
+            <div class="board-column">
+              <section
+                class="panel table-panel"
+                aria-labelledby="pyramid-title"
+              >
+                <div class="section-heading">
+                  <h2 id="pyramid-title">Die Pyramide</h2>
+                  <span id="pyramid-progress" class="small muted"></span>
+                </div>
+                <div id="pyramid-area" class="pyramid-area"></div>
+                <div class="active-card-bar">
+                  <div>
+                    <span class="eyebrow">AKTUELLER WERT</span
+                    ><strong id="active-trigger">Noch keine Karte</strong>
+                  </div>
+                  <span id="active-points" class="points-chip">–</span>
+                </div>
+                <div id="discard-area" hidden>
+                  <h3>
+                    Restkarten <span id="discard-count" class="muted"></span>
+                  </h3>
+                  <div id="discard-cards" class="card-hand"></div>
+                </div>
+              </section>
+              <div id="reveal-controls" class="action-dock" hidden>
+                <p id="host-wait-hint" class="muted" role="status"></p>
+                <button id="reveal-button" class="primary" data-game-action>
+                  Nächste Karte aufdecken</button
+                ><button
+                  id="finish-button"
+                  class="text-button"
+                  data-game-action
+                  hidden
+                >
+                  Restkarten auslassen & Runde beenden
+                </button>
+              </div>
+            </div>
+            <div class="personal-column" id="personal-column">
+              <section
+                id="receipt-panel"
+                class="panel receipt-panel"
+                hidden
+                aria-labelledby="receipt-title"
+              >
+                <p class="eyebrow">DEINE AKTION</p>
+                <h2 id="receipt-title">Karten erhalten</h2>
+                <div id="receipt-details"></div>
+                <button id="confirm-button" class="primary" data-game-action>
+                  Gesehen & bestätigt
+                </button>
+              </section>
+              <section id="give-panel" class="panel give-panel" hidden>
+                <p class="eyebrow">DU BIST DRAN</p>
+                <h2>Karten verteilen</h2>
+                <p class="muted">
+                  Wähle für jede passende Karte einen Mitspieler.
+                </p>
+                <form id="give-form">
+                  <div id="assignments"></div>
+                  <button
+                    id="give-button"
+                    class="primary"
+                    data-game-action
+                    type="submit"
+                  >
+                    Karten verteilen →
+                  </button>
+                </form>
+              </section>
+              <section class="panel">
+                <div class="section-heading">
+                  <h2>Deine Hand</h2>
+                  <span id="hand-count" class="count-badge"></span>
+                </div>
+                <div id="hand-cards" class="card-hand"></div>
+                <p id="hand-hint" class="muted"></p>
+              </section>
+              <details id="received-section" class="panel received-section">
+                <summary>
+                  Erhaltene Karten
+                  <span id="received-count" class="count-badge"></span>
+                </summary>
+                <p class="muted">
+                  Wird ihr Wert erneut aufgedeckt, zählen diese Karten wieder.
+                </p>
+                <div id="received-cards" class="card-hand"></div>
+              </details>
+            </div>
+          </div>
+          <section id="score-panel" class="panel score-panel">
+            <div class="section-heading">
+              <h2>Die Runde</h2>
+              <span class="small muted">Punkte</span>
+            </div>
+            <ul id="score-list" class="player-list score-list"></ul>
+            <p id="round-status" class="muted" role="status"></p>
+          </section>
+        </section>
+        <div id="takeover-area" class="takeover-area" hidden>
+          <p class="muted">
+            Der Host war seit mindestens zwei Minuten nicht mehr aktiv.
+          </p>
+          <button
+            id="claim-host-button"
+            class="secondary compact"
+            data-game-action
+          >
+            Host übernehmen
+          </button>
+        </div>
+      </main>
+      <footer class="site-footer">
+        <a href="index.html">← Zur Spielesammlung</a>
+        <p>Kurze Pause? Du kannst auf diesem Gerät zurück in die Runde.</p>
+      </footer>
+    </div>
+    <dialog id="invite-dialog">
+      <div class="section-heading">
+        <h2>Alle an Bord holen</h2>
+        <button
+          id="close-invite"
+          class="icon-button"
+          aria-label="Einladung schließen"
+        >
+          ×
+        </button>
+      </div>
+      <p>Öffnet diesen Link auf den anderen Geräten.</p>
+      <label for="invite-url">Einladungslink</label
+      ><input id="invite-url" readonly /><button
+        id="copy-invite"
+        class="primary"
+      >
+        Link kopieren
+      </button>
+      <p id="copy-status" class="muted" role="status"></p>
+    </dialog>
+    <script type="module" src="script.js"></script>
+  </body>
+</html>

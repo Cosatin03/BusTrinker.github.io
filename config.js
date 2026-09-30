@@ -1,16 +1,8 @@
-
-// In dieser Datei werden die Firebase-Konfigurationsdaten sicher aufbewahrt.
-
+// Public Firebase web configuration. Access must be controlled with Firestore rules.
 const firebaseConfig = {
   apiKey: "AIzaSyAw5zRVmbvHGJUFKV0LGthGWsE4EqPN-Bw",
   authDomain: "bust-42c39.firebaseapp.com",
-  projectId: "bust-42c39"
+  projectId: "bust-42c39",
 };
-
-// Initialisiert Firebase nur einmal
-if (!firebase.apps.length) {
-  firebase.initializeApp(firebaseConfig);
-}
-
-// Stellt die Firestore-Datenbankinstanz global zur Verfügung
-const db = firebase.firestore();
+if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+window.bustrinkerDb = firebase.firestore();

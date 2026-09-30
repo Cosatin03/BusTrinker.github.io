@@ -128,6 +128,12 @@ try {
         ?.textContent.startsWith("Verbunden"),
     );
   }
+  async function settled(page) {
+    await page.waitForFunction(
+      () =>
+        document.getElementById("main")?.getAttribute("aria-busy") === "false",
+    );
+  }
   const menu = await pageAt(1440);
   await menu.goto(base);
   await menu.locator(".game-tile").first().waitFor();
@@ -214,6 +220,7 @@ try {
   );
   assert.equal(await guest.locator("#give-button").isEnabled(), false);
   await display.locator("#reveal-button").click();
+  await settled(display);
   await guest.context().setOffline(false);
   await connected(guest);
   assert.equal(db.read(`rooms/${code}`).value.gameState.turn, 1);
@@ -230,6 +237,8 @@ try {
         for (let index = 0; index < (await selects.count()); index++)
           await selects.nth(index).selectOption({ index: 1 });
         await page.locator("#give-button").click();
+        await settled(page);
+        await page.locator("#give-panel").waitFor({ state: "hidden" });
       }
     }
     for (const page of [host, guest]) {
@@ -249,6 +258,8 @@ try {
           );
         }
         await page.locator("#confirm-button").click();
+        await settled(page);
+        await page.locator("#receipt-panel").waitFor({ state: "hidden" });
       }
     }
     await connected(host);
@@ -261,6 +272,7 @@ try {
     }
     if (db.read(`rooms/${code}`).value.status === "finished") break;
     await host.locator("#reveal-button").click();
+    await settled(host);
   }
   await host.locator("#result-panel").waitFor();
   await guest.locator("#result-panel").waitFor();
@@ -273,8 +285,10 @@ try {
   );
   // Maximum pyramid width must fit on a narrow phone.
   await host.locator("#card-count-select").selectOption("52");
+  await settled(host);
   await connected(host);
   await host.locator("#row-count-select").selectOption("8");
+  await settled(host);
   await connected(host);
   await host.locator("#start-game-button").click();
   await host.locator("#pyramid-area .pyramid-row").nth(7).waitFor();

@@ -75,6 +75,7 @@ function actor() {
 }
 function setBusy(value) {
   busy = value;
+  $("main").setAttribute("aria-busy", String(value));
   renderControls();
 }
 async function action(work) {

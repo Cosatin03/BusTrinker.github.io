@@ -1735,3 +1735,21 @@ dialog .muted {
     animation: none !important;
   }
 }
+
+/* Keep the small-screen introduction focused on the game choices. Decorative
+   rotated cards must not create a horizontally scrollable viewport. */
+@media (max-width: 650px) {
+  .hero-table {
+    display: none;
+  }
+  .home-intro h1 {
+    max-width: none;
+    font-size: 52px;
+    letter-spacing: -2.8px;
+  }
+}
+@media (max-width: 370px) {
+  .home-intro h1 {
+    font-size: 44px;
+  }
+}

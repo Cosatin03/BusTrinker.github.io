@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFile, mkdir } from "node:fs/promises";
+import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { createServer } from "node:http";
 import { extname, resolve } from "node:path";
 import { chromium } from "playwright";
@@ -100,10 +100,24 @@ try {
     return page;
   }
   async function noOverflow(page) {
+    const layout = await page.evaluate(() => ({
+      viewport: innerWidth,
+      width: document.documentElement.scrollWidth,
+      overflowing: [...document.querySelectorAll("body *")]
+        .map((el) => ({
+          element: el.tagName + "#" + el.id + "." + String(el.className),
+          right: el.getBoundingClientRect().right,
+          left: el.getBoundingClientRect().left,
+        }))
+        .filter((el) => el.right > innerWidth + 1 || el.left < -1),
+    }));
+    if (layout.width > layout.viewport + 1)
+      await writeFile(
+        resolve(results, "overflow.json"),
+        JSON.stringify(layout, null, 2),
+      );
     assert.ok(
-      await page.evaluate(
-        () => document.documentElement.scrollWidth <= innerWidth + 1,
-      ),
+      layout.width <= layout.viewport + 1,
       `Horizontal overflow on ${page.url()}`,
     );
   }

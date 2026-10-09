@@ -1,0 +1,247 @@
+.local-main {
+  padding-top: 30px;
+}
+.local-main .entry-intro h1 {
+  font-size: clamp(48px, 6vw, 76px);
+}
+.add-player-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.add-player-row button {
+  font-size: 24px;
+  min-width: 52px;
+}
+.local-main .entry-layout {
+  padding-top: 10px;
+}
+.local-main .entry-intro h1 br {
+  display: block;
+}
+.piles {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  margin: 24px 0;
+}
+.pile {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  border-radius: 16px;
+  padding: 22px 10px;
+  min-width: 0;
+}
+.pile.selected {
+  border-color: var(--lime);
+  box-shadow: 0 0 0 2px var(--lime);
+  background: #2a432e;
+}
+.pile:disabled {
+  opacity: 1;
+  cursor: default;
+}
+.pile .eyebrow {
+  font-size: 9px;
+  margin-bottom: 4px;
+  color: var(--muted);
+}
+.pile-cards {
+  height: 122px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: 100%;
+}
+.pile-cards .playing-card {
+  width: 75px;
+  height: 108px;
+  transform: rotate(-7deg);
+}
+.pile-cards .playing-card + .playing-card {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-20%) rotate(8deg);
+}
+.pile-cards .card-symbol {
+  font-size: 40px;
+}
+.pile-cards .card-corner {
+  font-size: 19px;
+}
+.pile-range {
+  font-size: 13px;
+}
+.guess-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 14px;
+  max-width: 640px;
+  margin: 28px auto;
+}
+.guess-controls button {
+  min-height: 58px;
+  font-size: 17px;
+}
+.guess-controls button span {
+  font-size: 23px;
+}
+.local-result {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 36px;
+  max-width: 700px;
+  margin: 24px auto;
+  background: #2b402d;
+  border-color: #607c4b;
+}
+.local-result > div:last-child {
+  flex: 1;
+}
+.local-result h2 {
+  font-size: 26px;
+  overflow-wrap: anywhere;
+}
+.local-result .playing-card {
+  width: 92px;
+  height: 132px;
+}
+.local-result .card-symbol {
+  font-size: 48px;
+}
+.local-result .card-corner {
+  font-size: 22px;
+}
+.local-result .eyebrow {
+  color: var(--lime);
+  margin-bottom: 8px;
+}
+.local-footer-actions {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 24px 0;
+}
+.local-footer-actions > span {
+  margin-left: auto;
+}
+.restart-actions {
+  display: flex;
+  gap: 12px;
+}
+.restart-actions button {
+  font-size: 13px;
+}
+.local-main #turn-indicator {
+  overflow-wrap: anywhere;
+}
+.local-main .game-heading {
+  align-items: flex-start;
+}
+.local-main #next-player {
+  overflow-wrap: anywhere;
+}
+@media (max-width: 650px) {
+  .local-main {
+    padding-top: 16px;
+  }
+  .local-main .entry-intro h1 {
+    font-size: 48px;
+  }
+  .piles {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 20px 0;
+  }
+  .pile {
+    padding: 15px 8px;
+    gap: 6px;
+  }
+  .pile-cards {
+    height: 103px;
+  }
+  .pile-cards .playing-card {
+    width: 60px;
+    height: 86px;
+  }
+  .pile-cards .card-symbol {
+    font-size: 32px;
+  }
+  .pile-cards .card-corner {
+    font-size: 16px;
+  }
+  .pile-range {
+    font-size: 12px;
+  }
+  .guess-controls {
+    gap: 8px;
+    margin: 20px 0;
+  }
+  .guess-controls button {
+    font-size: 14px;
+    gap: 5px;
+    padding: 10px 8px;
+    min-height: 56px;
+  }
+  .local-result {
+    gap: 20px;
+    padding: 20px;
+  }
+  .local-result .playing-card {
+    width: 68px;
+    height: 96px;
+  }
+  .local-result .card-corner {
+    font-size: 18px;
+  }
+  .local-result .card-symbol {
+    font-size: 36px;
+  }
+  .local-result h2 {
+    font-size: 22px;
+    margin-bottom: 10px;
+  }
+  .local-result p {
+    font-size: 12px;
+  }
+  .local-result #next-player {
+    font-size: 12px;
+    padding-inline: 12px;
+  }
+  .local-footer-actions {
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .local-footer-actions > span {
+    width: 100%;
+    margin: 0;
+  }
+  .local-main .entry-layout {
+    gap: 26px;
+  }
+  .local-main .game-heading h1 {
+    font-size: 29px;
+  }
+  .local-main .game-heading {
+    gap: 8px;
+  }
+  .local-main .pill {
+    font-size: 9px;
+    padding: 8px;
+  }
+  .local-main .entry-intro h1 br {
+    display: none;
+  }
+  .local-main .entry-intro h1 {
+    font-size: 45px;
+  }
+  .local-main .entry-intro .text-link {
+    display: inline-block;
+    margin-top: 12px;
+  }
+}

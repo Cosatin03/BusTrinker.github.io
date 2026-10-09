@@ -1,122 +1,142 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="de">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Bustrinker</title>
-    <link rel="icon" href="icon.jpeg" type="image/jpeg">
-    <link rel="sitemap" type="application/xml" title="Sitemap" href="sitemap.xml">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
-    
-    <!-- Link zur externen CSS-Datei -->
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-<div class="container">
-    <!-- Screen 1: Home -->
-    <div id="home-screen" class="screen active">
-        <h1>BusTrinker</h1>
-        <input type="text" id="nickname-input" placeholder="Dein Nickname">
-        <button onclick="hostGame()">Spiel hosten</button>
-        <hr>
-        <input type="text" id="room-code-input" placeholder="Raum-Code" style="text-transform:uppercase">
-        <button class="secondary-button" onclick="joinGame()">Spiel beitreten</button>
-        <hr>
-        <input type="text" id="display-code-input" placeholder="Display-Code">
-        <button class="warning-button" onclick="joinAsDisplay()">Als Display beitreten</button>
-        <button class="warning-button" style="margin-top: 20px;" onclick="window.open('rules.html', '_blank');">Regeln & Anleitung</button>
-    </div>
-
-    <!-- Screen 2: Lobby -->
-    <div id="lobby-screen" class="screen">
-        <h2>Lobby</h2>
-        <p>Raum-Code:</p><div class="room-code" id="room-code-display"></div>
-        <p><strong id="player-count">0</strong>/10 Spieler:</p><ul id="player-list"></ul>
-        <div id="host-controls" style="display:none">
-            <div class="settings-form">
-                <label>Kartenanzahl:
-                    <select id="card-count-select" onchange="updateSettings()">
-                        <option value="32">32</option>
-                        <option value="52">52</option>
-                    </select>
-                </label>
-                <label>Anzahl Reihen:
-                    <select id="row-count-select" onchange="updateSettings()">
-                        <option value="3">3</option><option value="4">4</option>
-                        <option value="5">5</option><option value="6">6</option>
-                        <option value="7">7</option><option value="8">8</option>
-                    </select>
-                </label>
-                <label class="checkbox-label"><input type="checkbox" id="external-display-checkbox" onchange="updateSettings()"> Externes Display?</label>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#142b26" />
+    <meta
+      name="description"
+      content="Eure Trinkspiele an einem Ort. BusTrinker mit eigener Lobby oder Höher / Tiefer gemeinsam an einem Gerät spielen."
+    />
+    <title>BusTrinker · Die Spielesammlung</title>
+    <link rel="icon" href="Icon.jpeg" type="image/jpeg" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Zum Inhalt</a>
+    <div class="shell">
+      <header class="site-header">
+        <a class="brand" href="index.html" aria-label="BusTrinker Startseite"
+          ><span class="brand-mark" aria-hidden="true">B<span>♣</span></span
+          >BusTrinker<span class="brand-sub">SPIELESAMMLUNG</span></a
+        >
+        <nav aria-label="Hauptnavigation">
+          <a class="nav-link active" href="index.html" aria-current="page"
+            >Spiele</a
+          ><a class="nav-link" href="rules.html"
+            >Spielregeln <span aria-hidden="true">↗</span></a
+          >
+        </nav>
+      </header>
+      <main id="main">
+        <section class="home-intro">
+          <div>
+            <p class="eyebrow">
+              <span class="status-dot"></span> FÜR EURE NÄCHSTE RUNDE
+            </p>
+            <h1>Eure Runde.<br /><span>Euer Spiel.</span></h1>
+            <p class="intro-copy">
+              Sucht euch ein Spiel aus. Verteilt die Karten.<br />Den Rest
+              regelt ihr am Tisch.
+            </p>
+            <a class="button primary compact" href="#games"
+              >Spiel aussuchen <span aria-hidden="true">↓</span></a
+            >
+          </div>
+          <div class="hero-table" aria-hidden="true">
+            <span class="table-ring"></span>
+            <div class="hero-card hero-card-back"><span>B</span></div>
+            <div class="hero-card hero-card-front">
+              <b>A<small>♠</small></b
+              ><span>♠</span><em>GUTE KARTEN.</em>
             </div>
-            <div id="display-code-area" style="display:none">
-                <p>Display-Code:</p><div class="display-code" id="display-code-display"></div>
+            <span class="table-chip">DEINE<br />RUNDE</span
+            ><span class="table-spark">✳</span>
+          </div>
+        </section>
+        <section
+          id="resume-area"
+          class="resume-banner"
+          hidden
+          aria-label="Gespeicherte Runde"
+        >
+          <div>
+            <span class="eyebrow">NOCH EINE RUNDE OFFEN?</span>
+            <h2 id="resume-label">Dein Spiel wartet.</h2>
+            <p id="resume-description" class="muted"></p>
+          </div>
+          <a
+            id="resume-link"
+            class="button primary compact"
+            href="bustrinker.html"
+            >Runde fortsetzen <span aria-hidden="true">→</span></a
+          >
+        </section>
+        <section
+          id="games"
+          class="collection-section"
+          aria-labelledby="games-title"
+        >
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">DIE SAMMLUNG</p>
+              <h2 id="games-title">Was spielen wir?</h2>
             </div>
-            <button id="start-game-button" onclick="startGame()" disabled>Spiel starten</button>
-        </div>
-        <div id="player-wait-message" style="display:none">
-            <p>Warte, bis der Host startet...</p>
-            <div id="player-settings-display"></div>
-        </div>
+            <span id="game-count" class="muted"></span>
+          </div>
+          <div class="collection-tools">
+            <div class="filter-tabs" role="group" aria-label="Spielmodus">
+              <button
+                data-filter="all"
+                aria-pressed="true"
+                class="filter active"
+              >
+                Alle Spiele</button
+              ><button data-filter="online" aria-pressed="false" class="filter">
+                Eigene Handys</button
+              ><button data-filter="local" aria-pressed="false" class="filter">
+                Ein Gerät
+              </button>
+            </div>
+            <label class="search-field"
+              ><span aria-hidden="true">⌕</span
+              ><span class="sr-only">Spiele suchen</span
+              ><input
+                id="game-search"
+                type="search"
+                placeholder="Spiel suchen …"
+                autocomplete="off"
+            /></label>
+          </div>
+          <div id="game-grid" class="game-grid"></div>
+          <p id="no-games" class="empty-state" hidden>
+            Kein passendes Spiel gefunden. Probiere einen anderen Namen oder
+            Spielmodus.
+          </p>
+        </section>
+        <section class="how-strip" aria-label="So funktioniert es">
+          <span class="how-icon" aria-hidden="true">↗</span>
+          <div>
+            <h2>Zusammen am Tisch. Oder mit eigener Hand.</h2>
+            <p>
+              Bei BusTrinker verbindet euch ein Raum-Code. Für Höher / Tiefer
+              reicht ein gemeinsames Gerät.
+            </p>
+          </div>
+          <a href="rules.html" class="text-link"
+            >So wird gespielt <span aria-hidden="true">→</span></a
+          >
+        </section>
+      </main>
+      <footer class="site-footer">
+        <a class="footer-brand" href="index.html">BusTrinker<span>♣</span></a>
+        <p>Die Karten sind digital. Die Runde gehört euch.</p>
+        <span>32 / 52 Karten</span>
+      </footer>
     </div>
-
-    <!-- Screen 3: Game (für Spieler) -->
-    <div id="game-screen" class="screen">
-        <h1>Spiel läuft!</h1>
-        <div id="host-game-controls" style="display:none">
-            <button id="reveal-pyramid-card-button" onclick="revealNextPyramidCardByHost()">Pyramiden-Karte aufdecken</button>
-            <button id="reveal-discard-card-button" onclick="revealNextDiscardCard()">Reststapel-Karte aufdecken</button>
-            <div class="muted" id="host-wait-hint" style="display:none">Warten auf Abgaben/Bestätigungen…</div>
-        </div>
-        <div id="public-info" class="game-section">
-            <h3>Pyramide</h3><div id="pyramid-area-player"></div>
-            <h3>Aufgedeckte Restkarten</h3><div id="public-revealed-cards">Keine</div>
-            <p class="muted">Aktiver Wert:<span id="active-trigger-player" class="trigger-badge">–</span></p>
-        </div>
-        <div id="my-hand" class="game-section">
-            <h3>Deine Handkarten</h3><div id="hand-cards-display"></div>
-        </div>
-        <div id="received-cards" class="game-section" style="display:none">
-            <h3>Erhaltene Karten</h3><div id="received-cards-display"></div>
-        </div>
-        <div id="give-card-controls" style="display:none">
-            <p><strong>Aktion!</strong> Weise jede deiner Karten mit dem aktiven Wert einem Spieler zu.</p>
-            <div id="card-assignment-area"></div>
-            <button onclick="giveCard()">Ausgewählte Karten abgeben</button>
-            <div class="muted">Weiter geht’s erst, wenn alle Pflicht-Geber abgegeben haben und alle Empfänger bestätigt haben.</div>
-        </div>
-        <hr>
-        <p>Spieler (Score):</p><ul id="game-player-list"></ul>
-    </div>
-
-    <!-- Screen 4: Display (für externes Gerät) -->
-    <div id="display-screen" class="screen">
-        <h1>Externes Display</h1>
-        <div id="display-content" class="game-section">
-            <h3>Pyramide</h3><div id="pyramid-area-display"></div>
-            <hr><h3>Aufgedeckte Restkarten</h3><div id="display-revealed-cards"></div>
-            <p class="muted">Aktiver Wert:<span id="active-trigger-display" class="trigger-badge">–</span></p>
-        </div>
-    </div>
-</div>
-
-<!-- Overlay für Kartenbestätigung -->
-<div id="card-received-overlay" class="overlay" style="display:none">
-    <div class="overlay-content">
-        <h2>Karten erhalten!</h2>
-        <p>Du hast <strong id="received-card-value"></strong> erhalten.</p>
-        <button onclick="confirmReceivedCard()">Bestätigen</button>
-    </div>
-</div>
-
-<!-- Firebase und Konfiguration -->
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-<script src="config.js"></script>
-
-<!-- Link zur externen JavaScript-Datei -->
-<script src="script.js"></script>
-</body>
+    <script type="module" src="catalog.js"></script>
+  </body>
 </html>

@@ -57,3 +57,21 @@ test("blocked storage keeps the current tab usable and reports failed persistenc
   removeSaved("blocked-test");
   assert.equal(readSaved("blocked-test"), null);
 });
+test("failed writes use the latest in-memory state even when old storage is readable", () => {
+  storage();
+  save("quota-test", { revision: 1 });
+  localStorage.setItem = () => {
+    throw new Error("quota exceeded");
+  };
+  assert.equal(save("quota-test", { revision: 2 }), false);
+  assert.deepEqual(readSaved("quota-test"), { revision: 2 });
+});
+test("failed removal cannot resurrect a saved session in the current tab", () => {
+  storage();
+  save("remove-test", { roomCode: "ABC123" });
+  localStorage.removeItem = () => {
+    throw new Error("blocked");
+  };
+  removeSaved("remove-test");
+  assert.equal(readSaved("remove-test"), null);
+});

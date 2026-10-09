@@ -49,6 +49,8 @@ Spielzüge lesen den Raum und alle aktuellen Mitglieder innerhalb einer Transakt
 
 Eine gemeinsame `stateVersion` verhindert, dass die Oberfläche Raum- und Spielersnapshots aus unterschiedlichen Transaktionen mischt. Alle Listener werden beim Neuverbinden abgemeldet. Fehler beim Netzwerkzugriff löschen die Sitzung nicht. Nach Wiederkehr, `online` oder erneutem Seitenaufruf wird der Serverstand geladen. Aktionen bleiben bis zur Synchronisierung gesperrt.
 
+Ein geöffneter Einladungslink bleibt auch nach einem App- oder Tab-Wechsel sichtbar. Eine zuvor gespeicherte andere Runde wird dort erst über „Runde fortsetzen“ wieder aufgenommen. Schlägt ein lokaler Schreib- oder Löschzugriff fehl, gilt im geöffneten Tab der letzte Stand im Arbeitsspeicher; ein älterer gespeicherter Stand setzt ihn nicht zurück. Nach Schließen des Tabs ist in diesem Fall nur der zuletzt erfolgreich gespeicherte Stand verfügbar.
+
 Ein Hostwechsel ist nach zwei Minuten ohne Präsenzsignal möglich. Präsenz wird nur bei sichtbarer Seite etwa alle 30 Sekunden aktualisiert. Diese Anzeige nutzt die Gerätezeit und ist eine Bedienhilfe, keine serverseitige Verbindungs- oder Sicherheitsgarantie.
 
 ## Betrieb und Grenzen

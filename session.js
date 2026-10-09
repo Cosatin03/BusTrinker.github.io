@@ -4,13 +4,15 @@ const fallback = new Map();
 const failedWrites = new Set();
 
 export function readSaved(key) {
+  // A readable but older disk value must not undo a failed write or removal.
+  if (failedWrites.has(key)) return fallback.get(key) ?? null;
   let raw;
   try {
     raw = localStorage.getItem(key);
   } catch {
     return fallback.get(key) || null;
   }
-  if (!raw) return failedWrites.has(key) ? fallback.get(key) || null : null;
+  if (!raw) return null;
   try {
     return JSON.parse(raw);
   } catch {
@@ -30,11 +32,11 @@ export function save(key, value) {
 }
 export function removeSaved(key) {
   fallback.delete(key);
-  failedWrites.delete(key);
   try {
     localStorage.removeItem(key);
+    failedWrites.delete(key);
   } catch {
-    /* Session can still live in this tab. */
+    failedWrites.add(key);
   }
 }
 export function newId() {

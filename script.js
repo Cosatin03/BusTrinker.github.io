@@ -32,6 +32,8 @@ let busy = false,
 let assignmentSignature = "",
   backendPromise;
 const invitation = new URLSearchParams(location.search);
+// Merely opening an invitation must not attach the last saved room on wake.
+let sessionActive = !invitation.has("room") && !invitation.has("display");
 
 function show(view) {
   document.querySelectorAll(".view").forEach((el) => {
@@ -144,6 +146,7 @@ function handleError(error, version) {
     stopListening();
     state = null;
     session = null;
+    sessionActive = false;
     removeSaved(SESSION_KEY);
     renderSaved();
     show("entry-view");
@@ -162,6 +165,7 @@ function handleError(error, version) {
 }
 async function resume() {
   if (!session) return;
+  sessionActive = true;
   stopListening();
   const version = generation,
     saved = { ...session };
@@ -170,6 +174,7 @@ async function resume() {
     await getStore();
     await store.checkSession(saved);
     if (version !== generation) return;
+    history.replaceState(null, "", location.pathname);
     unsubscribe = store.subscribe(
       saved.roomCode,
       (next) => {
@@ -695,6 +700,7 @@ $("leave-lobby").addEventListener("click", () =>
     await command("leave");
     stopListening();
     session = null;
+    sessionActive = false;
     state = null;
     removeSaved(SESSION_KEY);
     assignmentSignature = "";
@@ -730,15 +736,15 @@ if (invitation.has("room")) {
   setEntryMode("display");
   $("display-code-input").value = invitation.get("display");
 }
-if (session && !invitation.has("room") && !invitation.has("display"))
-  void resume();
+if (session && sessionActive) void resume();
 else connection(false);
 window.addEventListener("offline", () => {
   connection(false);
   render();
 });
 function wake() {
-  if (session && !busy && !document.hidden && navigator.onLine) void resume();
+  if (sessionActive && session && !busy && !document.hidden && navigator.onLine)
+    void resume();
 }
 window.addEventListener("online", wake);
 window.addEventListener("pageshow", (event) => {
@@ -756,7 +762,9 @@ window.addEventListener("storage", (event) => {
     );
 });
 setInterval(() => {
-  if (session && store && connected && !document.hidden && !busy) {
+  if (
+    sessionActive && session && store && connected && !document.hidden && !busy
+  ) {
     const version = generation;
     void store
       .heartbeat({ ...session })

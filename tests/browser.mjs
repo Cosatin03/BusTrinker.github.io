@@ -209,6 +209,35 @@ try {
     "PASS host/player/display refresh and menu reentry keep hands and roles",
   );
 
+  // Opening an invitation must remain an explicit choice even with an old session.
+  // Mobile browsers emit these events when returning from another app.
+  await guest.goto(base + "/bustrinker.html?room=NEW123");
+  await guest.locator("#entry-view").waitFor();
+  await guest.evaluate(() => {
+    document.dispatchEvent(new Event("visibilitychange"));
+    window.dispatchEvent(new Event("online"));
+    window.dispatchEvent(new PageTransitionEvent("pageshow", { persisted: true }));
+  });
+  // Allow an unwanted asynchronous reconnect to surface before asserting.
+  await guest.waitForTimeout(300);
+  assert.equal(await guest.locator("#entry-view").isVisible(), true);
+  assert.equal(await guest.locator("#room-code-input").inputValue(), "NEW123");
+  assert.equal(watchers.get(guest).size, 0);
+  await guest.locator("#resume-button").click();
+  await connected(guest);
+  assert.equal(await guest.locator("#hand-cards").innerText(), before);
+  assert.equal(new URL(guest.url()).search, "");
+  for (let wake = 0; wake < 3; wake++) {
+    await guest.evaluate(() => {
+      document.dispatchEvent(new Event("visibilitychange"));
+      window.dispatchEvent(new Event("online"));
+    });
+    await connected(guest);
+    assert.equal(watchers.get(guest).size, 2);
+    assert.equal(await guest.locator("#hand-cards").innerText(), before);
+  }
+  console.log("PASS invitations survive app switches; explicit resume preserves the old hand");
+
   const guestSession = await guest.evaluate(() =>
     JSON.parse(localStorage.getItem("bustrinker.session.v2")),
   );

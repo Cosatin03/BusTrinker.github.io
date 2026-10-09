@@ -103,3 +103,20 @@ test("missing rooms expire but network errors do not erase sessions", async () =
     (error) => !error.expired,
   );
 });
+test("leave and rejoin work when deployed rules reject document deletion", async () => {
+  const {db, store} = await setup();
+  const original = db.runTransaction.bind(db);
+  db.runTransaction = (work) => original(tx => work({
+    ...tx,
+    delete() { throw Object.assign(new Error("Delete denied"), {code:"permission-denied"}); },
+  }));
+  await store.command("ABC123", guest, {type:"leave"});
+  assert.deepEqual(db.read("rooms/ABC123").value.playerIds, [host.id]);
+  await assert.rejects(store.checkSession({...guest, roomCode:"ABC123"}), error => error.expired);
+  await store.command("ABC123", guest, {type:"join", nickname:"Gast zurück"});
+  assert.equal(db.read("rooms/ABC123/players/guest").value.nickname, "Gast zurück");
+  await store.command("ABC123", host, {type:"leave"});
+  assert.equal(db.read("rooms/ABC123").value.hostId, guest.id);
+  await store.command("ABC123", guest, {type:"leave"});
+  assert.equal(db.read("rooms/ABC123").value.status, "closed");
+});

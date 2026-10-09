@@ -43,9 +43,9 @@ export class RoomStore {
       tx.set(ref, next.room);
       for (const id of next.room.playerIds)
         tx.set(ref.collection("players").doc(id), next.players[id]);
-      for (const id of room.playerIds)
-        if (!next.room.playerIds.includes(id))
-          tx.delete(ref.collection("players").doc(id));
+      // Membership is defined by room.playerIds. The deployed rules allow
+      // writes but reject deletes, so departed lobby records remain inactive.
+      // A later lobby join overwrites that player's record with fresh state.
       return next;
     });
   }

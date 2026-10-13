@@ -20,6 +20,7 @@ let names = state ? state.players.map((p) => p.name) : [],
   audioContext = null,
   soundTimer = null;
 let busy = false;
+$("main").setAttribute("aria-busy", "false");
 const numberFormat = new Intl.NumberFormat("de-DE");
 const fmt = (n) => numberFormat.format(n);
 function notice(message = "") {
@@ -36,6 +37,7 @@ function persist() {
 async function act(command) {
   if (busy || !state) return;
   busy = true;
+  $("main").setAttribute("aria-busy", "true");
   let succeeded = false;
   const expected = state.revision,
     gameId = state.gameId;
@@ -62,6 +64,7 @@ async function act(command) {
   } finally {
     busy = false;
     render();
+    $("main").setAttribute("aria-busy", "false");
     if (succeeded && command.type === "bet") {
       document
         .querySelectorAll(".just-placed")

@@ -1,6 +1,6 @@
 # BusTrinker
 
-Statische Spielesammlung für GitHub Pages: BusTrinker mit Firestore-Lobby und Höher / Tiefer an einem gemeinsamen Gerät. Die bestehenden URLs `index.html`, `HoeherTiefer.html` und `rules.html` bleiben erreichbar. Die BusTrinker-Lobby liegt unter `bustrinker.html`.
+Statische Spielesammlung für GitHub Pages: BusTrinker mit Firestore-Lobby sowie Höher / Tiefer und Roulette an einem gemeinsamen Gerät. Die bestehenden URLs `index.html`, `HoeherTiefer.html` und `rules.html` bleiben erreichbar. Die BusTrinker-Lobby liegt unter `bustrinker.html`.
 
 ## Lokal starten
 
@@ -62,3 +62,11 @@ Ein Hostwechsel ist nach zwei Minuten ohne Präsenzsignal möglich. Präsenz wir
 - Bereits vor diesem Update gestartete Räume besitzen keine gespeicherte Geräteidentität. Sie werden mit einem erklärenden Hinweis abgewiesen und nicht automatisch verändert. Nach dem Update eine neue Lobby erstellen.
 - Wiederaufnahme gilt für denselben Browser mit erhaltenem Website-Speicher. Gelöschter Speicher, Privatmodus-Ende oder ein anderes Gerät können den ursprünglichen Platz nicht automatisch zurückholen.
 - Am 9. Oktober 2026 wurde eine vollständige Runde mit dem Firebase-SDK gegen die aktiven Regeln geprüft: Beitritt, Display, Start, Listener, Wiederaufnahme, Offline-/Online-Wechsel, konkurrierendes Aufdecken, Abgaben, Bestätigungen und Neustart. Mobile Browserabläufe werden zusätzlich mit getrennten Testkontexten geprüft; der Live-SDK-Test ersetzt keinen Test auf physischen Handys.
+
+## Roulette
+
+`roulette.html` ist ein lokales Spiel für mindestens eine Person ohne feste Spielergrenze. `roulette-core.js` enthält die vollständigen europäischen Setzfelder und Zustandsübergänge, `roulette.js` Bedienung und Speicherung, `roulette-scene.js` die feste Three.js-Kamera, Rad, Kugel und Jetons. Gewinne sind Nettoquoten (35:1 bis 1:1); gewonnene Einsätze werden nicht als zusätzliche Schlücke gezählt. Zero verliert auf allen Außenwetten. Gewinn- und Verlustgrenzen sind optional und standardmäßig aus.
+
+Die zufällige Zahl wird vor der Animation mit Web Crypto und Rejection Sampling gleichverteilt gewählt und zusammen mit dem Startzeitpunkt gespeichert. Animation und Ergebnis benutzen dieselbe Zahl. Neuladen würfelt nicht erneut; das Abrechnen und Zuteilen ist revisionsgesichert. Web Locks serialisieren Aktionen mehrerer Tabs, soweit vom Browser unterstützt. Spielerzahl ist nur durch Gerätespeicher/Browser begrenzt. Der Zahlenbereich ist endlich; Einsätze sind auf 10.000 je Feld begrenzt.
+
+Three.js 0.180.0 wird inklusive MIT-Lizenz unter `vendor/three/` ausgeliefert. Es sind weder CDN-Zugriff noch Build-Schritt nötig. Zur Aktualisierung die festgelegte npm-Version ändern und `three.module.min.js`, `three.core.min.js` sowie `LICENSE` aus dem Paket übernehmen. WebGL-Fehler blockieren die Spielregeln nicht. Reduzierte Bewegung wird respektiert; Sound ist standardmäßig aus und startet erst nach einer Benutzeraktion.

@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#102b26" />
+    <title>Roulette · BusTrinker</title>
+    <link rel="icon" href="Icon.jpeg" />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="roulette.css" />
+  </head>
+  <body class="roulette-page">
+    <a class="skip-link" href="#main">Zum Inhalt</a>
+    <div class="shell roulette-shell">
+      <header class="site-header">
+        <a class="brand" href="index.html"
+          ><span class="brand-mark" aria-hidden="true">B<span>♣</span></span
+          >BusTrinker</a
+        >
+        <nav aria-label="Spielnavigation">
+          <a class="nav-link" href="index.html">← Spiele</a
+          ><a class="nav-link" href="rules.html#roulette">Regeln</a>
+        </nav>
+      </header>
+      <main id="main">
+        <div id="notice" class="notice" role="alert" hidden></div>
+        <div class="roulette-title">
+          <div>
+            <p class="eyebrow">EUROPÄISCHES ROULETTE · EIN GERÄT</p>
+            <h1>Alles auf <em>deine Zahl.</em></h1>
+          </div>
+          <span class="table-number">TABLE / 003</span>
+        </div>
+        <div class="roulette-layout">
+          <section class="wheel-panel" aria-label="Roulette-Rad">
+            <div class="wheel-top">
+              <span class="live-dot"></span
+              ><span id="wheel-status" aria-live="polite"
+                >Euer Tisch wartet</span
+              ><span class="wheel-type">SINGLE ZERO</span>
+            </div>
+            <div id="wheel-scene" class="wheel-scene">
+              <div id="wheel-fallback" hidden>
+                <div class="fallback-wheel">0</div>
+                <p>
+                  3D ist auf diesem Gerät nicht verfügbar.<br />Das Spiel bleibt
+                  vollständig bedienbar.
+                </p>
+              </div>
+            </div>
+            <div class="wheel-bottom">
+              <span>37 FÄCHER. EIN MOMENT.</span><span>0 — 36</span>
+            </div>
+            <div
+              id="history"
+              class="roulette-history"
+              aria-label="Letzte Ergebnisse"
+            ></div>
+          </section>
+          <section id="setup" class="setup-panel">
+            <p class="eyebrow">NEHMT PLATZ</p>
+            <h2>Eure Runde</h2>
+            <p class="muted">
+              Ab 1 Person, ohne feste Spielergrenze. Alle setzen nacheinander
+              auf diesem Gerät.
+            </p>
+            <form id="add-player-form">
+              <label for="player-name">Spielername</label>
+              <div class="input-row">
+                <input
+                  id="player-name"
+                  maxlength="24"
+                  placeholder="Name eingeben"
+                  autocomplete="off"
+                  required
+                /><button
+                  type="submit"
+                  class="secondary"
+                  aria-label="Spieler hinzufügen"
+                >
+                  +
+                </button>
+              </div>
+            </form>
+            <ul id="players" class="setup-players"></ul>
+            <form id="settings-form">
+              <details open>
+                <summary>Spieleinstellungen</summary>
+                <div class="settings-grid">
+                  <label
+                    >Mindesteinsatz je Feld<input
+                      id="minimum"
+                      type="number"
+                      min="1"
+                      max="1000"
+                      step="1"
+                      value="3"
+                      required
+                    /><small>Schlücke · Standard: 3</small></label
+                  >
+                  <label
+                    >Verlorener Einsatz<select id="loss-multiplier">
+                      <option value="1">1× selbst trinken</option>
+                      <option value="2">2× selbst trinken</option>
+                      <option value="0">Keine Schlücke</option>
+                    </select></label
+                  >
+                  <label
+                    >Max. verteilen / Person / Runde<input
+                      id="win-cap"
+                      type="number"
+                      min="0"
+                      max="10000"
+                      step="1"
+                      value="0"
+                      required
+                    /><small>0 = ohne Grenze</small></label
+                  >
+                  <label
+                    >Max. Verlust / Person / Runde<input
+                      id="loss-cap"
+                      type="number"
+                      min="0"
+                      max="10000"
+                      step="1"
+                      value="0"
+                      required
+                    /><small
+                      >Gilt für eigene Fehlwetten, 0 = ohne Grenze</small
+                    ></label
+                  >
+                  <label
+                    >Drehdauer<select id="duration">
+                      <option value="3">Kurz · 3 Sekunden</option>
+                      <option value="8" selected>Klassisch · 8 Sekunden</option>
+                      <option value="12">Ausführlich · 12 Sekunden</option>
+                    </select></label
+                  >
+                  <label class="sound-setting"
+                    ><input id="sound" type="checkbox" /> Kugelgeräusche</label
+                  >
+                </div>
+              </details>
+              <p class="rule-note">
+                Gewinn = Einsatz × Quote zum Verteilen. Der gewonnene Einsatz
+                selbst bleibt neutral. Solo kannst du Gewinne selbst übernehmen
+                oder verfallen lassen.
+              </p>
+              <button
+                id="start"
+                class="primary gold-button"
+                type="submit"
+                disabled
+              >
+                Tisch eröffnen →
+              </button>
+            </form>
+          </section>
+          <section id="play" class="play-panel" hidden>
+            <div class="round-heading">
+              <div>
+                <p id="round-label" class="eyebrow"></p>
+                <h2 id="turn-label"></h2>
+              </div>
+              <button id="edit" class="text-button">Einstellungen</button>
+            </div>
+            <p id="instruction" class="muted"></p>
+            <div
+              id="player-tabs"
+              class="player-tabs"
+              role="group"
+              aria-label="Spieler auswählen"
+            ></div>
+            <div id="betting">
+              <div class="stake-controls">
+                <label for="stake"
+                  >Einsatz in Schlücken<input
+                    id="stake"
+                    type="number"
+                    min="3"
+                    max="10000"
+                    step="1"
+                    value="3"
+                /></label>
+                <div
+                  id="chip-controls"
+                  class="chip-controls"
+                  aria-label="Jetonwert"
+                ></div>
+              </div>
+              <div class="bet-layout" aria-label="Roulette-Setzfeld">
+                <button id="zero" class="bet-cell green" data-bet="n0">
+                  0
+                </button>
+                <div id="numbers" class="number-grid"></div>
+                <div id="columns" class="column-grid"></div>
+                <div id="dozens" class="dozen-grid"></div>
+                <div id="outside" class="outside-grid"></div>
+              </div>
+              <details class="combination-panel">
+                <summary>
+                  Nachbarn & Kombinationen <span>5:1 bis 17:1</span>
+                </summary>
+                <div class="combination-controls">
+                  <label
+                    >Wettart<select id="combination-type">
+                      <option value="split">Cheval · 2 Zahlen · 17:1</option>
+                      <option value="street">
+                        Transversale pleine · 3 Zahlen · 11:1
+                      </option>
+                      <option value="corner">Carré · 4 Zahlen · 8:1</option>
+                      <option value="six">
+                        Transversale simple · 6 Zahlen · 5:1
+                      </option>
+                    </select></label
+                  ><label>Zahlen<select id="combination"></select></label
+                  ><button id="place-combination" class="secondary">
+                    Setzen
+                  </button>
+                </div>
+              </details>
+              <div class="bets-heading">
+                <strong id="bet-total">Deine Einsätze</strong
+                ><button id="clear" class="text-button">Alle entfernen</button>
+              </div>
+              <ul id="bet-list" class="bet-list"></ul>
+              <div class="bet-actions">
+                <button id="ready" class="secondary">
+                  Einsätze bestätigen →</button
+                ><button id="spin" class="primary gold-button" disabled>
+                  Rad drehen
+                </button>
+              </div>
+            </div>
+            <section
+              id="spinning"
+              class="spinning-panel"
+              hidden
+              aria-live="polite"
+            >
+              <div class="spin-orbit"></div>
+              <h2>Rien ne va plus.</h2>
+              <p>Keine Einsätze mehr. Die Kugel entscheidet.</p>
+            </section>
+            <section id="results" hidden>
+              <div class="result-heading">
+                <span id="result-number" class="result-number"></span>
+                <div>
+                  <p class="eyebrow">DIE KUGEL LIEGT</p>
+                  <h2 id="result-title"></h2>
+                </div>
+              </div>
+              <div id="settlements"></div>
+              <button id="next" class="primary gold-button">
+                Nächste Runde →
+              </button>
+            </section>
+          </section>
+        </div>
+        <section id="score-panel" class="roulette-scores" hidden>
+          <div class="section-heading">
+            <h2>Am Tisch</h2>
+            <span class="small muted">Bisher zugeteilte Schlücke</span>
+          </div>
+          <ul id="scores"></ul>
+        </section>
+        <div class="roulette-foot">
+          <span id="save-status">Lokal auf diesem Gerät · Ohne Lobby</span
+          ><span>35:1 Zahl · 2:1 Dutzend · 1:1 Farbe</span>
+        </div>
+      </main>
+      <footer class="site-footer">
+        <a href="index.html">← Zur Spielesammlung</a>
+        <p>Ihr bestimmt das Tempo. Funktioniert auch mit Punkten.</p>
+      </footer>
+    </div>
+    <dialog id="edit-dialog">
+      <h2>Partie neu einrichten?</h2>
+      <p>
+        Spieler und Einstellungen werden übernommen. Einsätze und Statistik der
+        laufenden Partie werden beim neuen Start zurückgesetzt.
+      </p>
+      <div class="dialog-actions">
+        <button id="cancel-edit" class="secondary">Weiterspielen</button
+        ><button id="confirm-edit" class="primary">Neu einrichten</button>
+      </div>
+    </dialog>
+    <script type="module" src="roulette.js"></script>
+  </body>
+</html>

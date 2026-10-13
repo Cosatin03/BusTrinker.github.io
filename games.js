@@ -32,4 +32,20 @@ export const games = [
     color: "peach",
     cta: "An den Tisch",
   },
+  {
+    id: "roulette",
+    title: "Roulette",
+    subtitle: "EIN DREH. EURE EINSÄTZE.",
+    mode: "local",
+    players: "Ab 1 Spieler",
+    duration: "Ein Gerät",
+    href: "roulette.html",
+    rules: "rules.html#roulette",
+    description:
+      "Setzt eure Schlücke. Dreht das 3D-Rad. Verteilt eure Gewinne oder trinkt euren Einsatz.",
+    tags: ["Roulette", "3D", "Jetons", "Ohne Lobby"],
+    illustration: "roulette",
+    color: "gold",
+    cta: "An den Roulette-Tisch",
+  },
 ];

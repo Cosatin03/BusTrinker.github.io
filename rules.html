@@ -27,6 +27,7 @@
         <p class="eyebrow">KURZ VOR DER ERSTEN RUNDE</p>
         <h1>So wird gespielt.</h1>
         <nav class="rules-tabs" aria-label="Spiel auswählen">
+          <a class="button secondary compact" href="#roulette">Roulette</a>
           <a class="button secondary compact" href="#bustrinker">BusTrinker</a
           ><a class="button secondary compact" href="#hoeher-tiefer"
             >Höher / Tiefer</a
@@ -148,6 +149,109 @@
           </p>
           <a class="button primary compact" href="HoeherTiefer.html"
             >Höher / Tiefer spielen →</a
+          >
+        </section>
+        <section id="roulette" class="panel">
+          <p class="eyebrow">AB 1 SPIELER · EIN GERÄT</p>
+          <h2>Roulette</h2>
+          <p>
+            Europäisches Roulette mit einer Zero und 36 Zahlen. Fügt eure Namen
+            hinzu und legt in den Spieleinstellungen Mindesteinsatz,
+            Verlustmultiplikator, optionale Grenzen, Drehdauer und Ton fest. Es
+            gibt keine feste Spielergrenze.
+          </p>
+          <ol>
+            <li>
+              Wählt einen Jetonwert und tippt auf ein oder mehrere Felder. Jeder
+              Tipp setzt diesen Betrag zusätzlich. Der Mindesteinsatz gilt je
+              Feld. Kombinationen wählt ihr unter „Nachbarn &amp;
+              Kombinationen“.
+            </li>
+            <li>
+              Bestätigt eure Einsätze oder setzt die Runde aus. Bis zum Dreh
+              könnt ihr sie wieder öffnen und entfernen. Erst wenn alle
+              bestätigt haben und mindestens ein Einsatz liegt, lässt sich das
+              Rad drehen.
+            </li>
+            <li>
+              Gewinnende Einsätze ergeben Schlücke zum Verteilen nach der
+              Tabelle. Der Einsatz selbst wird nicht zusätzlich verteilt.
+              Verlorene Einsätze trinkt ihr selbst, multipliziert mit eurer
+              Verlustregel. Gewinne und Verluste werden getrennt ausgewertet.
+            </li>
+            <li>
+              Gewinne könnt ihr auf mehrere Personen verteilen, selbst
+              übernehmen oder verfallen lassen. Solo stehen Selbstübernahme und
+              Verfallenlassen zur Wahl. Bestätigt die zugeteilten Schlücke,
+              bevor ihr die nächste Runde startet.
+            </li>
+          </ol>
+          <div style="overflow-x: auto">
+            <table>
+              <thead>
+                <tr>
+                  <th>Wette</th>
+                  <th>Zahlen</th>
+                  <th>Gewinnquote</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Plein (einzelne Zahl)</td>
+                  <td>1</td>
+                  <td>35:1</td>
+                </tr>
+                <tr>
+                  <td>Cheval</td>
+                  <td>2 benachbarte</td>
+                  <td>17:1</td>
+                </tr>
+                <tr>
+                  <td>Transversale pleine / Zero-Trio</td>
+                  <td>3</td>
+                  <td>11:1</td>
+                </tr>
+                <tr>
+                  <td>Carré / erste vier (0, 1, 2, 3)</td>
+                  <td>4</td>
+                  <td>8:1</td>
+                </tr>
+                <tr>
+                  <td>Transversale simple</td>
+                  <td>6</td>
+                  <td>5:1</td>
+                </tr>
+                <tr>
+                  <td>Dutzend / Kolonne</td>
+                  <td>12</td>
+                  <td>2:1</td>
+                </tr>
+                <tr>
+                  <td>Rot / Schwarz, Gerade / Ungerade, 1–18 / 19–36</td>
+                  <td>18</td>
+                  <td>1:1</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            Beispiel: 3 Schlücke auf eine Zahl gewinnen 105 Schlücke zum
+            Verteilen. 3 auf Rot gewinnen 3. Bei Zero verlieren alle
+            Außenwetten, auch Gerade. Es gibt keine La-Partage- oder
+            En-Prison-Regel. Schluckgrenzen verändern die Quote nicht, begrenzen
+            aber die tatsächliche Menge pro Person und Runde. Die Verlustgrenze
+            gilt nur für eigene Fehlwetten, nicht für empfangene Schlücke.
+          </p>
+          <p>
+            Die Partie wird nach jeder Aktion lokal gespeichert. Nach einem
+            Neuladen oder Seitenwechsel bleiben Einsätze, Ergebnisse und offene
+            Verteilungen erhalten. Ein angefangener Dreh wird mit demselben
+            Ergebnis fortgesetzt. Die letzten 20 Zahlen erscheinen unter dem
+            Rad. Ohne WebGL bleibt das Setzfeld mit einer einfachen
+            Ersatzanzeige spielbar.
+          </p>
+          <a class="button primary compact" href="roulette.html"
+            >Roulette spielen →</a
           >
         </section>
       </main>

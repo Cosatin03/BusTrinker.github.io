@@ -137,7 +137,7 @@ try {
   const menu = await pageAt(1440);
   await menu.goto(base);
   await menu.locator(".game-tile").first().waitFor();
-  assert.equal(await menu.locator(".game-tile").count(), 2);
+  assert.equal(await menu.locator(".game-tile").count(), 3);
   await noOverflow(menu);
   await menu.screenshot({
     path: resolve(results, "menu-desktop.png"),
@@ -150,7 +150,7 @@ try {
     fullPage: true,
   });
   await menu.getByRole("button", { name: "Ein Gerät", exact: true }).click();
-  assert.equal(await menu.locator(".game-tile").count(), 1);
+  assert.equal(await menu.locator(".game-tile").count(), 2);
   await menu.locator("#game-search").fill("nichts");
   await menu.locator("#no-games").waitFor();
   console.log("PASS collection filters, mobile/desktop layout");
@@ -216,7 +216,9 @@ try {
   await guest.evaluate(() => {
     document.dispatchEvent(new Event("visibilitychange"));
     window.dispatchEvent(new Event("online"));
-    window.dispatchEvent(new PageTransitionEvent("pageshow", { persisted: true }));
+    window.dispatchEvent(
+      new PageTransitionEvent("pageshow", { persisted: true }),
+    );
   });
   // Allow an unwanted asynchronous reconnect to surface before asserting.
   await guest.waitForTimeout(300);
@@ -236,7 +238,9 @@ try {
     assert.equal(watchers.get(guest).size, 2);
     assert.equal(await guest.locator("#hand-cards").innerText(), before);
   }
-  console.log("PASS invitations survive app switches; explicit resume preserves the old hand");
+  console.log(
+    "PASS invitations survive app switches; explicit resume preserves the old hand",
+  );
 
   const guestSession = await guest.evaluate(() =>
     JSON.parse(localStorage.getItem("bustrinker.session.v2")),
@@ -372,6 +376,129 @@ try {
   await local.locator("#confirm-restart").click();
   await local.locator("#local-setup").waitFor();
   assert.equal(await local.locator("#local-player-list li").count(), 2);
+  const roulette = await pageAt(1440);
+  await roulette.goto(base + "/roulette.html");
+  for (const name of ["Alex", "Kim"]) {
+    await roulette.locator("#player-name").fill(name);
+    await roulette.locator("#add-player-form button").click();
+  }
+  await roulette.locator("#duration").selectOption("3");
+  await roulette.locator("#wheel-scene canvas").waitFor();
+  assert.equal(await roulette.locator("#wheel-fallback").isVisible(), false);
+  await roulette.screenshot({
+    path: resolve(results, "roulette-setup-desktop.png"),
+    fullPage: true,
+  });
+  await roulette.locator("#start").click();
+  await roulette.locator('[data-bet="red"]').click();
+  assert.equal(
+    await roulette.locator("#bet-total").innerText(),
+    "3 Schlücke gesetzt",
+  );
+  await roulette.locator("#ready").click();
+  await roulette.locator('[data-bet="n0"]').click();
+  await roulette.locator("#ready").click();
+  await noOverflow(roulette);
+  await roulette.screenshot({
+    path: resolve(results, "roulette-betting-desktop.png"),
+    fullPage: true,
+  });
+  await roulette.setViewportSize({ width: 390, height: 844 });
+  await roulette.locator("#spin").click();
+  await roulette.waitForFunction(() => {
+    const bounds = document.querySelector(".wheel-panel").getBoundingClientRect();
+    return bounds.top >= 0 && bounds.bottom <= window.innerHeight;
+  });
+  await roulette.locator("#spinning").waitFor();
+  const spinningSave = await roulette.evaluate(
+    () => JSON.parse(localStorage.getItem("bustrinker.roulette.v1")).state,
+  );
+  await roulette.reload();
+  await roulette.locator("#results").waitFor();
+  const resultSave = await roulette.evaluate(
+    () => JSON.parse(localStorage.getItem("bustrinker.roulette.v1")).state,
+  );
+  assert.equal(resultSave.outcome, spinningSave.outcome);
+  assert.equal(resultSave.history.length, 1);
+  assert.equal(
+    await roulette.locator("#result-number").innerText(),
+    String(spinningSave.outcome),
+  );
+  await roulette.setViewportSize({ width: 320, height: 740 });
+  await noOverflow(roulette);
+  await roulette.screenshot({
+    path: resolve(results, "roulette-result-mobile.png"),
+    fullPage: true,
+  });
+  // Seed a known winning round through the same pure engine, then distribute via UI.
+  await roulette.evaluate(async () => {
+    const { createGame, transition, ROULETTE_KEY } = await import(
+      "/roulette-core.js"
+    );
+    let s = createGame(["Alex", "Kim"], { duration: 3 });
+    const act = (c) => {
+      s = transition(s, { ...c, revision: s.revision });
+    };
+    act({ type: "bet", id: "red", amount: 3 });
+    act({ type: "ready" });
+    act({ type: "ready" });
+    act({ type: "spin", outcome: 1, now: Date.now() - 4000 });
+    act({ type: "settle", now: Date.now() });
+    localStorage.setItem(ROULETTE_KEY, JSON.stringify({ state: s }));
+  });
+  await roulette.reload();
+  await roulette.locator(".allocation button").click();
+  await roulette.locator(".confirm-drink:not([disabled])").click();
+  await roulette.locator("#next").click();
+  assert.ok(
+    (await roulette.locator("#round-label").innerText()).includes("RUNDE 2"),
+  );
+  await roulette.locator(".combination-panel summary").click();
+  await roulette.locator("#combination-type").selectOption("corner");
+  await roulette.locator("#combination").selectOption("firstfour");
+  await roulette.locator("#place-combination").click();
+  assert.ok(
+    (await roulette.locator("#bet-list").innerText()).includes("0 / 1 / 2 / 3"),
+  );
+  await noOverflow(roulette);
+  await roulette.screenshot({
+    path: resolve(results, "roulette-betting-mobile.png"),
+    fullPage: true,
+  });
+  await roulette.reload();
+  assert.ok(
+    (await roulette.locator("#bet-list").innerText()).includes("0 / 1 / 2 / 3"),
+  );
+  await roulette.locator("#edit").click();
+  await roulette.locator("#cancel-edit").click();
+  assert.equal(await roulette.locator("#bet-list li").count(), 1);
+  await roulette.locator("#edit").click();
+  await roulette.locator("#confirm-edit").click();
+  assert.equal(await roulette.locator("#players li").count(), 2);
+  await roulette.locator("#minimum").fill("5");
+  await roulette.locator("#start").click();
+  assert.equal(await roulette.locator("#stake").inputValue(), "5");
+  // WebGL unavailability must not block any betting controls.
+  const fallback = await pageAt(390);
+  await fallback.addInitScript(() => {
+    const original = HTMLCanvasElement.prototype.getContext;
+    HTMLCanvasElement.prototype.getContext = function (type, ...args) {
+      return type.startsWith("webgl")
+        ? null
+        : original.call(this, type, ...args);
+    };
+  });
+  await fallback.goto(base + "/roulette.html");
+  await fallback.locator("#wheel-fallback").waitFor();
+  await fallback.locator("#player-name").fill("Solo");
+  await fallback.locator("#add-player-form button").click();
+  await fallback.locator("#start").click();
+  await fallback.locator('[data-bet="red"]').click();
+  assert.equal(await fallback.locator("#bet-list li").count(), 1);
+  await noOverflow(fallback);
+  console.log(
+    "PASS roulette 3D, mobile layout, betting, spin reload, payouts, settings, combinations and WebGL fallback",
+  );
   assert.deepEqual(errors, []);
   console.log(
     "PASS higher/lower persistence, equal option, next player, restart; no browser exceptions",

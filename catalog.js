@@ -29,6 +29,12 @@ function render() {
         art.append(row);
       }
       art.append(element("span", "art-stamp", "ALLE AN BORD"));
+    } else if (game.illustration === "roulette") {
+      art.append(
+        element("div", "catalog-wheel", "0"),
+        element("span", "catalog-chip", "3"),
+        element("span", "art-stamp", "FAITES VOS JEUX"),
+      );
     } else
       art.append(
         card("h3"),
@@ -75,16 +81,21 @@ document.querySelectorAll("[data-filter]").forEach((button) =>
 search.addEventListener("input", render);
 render();
 const session = loadSession(),
-  local = readSaved("bustrinker.higher-lower.v1");
-if (session || local?.state) {
+  local = readSaved("bustrinker.higher-lower.v1"),
+  roulette = readSaved("bustrinker.roulette.v1");
+if (session || local?.state || roulette?.state) {
   document.querySelector("#resume-area").hidden = false;
   document.querySelector("#resume-label").textContent = session
     ? `BusTrinker · ${session.roomCode}`
-    : "Höher / Tiefer";
+    : roulette?.state
+      ? "Roulette"
+      : "Höher / Tiefer";
   document.querySelector("#resume-description").textContent = session
     ? "Mit deinen Karten und deinem bisherigen Punktestand weiterspielen."
     : "Euer Spielstand ist auf diesem Gerät gespeichert.";
   document.querySelector("#resume-link").href = session
     ? "bustrinker.html"
-    : "HoeherTiefer.html";
+    : roulette?.state
+      ? "roulette.html"
+      : "HoeherTiefer.html";
 }

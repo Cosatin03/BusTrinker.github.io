@@ -1,14 +1,15 @@
 import * as THREE from "./vendor/three/three.module.min.js";
 import { WHEEL, color } from "./roulette-core.js";
+import { roulettePose, restingAngle } from "./roulette-motion.js";
 const TAU = Math.PI * 2,
   STEP = TAU / 37;
 const palette = { red: 0xa52c39, black: 0x18272b, green: 0x08785d };
-export function createRouletteScene(host, onFailure) {
+export function createRouletteScene(host, onFailure, onMotion = () => {}) {
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.35;
+  renderer.toneMappingExposure = 1.05;
   host.append(renderer.domElement);
   renderer.domElement.setAttribute(
     "aria-label",
@@ -19,11 +20,11 @@ export function createRouletteScene(host, onFailure) {
   const camera = new THREE.PerspectiveCamera(39, 1, 0.1, 60);
   camera.position.set(0, 8.4, 8.2);
   camera.lookAt(0, 0, 0.25);
-  scene.add(new THREE.HemisphereLight(0xe1efff, 0x273921, 3));
-  const light = new THREE.DirectionalLight(0xffdfae, 5);
+  scene.add(new THREE.HemisphereLight(0xe1efff, 0x273921, 2));
+  const light = new THREE.DirectionalLight(0xffdfae, 3.5);
   light.position.set(-3, 7, 4);
   scene.add(light);
-  const rimLight = new THREE.DirectionalLight(0xa8d7ff, 2);
+  const rimLight = new THREE.DirectionalLight(0xa8d7ff, 1.8);
   rimLight.position.set(4, 3, -4);
   scene.add(rimLight);
   const gold = new THREE.MeshStandardMaterial({
@@ -72,13 +73,15 @@ export function createRouletteScene(host, onFailure) {
   mesh(new THREE.CylinderGeometry(1.7, 1.85, 0.2, 96), wood, rotor, 0, 0.11);
   ring(1.69, 0.04, 0.22, rotor);
   ring(2.27, 0.035, 0.17, rotor);
-  const textures = [];
+  const textures = [],
+    pockets = [];
   WHEEL.forEach((number, i) => {
     const angle = -i * STEP;
     const material = new THREE.MeshStandardMaterial({
       color: palette[color(number)],
       roughness: 0.55,
     });
+    pockets.push(material);
     const sector = mesh(
       new THREE.RingGeometry(1.73, 2.25, 8, 1, angle - STEP / 2, STEP),
       material,
@@ -148,7 +151,7 @@ export function createRouletteScene(host, onFailure) {
     color: 0x0b322e,
     roughness: 1,
   });
-  mesh(new THREE.CylinderGeometry(5, 5, 0.1, 96), felt, scene, 0, -0.44);
+  mesh(new THREE.CylinderGeometry(3.8, 3.8, 0.1, 96), felt, scene, 0, -0.44);
   const chips = new THREE.Group();
   scene.add(chips);
   const chipGeometry = new THREE.CylinderGeometry(0.25, 0.25, 0.095, 32);
@@ -195,29 +198,38 @@ export function createRouletteScene(host, onFailure) {
     cancelAnimationFrame(raf);
     if (lost || document.hidden) return;
     const spinning = state?.phase === "spinning";
-    const outcome = state?.outcome ?? 0;
-    const wheelEnd = TAU * 5 - Math.PI / 2 + WHEEL.indexOf(outcome) * STEP;
+    const previous = state?.history?.[state.phase === "result" ? 1 : 0] ?? 0;
+    const outcome = state?.outcome ?? state?.history?.[0] ?? 0;
     const elapsed = state ? Date.now() - state.startedAt : 0;
-    const t = spinning
-      ? Math.max(0, Math.min(1, elapsed / (state.settings.duration * 1000)))
-      : 1;
-    const ease = 1 - (1 - t) ** 3;
     const moving = spinning && !reduced.matches;
-    rotor.rotation.y = moving ? wheelEnd * ease : wheelEnd;
-    const a = moving ? -Math.PI / 2 + TAU * 8 * (1 - ease) : -Math.PI / 2;
-    const settle = Math.max(0, (t - 0.64) / 0.36);
-    const radius = moving ? 2.53 - (2.53 - 1.84) * settle : 1.84;
+    const pose = moving
+      ? roulettePose(outcome, elapsed, state.settings.duration, previous)
+      : {
+          wheelAngle: restingAngle(outcome),
+          ballAngle: -Math.PI / 2,
+          radius: 1.85,
+          height: 0.29,
+          progress: 1,
+        };
+    rotor.rotation.y = pose.wheelAngle;
     ball.position.set(
-      Math.cos(a) * radius,
-      0.29 +
-        (moving
-          ? Math.abs(Math.sin(settle * Math.PI * 7)) * 0.17 * (1 - settle)
-          : 0),
-      -Math.sin(a) * radius,
+      Math.cos(pose.ballAngle) * pose.radius,
+      pose.height,
+      -Math.sin(pose.ballAngle) * pose.radius,
     );
+    ball.rotation.x = pose.ballAngle * 12;
+    renderer.domElement.dataset.wheelAngle = String(pose.wheelAngle);
+    renderer.domElement.dataset.ballAngle = String(pose.ballAngle);
+    renderer.domElement.dataset.progress = String(pose.progress);
+    pockets.forEach((material, i) => {
+      material.emissive.setHex(
+        state?.phase === "result" && WHEEL[i] === outcome ? 0x8e641c : 0x000000,
+      );
+      material.emissiveIntensity = 0.7;
+    });
+    if (moving) onMotion(pose.stage);
     renderer.render(scene, camera);
-    if (spinning && t < 1 && !reduced.matches)
-      raf = requestAnimationFrame(render);
+    if (moving && pose.progress < 1) raf = requestAnimationFrame(render);
   }
   function resize() {
     const w = host.clientWidth,

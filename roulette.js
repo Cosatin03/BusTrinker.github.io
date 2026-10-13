@@ -62,6 +62,21 @@ async function act(command) {
   } finally {
     busy = false;
     render();
+    if (succeeded && command.type === "bet") {
+      document
+        .querySelectorAll(".just-placed")
+        .forEach((field) => field.classList.remove("just-placed"));
+      const field = document.querySelector(`[data-bet="${command.id}"]`);
+      if (field) {
+        void field.offsetWidth;
+        field.classList.add("just-placed");
+      }
+    }
+    if (succeeded && command.type === "settle") {
+      $("results").classList.remove("result-reveal");
+      void $("results").offsetWidth;
+      $("results").classList.add("result-reveal");
+    }
     if (succeeded && command.type === "spin" && window.innerWidth <= 760) {
       document.querySelector(".wheel-panel").scrollIntoView({
         block: "start",
@@ -108,12 +123,22 @@ function setupPlayers() {
 function place(id) {
   act({ type: "bet", id, amount: Number($("stake").value) });
 }
+const playerColor = (index) => `hsl(${(index * 137.508 + 38) % 360} 65% 65%)`;
+const initials = (name) =>
+  name
+    .split(/\s+/)
+    .map((word) => word[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
 function makeField(bet) {
   const b = button(
     bet.kind === "column" ? `${bet.label} · 2:1` : bet.label,
     `bet-cell ${bet.kind === "straight" ? color(bet.numbers[0]) : bet.id === "red" ? "red" : bet.id === "black" ? "black" : ""}`,
     () => place(bet.id),
   );
+  const label = element("span", "field-label", b.textContent);
+  b.replaceChildren(label);
   b.dataset.bet = bet.id;
   b.title = `${bet.label} · ${bet.odds}:1`;
   b.setAttribute("aria-label", `${bet.label}, Gewinn ${bet.odds} zu 1`);
@@ -169,12 +194,38 @@ $("stake").addEventListener("input", () => {
 function renderBetting() {
   const editable = state.phase === "betting" && !state.ready[state.current];
   const mine = state.bets.filter((b) => b.player === state.current);
-  document.querySelectorAll("[data-bet]").forEach((b) => {
-    const bet = mine.find((x) => x.id === b.dataset.bet);
-    b.disabled = !editable;
-    b.classList.toggle("has-bet", !!bet);
-    b.querySelector(".bet-badge")?.remove();
-    if (bet) b.append(element("span", "bet-badge", String(bet.amount)));
+  document.querySelectorAll("[data-bet]").forEach((field) => {
+    const rule = betById.get(field.dataset.bet);
+    const placed = state.bets.filter(
+      (bet) =>
+        bet.id === rule.id ||
+        (rule.kind === "straight" &&
+          ["split", "street", "corner", "six"].includes(
+            betById.get(bet.id).kind,
+          ) &&
+          betById.get(bet.id).numbers.includes(rule.numbers[0])),
+    );
+    field.disabled = !editable;
+    field.classList.toggle("has-bet", placed.length > 0);
+    field.classList.toggle(
+      "winner",
+      state.phase === "result" && rule.numbers.includes(state.outcome),
+    );
+    field.querySelector(".field-chips")?.remove();
+    const markers = element("span", "field-chips");
+    for (const bet of placed) {
+      const player = state.players[bet.player];
+      const marker = element(
+        "span",
+        `field-chip${bet.id !== rule.id ? " combination-chip" : ""}`,
+        `${initials(player.name)} ${fmt(bet.amount)}`,
+      );
+      marker.style.setProperty("--player-color", playerColor(bet.player));
+      marker.title = `${player.name}: ${betById.get(bet.id).label} · ${fmt(bet.amount)} Schlücke`;
+      marker.setAttribute("aria-label", marker.title);
+      markers.append(marker);
+    }
+    field.append(markers);
   });
   for (const id of [
     "stake",
@@ -215,6 +266,68 @@ function renderBetting() {
     state.phase !== "betting" ||
     !state.bets.length ||
     !state.ready.every(Boolean);
+}
+function renderAllBets() {
+  const total = state.bets.reduce((sum, bet) => sum + bet.amount, 0);
+  $("table-pool").textContent = `${fmt(total)} Schlücke im Spiel`;
+  $("table-bet-count").textContent =
+    `${state.bets.length} WETTEN · ALLE SPIELER`;
+  $("all-bets-total").textContent = `${fmt(total)} Schlücke gesetzt`;
+  $("all-bets").replaceChildren(
+    ...state.players.map((player, index) => {
+      const group = element("article", "wager-player");
+      group.dataset.player = index;
+      group.style.setProperty("--player-color", playerColor(index));
+      const bets = state.bets.filter((bet) => bet.player === index);
+      const heading = element("div", "wager-player-heading");
+      heading.append(
+        element("strong", "", player.name),
+        element(
+          "span",
+          "",
+          `${fmt(bets.reduce((sum, bet) => sum + bet.amount, 0))} Schlücke · ${state.phase === "betting" ? (state.ready[index] ? "bestätigt" : "setzt") : "geschlossen"}`,
+        ),
+      );
+      group.append(heading);
+      if (bets.length) {
+        const list = element("ul", "wager-list");
+        list.append(
+          ...bets.map((bet) => {
+            const rule = betById.get(bet.id),
+              won =
+                state.phase === "result" &&
+                rule.numbers.includes(state.outcome);
+            const entry = element("li", `wager-entry${won ? " won" : ""}`);
+            entry.dataset.betId = bet.id;
+            entry.dataset.player = index;
+            entry.append(
+              element("span", "", rule.label),
+              element("span", "wager-stake", `${fmt(bet.amount)} Schlücke`),
+              element(
+                "span",
+                "wager-odds",
+                won
+                  ? `+${fmt(bet.amount * rule.odds)} verteilen`
+                  : `${rule.odds}:1`,
+              ),
+            );
+            return entry;
+          }),
+        );
+        group.append(list);
+      } else
+        group.append(
+          element(
+            "p",
+            "no-wager",
+            state.ready[index]
+              ? "Setzt diese Runde aus."
+              : "Noch kein Einsatz.",
+          ),
+        );
+      return group;
+    }),
+  );
 }
 function renderResults() {
   $("result-number").textContent = state.outcome;
@@ -366,12 +479,27 @@ function render() {
     setupPlayers();
     $("wheel-status").textContent = "Euer Tisch wartet";
     $("history").replaceChildren();
+    $("table-pool").textContent = "0 Schlücke im Spiel";
+    $("wheel-callout").hidden = true;
+    $("motion-status").textContent = "Einsätze vorbereiten";
+    document.querySelector(".casino-table").dataset.phase = "setup";
     scene?.update(null);
     return;
   }
   const betting = state.phase === "betting",
     spinning = state.phase === "spinning";
+  document.querySelector(".casino-table").dataset.phase = state.phase;
   $("betting").hidden = !betting;
+  $("bet-editing").hidden = !betting;
+  $("wheel-callout").hidden = state.phase !== "result";
+  $("wheel-callout-label").textContent = "GEWINNZAHL";
+  $("wheel-callout-number").textContent =
+    state.phase === "result" ? state.outcome : "";
+  $("motion-status").textContent = betting
+    ? "Einsätze offen · Alle Wetten auf dem Tisch"
+    : spinning
+      ? "Kugel in der Laufbahn"
+      : `Gewinnzahl ${state.outcome} · Gewinne verteilen`;
   $("spinning").hidden = !spinning;
   $("results").hidden = state.phase !== "result";
   $("round-label").textContent =
@@ -387,7 +515,7 @@ function render() {
       ? "Alle Einsätze sind geschlossen."
       : "Gewinne verteilen, selbst übernehmen oder verfallen lassen. Danach die zugeteilten Schlücke bestätigen.";
   $("edit").disabled = spinning;
-  $("player-tabs").hidden = !betting;
+  $("player-tabs").hidden = false;
   $("player-tabs").replaceChildren(
     ...state.players.map((p, index) => {
       const b = button(
@@ -396,6 +524,8 @@ function render() {
         () => act({ type: "select", player: index }),
       );
       b.setAttribute("aria-pressed", String(index === state.current));
+      b.style.setProperty("--player-color", playerColor(index));
+      b.disabled = !betting;
       return b;
     }),
   );
@@ -425,7 +555,8 @@ function render() {
       return li;
     }),
   );
-  if (betting) renderBetting();
+  renderBetting();
+  renderAllBets();
   if (state.phase === "result") renderResults();
   if (spinning) {
     const remaining =
@@ -540,7 +671,9 @@ function fallback() {
 import("./roulette-scene.js")
   .then(({ createRouletteScene }) => {
     try {
-      scene = createRouletteScene($("wheel-scene"), fallback);
+      scene = createRouletteScene($("wheel-scene"), fallback, (stage) => {
+        if (state?.phase === "spinning") $("motion-status").textContent = stage;
+      });
       scene.update(state);
     } catch {
       fallback();

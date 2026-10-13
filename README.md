@@ -70,3 +70,9 @@ Ein Hostwechsel ist nach zwei Minuten ohne Präsenzsignal möglich. Präsenz wir
 Die zufällige Zahl wird vor der Animation mit Web Crypto und Rejection Sampling gleichverteilt gewählt und zusammen mit dem Startzeitpunkt gespeichert. Animation und Ergebnis benutzen dieselbe Zahl. Neuladen würfelt nicht erneut; das Abrechnen und Zuteilen ist revisionsgesichert. Web Locks serialisieren Aktionen mehrerer Tabs, soweit vom Browser unterstützt. Spielerzahl ist nur durch Gerätespeicher/Browser begrenzt. Der Zahlenbereich ist endlich; Einsätze sind auf 10.000 je Feld begrenzt.
 
 Three.js 0.180.0 wird inklusive MIT-Lizenz unter `vendor/three/` ausgeliefert. Es sind weder CDN-Zugriff noch Build-Schritt nötig. Zur Aktualisierung die festgelegte npm-Version ändern und `three.module.min.js`, `three.core.min.js` sowie `LICENSE` aus dem Paket übernehmen. WebGL-Fehler blockieren die Spielregeln nicht. Reduzierte Bewegung wird respektiert; Sound ist standardmäßig aus und startet erst nach einer Benutzeraktion.
+
+### Gemeinsamer Roulette-Tisch
+
+Rad und Setzfeld stehen übereinander auf derselben Filzfläche. Das Setzfeld bleibt beim Drehen und im Ergebnis sichtbar und gesperrt. Farbige Jetons kennzeichnen jeden Spieler, auch auf den Zahlen von Kombinationswetten. Die dauerhaft sichtbare Übersicht „Alle Wetten“ zeigt jede einzelne Wette mit Spieler, Feld, Einsatz und Quote, ohne Filter auf die gerade aktive Person.
+
+`roulette-motion.js` berechnet die reproduzierbare Dreh- und Kugelbewegung: Radrotation mit fortlaufender Verzögerung, gegenläufige Kugel in der Laufbahn, Fallphase, Abpraller und Mitnahme im ausgewählten Fach. Es handelt sich um eine animierte Bewegungsbahn, nicht um eine vollständige Starrkörper-Physik. Die Zufallszahl bleibt vorab gleichverteilt gewählt und gespeichert. Neuladen setzt dieselbe Bewegung fort; reine Anzeigeaktionen starten sie nicht neu.

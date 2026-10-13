@@ -30,17 +30,25 @@
         <div class="roulette-title">
           <div>
             <p class="eyebrow">EUROPÄISCHES ROULETTE · EIN GERÄT</p>
-            <h1>Alles auf <em>deine Zahl.</em></h1>
+            <h1>Roulette<span class="title-dot">.</span></h1>
           </div>
-          <span class="table-number">TABLE / 003</span>
+          <span class="table-number">EIN GERÄT · EURE RUNDE</span>
         </div>
-        <div class="roulette-layout">
-          <section class="wheel-panel" aria-label="Roulette-Rad">
+        <section
+          class="casino-table"
+          aria-label="Gemeinsamer Roulette-Spieltisch"
+        >
+          <div class="table-trim">
+            <span>EUROPÄISCHES ROULETTE</span><span>35:1 · SINGLE ZERO</span>
+          </div>
+          <div class="wheel-panel" aria-label="Roulette-Rad">
             <div class="wheel-top">
               <span class="live-dot"></span
               ><span id="wheel-status" aria-live="polite"
                 >Euer Tisch wartet</span
-              ><span class="wheel-type">SINGLE ZERO</span>
+              ><span id="table-pool" class="table-pool"
+                >0 Schlücke im Spiel</span
+              >
             </div>
             <div id="wheel-scene" class="wheel-scene">
               <div id="wheel-fallback" hidden>
@@ -50,16 +58,25 @@
                   vollständig bedienbar.
                 </p>
               </div>
+              <div
+                id="wheel-callout"
+                class="wheel-callout"
+                aria-live="polite"
+                hidden
+              >
+                <span id="wheel-callout-label"></span
+                ><strong id="wheel-callout-number"></strong>
+              </div>
             </div>
             <div class="wheel-bottom">
-              <span>37 FÄCHER. EIN MOMENT.</span><span>0 — 36</span>
+              <span id="motion-status">Einsätze vorbereiten</span>
+              <div
+                id="history"
+                class="roulette-history"
+                aria-label="Letzte Ergebnisse"
+              ></div>
             </div>
-            <div
-              id="history"
-              class="roulette-history"
-              aria-label="Letzte Ergebnisse"
-            ></div>
-          </section>
+          </div>
           <section id="setup" class="setup-panel">
             <p class="eyebrow">NEHMT PLATZ</p>
             <h2>Eure Runde</h2>
@@ -163,7 +180,7 @@
             <div class="round-heading">
               <div>
                 <p id="round-label" class="eyebrow"></p>
-                <h2 id="turn-label"></h2>
+                <h2 id="turn-label" aria-live="polite"></h2>
               </div>
               <button id="edit" class="text-button">Einstellungen</button>
             </div>
@@ -174,7 +191,7 @@
               role="group"
               aria-label="Spieler auswählen"
             ></div>
-            <div id="betting">
+            <div id="betting" class="betting-console">
               <div class="stake-controls">
                 <label for="stake"
                   >Einsatz in Schlücken<input
@@ -190,19 +207,26 @@
                   class="chip-controls"
                   aria-label="Jetonwert"
                 ></div>
+                <span class="chip-hint">Jeton wählen. Feld antippen.</span>
               </div>
-              <div class="bet-layout" aria-label="Roulette-Setzfeld">
-                <button id="zero" class="bet-cell green" data-bet="n0">
-                  0
-                </button>
-                <div id="numbers" class="number-grid"></div>
-                <div id="columns" class="column-grid"></div>
-                <div id="dozens" class="dozen-grid"></div>
-                <div id="outside" class="outside-grid"></div>
-              </div>
+            </div>
+            <div class="felt-divider">
+              <span>VOS JEUX</span
+              ><span id="table-bet-count">ALLE EINSÄTZE SICHTBAR</span>
+            </div>
+            <div class="bet-layout" aria-label="Roulette-Setzfeld">
+              <button id="zero" class="bet-cell green" data-bet="n0">
+                <span class="field-label">0</span>
+              </button>
+              <div id="numbers" class="number-grid"></div>
+              <div id="columns" class="column-grid"></div>
+              <div id="dozens" class="dozen-grid"></div>
+              <div id="outside" class="outside-grid"></div>
+            </div>
+            <div id="bet-editing">
               <details class="combination-panel">
                 <summary>
-                  Nachbarn & Kombinationen <span>5:1 bis 17:1</span>
+                  Nachbarn &amp; Kombinationen <span>5:1 bis 17:1</span>
                 </summary>
                 <div class="combination-controls">
                   <label
@@ -224,26 +248,44 @@
               </details>
               <div class="bets-heading">
                 <strong id="bet-total">Deine Einsätze</strong
-                ><button id="clear" class="text-button">Alle entfernen</button>
+                ><button id="clear" class="text-button">
+                  Eigene Einsätze entfernen
+                </button>
               </div>
               <ul id="bet-list" class="bet-list"></ul>
               <div class="bet-actions">
                 <button id="ready" class="secondary">
                   Einsätze bestätigen →</button
                 ><button id="spin" class="primary gold-button" disabled>
-                  Rad drehen
+                  <span aria-hidden="true">◉</span> Rad drehen
                 </button>
               </div>
             </div>
+            <section
+              id="all-bets-panel"
+              class="all-bets-panel"
+              aria-label="Alle Wetten aller Spieler"
+            >
+              <div class="all-bets-heading">
+                <div>
+                  <p class="eyebrow">DER GANZE TISCH</p>
+                  <h3>Alle Wetten</h3>
+                </div>
+                <span id="all-bets-total" class="pool-value"></span>
+              </div>
+              <div id="all-bets" class="all-bets"></div>
+            </section>
             <section
               id="spinning"
               class="spinning-panel"
               hidden
               aria-live="polite"
             >
-              <div class="spin-orbit"></div>
-              <h2>Rien ne va plus.</h2>
-              <p>Keine Einsätze mehr. Die Kugel entscheidet.</p>
+              <span class="spin-orbit" aria-hidden="true"></span>
+              <div>
+                <h2>Rien ne va plus.</h2>
+                <p>Einsätze geschlossen. Alle Wetten bleiben auf dem Tisch.</p>
+              </div>
             </section>
             <section id="results" hidden>
               <div class="result-heading">
@@ -259,7 +301,11 @@
               </button>
             </section>
           </section>
-        </div>
+          <div class="table-trim bottom">
+            <span>BUS TRINKER / ROULETTE</span
+            ><span>UN TIRAGE · VOTRE TABLE</span>
+          </div>
+        </section>
         <section id="score-panel" class="roulette-scores" hidden>
           <div class="section-heading">
             <h2>Am Tisch</h2>

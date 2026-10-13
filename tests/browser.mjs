@@ -381,6 +381,7 @@ try {
   for (const name of ["Alex", "Kim"]) {
     await roulette.locator("#player-name").fill(name);
     await roulette.locator("#add-player-form button").click();
+  await settled(roulette);
   }
   await roulette.locator("#duration").selectOption("3");
   await roulette.locator("#wheel-scene canvas").waitFor();
@@ -390,14 +391,46 @@ try {
     fullPage: true,
   });
   await roulette.locator("#start").click();
+  await settled(roulette);
   await roulette.locator('[data-bet="red"]').click();
+  await settled(roulette);
   assert.equal(
     await roulette.locator("#bet-total").innerText(),
     "3 Schlücke gesetzt",
   );
   await roulette.locator("#ready").click();
+  await settled(roulette);
   await roulette.locator('[data-bet="n0"]').click();
+  await settled(roulette);
   await roulette.locator("#ready").click();
+  await settled(roulette);
+  assert.equal(await roulette.locator(".wager-entry").count(), 2);
+  assert.ok((await roulette.locator("#all-bets").innerText()).includes("Alex"));
+  assert.ok((await roulette.locator("#all-bets").innerText()).includes("Kim"));
+  assert.equal(
+    await roulette.locator('[data-bet="red"] .field-chip').innerText(),
+    "A 3",
+  );
+  assert.equal(
+    await roulette.locator('[data-bet="n0"] .field-chip').innerText(),
+    "K 3",
+  );
+  const unified = await roulette.evaluate(() => {
+    const table = document.querySelector(".casino-table");
+    const wheel = document
+      .querySelector(".wheel-panel")
+      .getBoundingClientRect();
+    const board = document.querySelector(".bet-layout").getBoundingClientRect();
+    return (
+      table.contains(document.querySelector(".wheel-panel")) &&
+      table.contains(document.querySelector(".bet-layout")) &&
+      wheel.bottom <= board.top
+    );
+  });
+  assert.ok(
+    unified,
+    "Wheel and betting layout must be on one vertically unified table",
+  );
   await noOverflow(roulette);
   await roulette.screenshot({
     path: resolve(results, "roulette-betting-desktop.png"),
@@ -405,11 +438,30 @@ try {
   });
   await roulette.setViewportSize({ width: 390, height: 844 });
   await roulette.locator("#spin").click();
+  await settled(roulette);
   await roulette.waitForFunction(() => {
-    const bounds = document.querySelector(".wheel-panel").getBoundingClientRect();
+    const bounds = document
+      .querySelector(".wheel-panel")
+      .getBoundingClientRect();
     return bounds.top >= 0 && bounds.bottom <= window.innerHeight;
   });
   await roulette.locator("#spinning").waitFor();
+  assert.equal(await roulette.locator(".bet-layout").isVisible(), true);
+  assert.equal(await roulette.locator(".wager-entry").count(), 2);
+  assert.equal(await roulette.locator('[data-bet="red"]').isEnabled(), false);
+  const firstFrame = await roulette
+    .locator("#wheel-scene canvas")
+    .evaluate((canvas) => ({
+      wheel: Number(canvas.dataset.wheelAngle),
+      ball: Number(canvas.dataset.ballAngle),
+    }));
+  await roulette.waitForFunction(({ wheel, ball }) => {
+    const canvas = document.querySelector("#wheel-scene canvas");
+    return (
+      Number(canvas.dataset.wheelAngle) > wheel + 0.1 &&
+      Number(canvas.dataset.ballAngle) < ball - 0.1
+    );
+  }, firstFrame);
   const spinningSave = await roulette.evaluate(
     () => JSON.parse(localStorage.getItem("bustrinker.roulette.v1")).state,
   );
@@ -419,6 +471,12 @@ try {
     () => JSON.parse(localStorage.getItem("bustrinker.roulette.v1")).state,
   );
   assert.equal(resultSave.outcome, spinningSave.outcome);
+  assert.equal(await roulette.locator(".bet-layout").isVisible(), true);
+  assert.equal(await roulette.locator(".wager-entry").count(), 2);
+  assert.equal(
+    await roulette.locator('[data-bet="red"] .field-chip').innerText(),
+    "A 3",
+  );
   assert.equal(resultSave.history.length, 1);
   assert.equal(
     await roulette.locator("#result-number").innerText(),
@@ -448,15 +506,20 @@ try {
   });
   await roulette.reload();
   await roulette.locator(".allocation button").click();
+  await settled(roulette);
   await roulette.locator(".confirm-drink:not([disabled])").click();
+  await settled(roulette);
   await roulette.locator("#next").click();
+  await settled(roulette);
   assert.ok(
     (await roulette.locator("#round-label").innerText()).includes("RUNDE 2"),
   );
   await roulette.locator(".combination-panel summary").click();
+  await settled(roulette);
   await roulette.locator("#combination-type").selectOption("corner");
   await roulette.locator("#combination").selectOption("firstfour");
   await roulette.locator("#place-combination").click();
+  await settled(roulette);
   assert.ok(
     (await roulette.locator("#bet-list").innerText()).includes("0 / 1 / 2 / 3"),
   );
@@ -465,18 +528,29 @@ try {
     path: resolve(results, "roulette-betting-mobile.png"),
     fullPage: true,
   });
+  assert.equal(await roulette.locator(".wager-entry").count(), 1);
+  for (const n of [0, 1, 2, 3])
+    assert.equal(
+      await roulette.locator(`[data-bet="n${n}"] .combination-chip`).count(),
+      1,
+    );
   await roulette.reload();
   assert.ok(
     (await roulette.locator("#bet-list").innerText()).includes("0 / 1 / 2 / 3"),
   );
   await roulette.locator("#edit").click();
+  await settled(roulette);
   await roulette.locator("#cancel-edit").click();
+  await settled(roulette);
   assert.equal(await roulette.locator("#bet-list li").count(), 1);
   await roulette.locator("#edit").click();
+  await settled(roulette);
   await roulette.locator("#confirm-edit").click();
+  await settled(roulette);
   assert.equal(await roulette.locator("#players li").count(), 2);
   await roulette.locator("#minimum").fill("5");
   await roulette.locator("#start").click();
+  await settled(roulette);
   assert.equal(await roulette.locator("#stake").inputValue(), "5");
   // WebGL unavailability must not block any betting controls.
   const fallback = await pageAt(390);
@@ -492,12 +566,15 @@ try {
   await fallback.locator("#wheel-fallback").waitFor();
   await fallback.locator("#player-name").fill("Solo");
   await fallback.locator("#add-player-form button").click();
+  await settled(fallback);
   await fallback.locator("#start").click();
+  await settled(fallback);
   await fallback.locator('[data-bet="red"]').click();
+  await settled(fallback);
   assert.equal(await fallback.locator("#bet-list li").count(), 1);
   await noOverflow(fallback);
   console.log(
-    "PASS roulette 3D, mobile layout, betting, spin reload, payouts, settings, combinations and WebGL fallback",
+    "PASS roulette unified table, all-player wagers in every phase, rendered counter-rotation, mobile layout, spin reload, payouts and WebGL fallback",
   );
   assert.deepEqual(errors, []);
   console.log(

@@ -1244,3 +1244,28 @@
     transition: none;
   }
 }
+.wheel-callout {
+  z-index: 2;
+}
+.wheel-bottom > span {
+  flex: 1;
+  min-width: 0;
+}
+.roulette-history {
+  min-width: 0;
+  flex-shrink: 1;
+}
+@media (max-width: 650px) {
+  .wheel-bottom {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+  }
+  .roulette-history {
+    max-width: 100%;
+    justify-self: start;
+  }
+  .roulette-history:empty {
+    display: none;
+  }
+}

@@ -18,7 +18,7 @@ export function createRouletteScene(host, onFailure, onMotion = () => {}) {
   renderer.domElement.setAttribute("role", "img");
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(39, 1, 0.1, 60);
-  camera.position.set(0, 8.4, 8.2);
+  camera.position.set(0, 6.9, 6.8);
   camera.lookAt(0, 0, 0.25);
   scene.add(new THREE.HemisphereLight(0xe1efff, 0x273921, 2));
   const light = new THREE.DirectionalLight(0xffdfae, 3.5);

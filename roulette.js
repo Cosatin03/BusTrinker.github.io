@@ -36,6 +36,7 @@ function persist() {
 async function act(command) {
   if (busy || !state) return;
   busy = true;
+  let succeeded = false;
   const expected = state.revision,
     gameId = state.gameId;
   const execute = () => {
@@ -48,6 +49,7 @@ async function act(command) {
     if (validGame(latest)) state = latest;
     try {
       state = transition(state, { ...command, revision: expected, gameId });
+      succeeded = true;
       persist();
       notice();
     } catch (error) {
@@ -60,6 +62,14 @@ async function act(command) {
   } finally {
     busy = false;
     render();
+    if (succeeded && command.type === "spin" && window.innerWidth <= 760) {
+      document.querySelector(".wheel-panel").scrollIntoView({
+        block: "start",
+        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+          ? "instant"
+          : "smooth",
+      });
+    }
   }
 }
 function button(label, cls, fn) {

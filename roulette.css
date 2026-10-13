@@ -702,3 +702,10 @@
   background: #f3e3bf;
   color: #533e20;
 }
+
+.roulette-page .skip-link:not(:focus) {
+  clip-path: inset(50%);
+}
+.wheel-panel {
+  scroll-margin-top: 16px;
+}

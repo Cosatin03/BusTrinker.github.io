@@ -204,7 +204,7 @@ export function createRouletteScene(host, onFailure) {
     const ease = 1 - (1 - t) ** 3;
     const moving = spinning && !reduced.matches;
     rotor.rotation.y = moving ? wheelEnd * ease : wheelEnd;
-    const a = moving ? -Math.PI / 2 - TAU * 8 * (1 - ease) : -Math.PI / 2;
+    const a = moving ? -Math.PI / 2 + TAU * 8 * (1 - ease) : -Math.PI / 2;
     const settle = Math.max(0, (t - 0.64) / 0.36);
     const radius = moving ? 2.53 - (2.53 - 1.84) * settle : 1.84;
     ball.position.set(

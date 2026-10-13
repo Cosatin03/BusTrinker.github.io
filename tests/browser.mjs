@@ -403,7 +403,14 @@ try {
     path: resolve(results, "roulette-betting-desktop.png"),
     fullPage: true,
   });
+  await roulette.setViewportSize({ width: 390, height: 844 });
   await roulette.locator("#spin").click();
+  await roulette.waitForFunction(
+    () =>
+      Math.abs(
+        document.querySelector(".wheel-panel").getBoundingClientRect().top - 16,
+      ) < 3,
+  );
   await roulette.locator("#spinning").waitFor();
   const spinningSave = await roulette.evaluate(
     () => JSON.parse(localStorage.getItem("bustrinker.roulette.v1")).state,

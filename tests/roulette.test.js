@@ -88,6 +88,7 @@ test("net odds, caps, losses, split allocation, confirmations and next round", (
   s = act(s, { type: "confirm", player: 1 });
   s = act(s, { type: "give", from: 0, to: 1, amount: 1 });
   assert.equal(s.settlement[1].confirmed, false);
+  assert.equal(s.settlement[1].drink - s.settlement[1].acknowledged, 1);
   s = act(s, { type: "give", from: 0, to: 2, amount: 12 });
   assert.equal(s.players[0].given, 20);
   assert.equal(s.players[1].drank, 8);
@@ -136,6 +137,9 @@ test("unbounded roster, invalid settings/state and stale revisions", () => {
     false,
   );
   assert.throws(() => transition(s, { type: "ready", revision: 9 }));
+  assert.throws(() =>
+    transition(s, { type: "ready", revision: s.revision, gameId: "old-game" }),
+  );
   s = act(s, { type: "ready" });
   assert.throws(() => act(s, { type: "spin", outcome: 0, now: 1 }));
 });

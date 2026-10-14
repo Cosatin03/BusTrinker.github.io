@@ -105,6 +105,12 @@ async function act(command) {
       $("results").classList.remove("result-reveal");
       void $("results").offsetWidth;
       $("results").classList.add("result-reveal");
+      $("results").scrollIntoView({
+        block: "start",
+        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+          ? "instant"
+          : "smooth",
+      });
     }
     if (succeeded && command.type === "spin" && window.innerWidth <= 760) {
       document.querySelector(".wheel-panel").scrollIntoView({

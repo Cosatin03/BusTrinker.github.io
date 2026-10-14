@@ -1908,3 +1908,14 @@
     transition: none;
   }
 }
+.sip-counter .amount-step {
+  grid-column: auto;
+}
+.roulette-history {
+  min-width: 34px;
+}
+@media (max-width: 400px) {
+  .recipient-grid {
+    grid-template-columns: repeat(auto-fit, minmax(76px, 1fr));
+  }
+}

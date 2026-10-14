@@ -595,6 +595,22 @@ try {
   });
   await payout.reload();
   await payout.locator("#send-sips").waitFor();
+  await payout.waitForFunction(
+    () => document.querySelector("#wheel-scene canvas")?.dataset.progress,
+  );
+  await payout.evaluate(
+    () =>
+      new Promise((resolve) =>
+        requestAnimationFrame(() => requestAnimationFrame(resolve)),
+      ),
+  );
+  const counterInline = await payout.evaluate(() => {
+    const [minus, plus] = [
+      ...document.querySelectorAll(".sip-counter .amount-step"),
+    ].map((b) => b.getBoundingClientRect());
+    return Math.abs(minus.top - plus.top) < 2 && minus.right < plus.left;
+  });
+  assert.ok(counterInline, "Amount stepper buttons must share one row");
   assert.equal(await payout.locator(".prize-count").innerText(), "105");
   assert.equal(await payout.locator(".recipient-card").count(), 3);
   const resultOrder = await payout.evaluate(

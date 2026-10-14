@@ -154,3 +154,29 @@ test("random selection rejects biased tail before mapping 37 equal outcomes", ()
   assert.equal(drawNumber(fake), 36);
   assert.equal(calls, 2);
 });
+
+test("transfer sources persist, old saves still load and next round clears the ledger", () => {
+  let s = createGame(["A", "B"]);
+  s = act(s, { type: "bet", id: "red", amount: 3 });
+  s = spin(s, 1);
+  const old = structuredClone(s);
+  delete old.transfers;
+  assert.ok(validGame(old));
+  s = act(old, { type: "give", from: 0, to: 1, amount: 1 });
+  s = act(s, { type: "confirm", player: 1 });
+  s = act(s, { type: "give", from: 0, to: 1, amount: 1 });
+  assert.deepEqual(s.transfers, [
+    { from: 0, to: 1, amount: 1 },
+    { from: 0, to: 1, amount: 1 },
+  ]);
+  assert.ok(validGame(JSON.parse(JSON.stringify(s))));
+  assert.equal(s.settlement[1].drink - s.settlement[1].acknowledged, 1);
+  assert.equal(
+    validGame({ ...s, transfers: [{ from: 0, to: 99, amount: 1 }] }),
+    false,
+  );
+  s = act(s, { type: "waive", player: 0 });
+  s = act(s, { type: "confirm", player: 1 });
+  s = act(s, { type: "next" });
+  assert.deepEqual(s.transfers, []);
+});

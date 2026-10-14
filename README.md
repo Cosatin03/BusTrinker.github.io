@@ -76,3 +76,9 @@ Three.js 0.180.0 wird inklusive MIT-Lizenz unter `vendor/three/` ausgeliefert. E
 Rad und Setzfeld stehen übereinander auf derselben Filzfläche. Das Setzfeld bleibt beim Drehen und im Ergebnis sichtbar und gesperrt. Farbige Jetons kennzeichnen jeden Spieler, auch auf den Zahlen von Kombinationswetten. Die dauerhaft sichtbare Übersicht „Alle Wetten“ zeigt jede einzelne Wette mit Spieler, Feld, Einsatz und Quote, ohne Filter auf die gerade aktive Person.
 
 `roulette-motion.js` berechnet die reproduzierbare Dreh- und Kugelbewegung: Radrotation mit fortlaufender Verzögerung, gegenläufige Kugel in der Laufbahn, Fallphase, Abpraller und Mitnahme im ausgewählten Fach. Es handelt sich um eine animierte Bewegungsbahn, nicht um eine vollständige Starrkörper-Physik. Die Zufallszahl bleibt vorab gleichverteilt gewählt und gespeichert. Neuladen setzt dieselbe Bewegung fort; reine Anzeigeaktionen starten sie nicht neu.
+
+### Gewinne und Empfang
+
+Die Ergebnisphase steht vor dem Setzfeld. Ein Gewinnpanel zeigt den verbleibenden Betrag und den Verteilfortschritt. Empfänger werden direkt als Spielerkarten ausgewählt; Mengen lassen sich über Zähler, Schnellwerte oder freie Eingabe bestimmen. Daneben zeigen Empfangskarten offene Schlücke getrennt von bereits bestätigten Mengen, eigenen verlorenen Einsätzen und Zuteilungen anderer Spieler. Jede Verteilung erzeugt eine visuelle Rückmeldung.
+
+Ein optionales `transfers`-Protokoll speichert pro Runde Absender, Empfänger und Menge. Alte Spielstände bleiben gültig; vorherige Zuteilungen ohne Protokoll werden als solche angezeigt. Nach einem Neuladen bleiben Verteilreste, Quellen und Bestätigungen erhalten. Beim Rundenwechsel wird das Protokoll geleert.

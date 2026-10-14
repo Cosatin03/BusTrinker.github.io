@@ -191,6 +191,30 @@
               role="group"
               aria-label="Spieler auswählen"
             ></div>
+            <section id="results" hidden>
+              <div class="result-hero">
+                <div class="result-heading">
+                  <span id="result-number" class="result-number"></span>
+                  <div>
+                    <p class="eyebrow">DIE KUGEL LIEGT</p>
+                    <h2 id="result-title"></h2>
+                  </div>
+                </div>
+                <div class="round-prize">
+                  <span>GEWINNE AM TISCH</span
+                  ><strong id="round-prize-total"></strong
+                  ><small>Schlücke zum Verteilen</small>
+                </div>
+                <div class="prize-sparks" aria-hidden="true"></div>
+              </div>
+              <div id="settlements"></div>
+              <div class="round-finish">
+                <p id="round-progress" aria-live="polite"></p>
+                <button id="next" class="primary gold-button">
+                  Nächste Runde →
+                </button>
+              </div>
+            </section>
             <div id="betting" class="betting-console">
               <div class="stake-controls">
                 <label for="stake"
@@ -287,19 +311,6 @@
                 <p>Einsätze geschlossen. Alle Wetten bleiben auf dem Tisch.</p>
               </div>
             </section>
-            <section id="results" hidden>
-              <div class="result-heading">
-                <span id="result-number" class="result-number"></span>
-                <div>
-                  <p class="eyebrow">DIE KUGEL LIEGT</p>
-                  <h2 id="result-title"></h2>
-                </div>
-              </div>
-              <div id="settlements"></div>
-              <button id="next" class="primary gold-button">
-                Nächste Runde →
-              </button>
-            </section>
           </section>
           <div class="table-trim bottom">
             <span>BUS TRINKER / ROULETTE</span
@@ -334,6 +345,13 @@
         ><button id="confirm-edit" class="primary">Neu einrichten</button>
       </div>
     </dialog>
+    <div
+      id="round-feedback"
+      class="round-feedback"
+      role="status"
+      aria-live="polite"
+      hidden
+    ></div>
     <script type="module" src="roulette.js"></script>
   </body>
 </html>

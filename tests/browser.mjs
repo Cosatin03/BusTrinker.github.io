@@ -381,7 +381,7 @@ try {
   for (const name of ["Alex", "Kim"]) {
     await roulette.locator("#player-name").fill(name);
     await roulette.locator("#add-player-form button").click();
-  await settled(roulette);
+    await settled(roulette);
   }
   await roulette.locator("#duration").selectOption("3");
   await roulette.locator("#wheel-scene canvas").waitFor();
@@ -505,7 +505,7 @@ try {
     localStorage.setItem(ROULETTE_KEY, JSON.stringify({ state: s }));
   });
   await roulette.reload();
-  await roulette.locator(".allocation button").click();
+  await roulette.locator("#send-sips").click();
   await settled(roulette);
   await roulette.locator(".confirm-drink:not([disabled])").click();
   await settled(roulette);
@@ -575,6 +575,121 @@ try {
   await noOverflow(fallback);
   console.log(
     "PASS roulette unified table, all-player wagers in every phase, rendered counter-rotation, mobile layout, spin reload, payouts and WebGL fallback",
+  );
+  const payout = await pageAt(390);
+  await payout.goto(base + "/roulette.html");
+  await payout.evaluate(async () => {
+    const { createGame, transition, ROULETTE_KEY } = await import(
+      "/roulette-core.js"
+    );
+    let s = createGame(["Alex", "Kim", "Mia"], { duration: 3 });
+    const act = (c) => {
+      s = transition(s, { ...c, revision: s.revision });
+    };
+    act({ type: "bet", id: "n1", amount: 3 });
+    act({ type: "bet", id: "black", amount: 3 });
+    for (let i = 0; i < 3; i++) act({ type: "ready" });
+    act({ type: "spin", outcome: 1, now: Date.now() - 4000 });
+    act({ type: "settle", now: Date.now() });
+    localStorage.setItem(ROULETTE_KEY, JSON.stringify({ state: s }));
+  });
+  await payout.reload();
+  await payout.locator("#send-sips").waitFor();
+  await payout.waitForFunction(
+    () => document.querySelector("#wheel-scene canvas")?.dataset.progress,
+  );
+  await payout.evaluate(
+    () =>
+      new Promise((resolve) =>
+        requestAnimationFrame(() => requestAnimationFrame(resolve)),
+      ),
+  );
+  const counterInline = await payout.evaluate(() => {
+    const [minus, plus] = [
+      ...document.querySelectorAll(".sip-counter .amount-step"),
+    ].map((b) => b.getBoundingClientRect());
+    return Math.abs(minus.top - plus.top) < 2 && minus.right < plus.left;
+  });
+  assert.ok(counterInline, "Amount stepper buttons must share one row");
+  assert.equal(await payout.locator(".prize-count").innerText(), "105");
+  assert.equal(await payout.locator(".recipient-card").count(), 3);
+  const resultOrder = await payout.evaluate(
+    () =>
+      document.querySelector("#results").getBoundingClientRect().top <
+      document.querySelector(".bet-layout").getBoundingClientRect().top,
+  );
+  assert.ok(resultOrder);
+  await noOverflow(payout);
+  await payout.screenshot({
+    path: resolve(results, "roulette-payout-mobile.png"),
+    fullPage: true,
+  });
+  await payout.setViewportSize({ width: 1440, height: 1000 });
+  await noOverflow(payout);
+  await payout.screenshot({
+    path: resolve(results, "roulette-payout-desktop.png"),
+    fullPage: true,
+  });
+  await payout.locator("#send-sips").click();
+  await settled(payout);
+  await payout.locator("#round-feedback").waitFor();
+  assert.ok(
+    (await payout.locator("#round-feedback").innerText()).includes(
+      "Alex → Kim",
+    ),
+  );
+  assert.ok(
+    (await payout.locator('[data-receipt-player="1"]').innerText()).includes(
+      "Von Alex",
+    ),
+  );
+  await payout.locator('[data-receipt-player="1"] .confirm-drink').click();
+  await settled(payout);
+  await payout.locator("#give-amount").fill("1");
+  await payout.locator("#send-sips").click();
+  await settled(payout);
+  assert.equal(
+    await payout
+      .locator('[data-receipt-player="1"] .confirm-drink')
+      .innerText(),
+    "1 Schluck bestätigen",
+  );
+  await payout.reload();
+  await payout.locator("#send-sips").waitFor();
+  assert.equal(await payout.locator(".prize-count").innerText(), "101");
+  assert.ok(
+    (await payout.locator('[data-receipt-player="1"]').innerText()).includes(
+      "Von Alex",
+    ),
+  );
+  await payout.locator('[data-recipient="2"]').click();
+  await payout.locator("#give-amount").fill("2");
+  await payout.locator("#send-sips").click();
+  await settled(payout);
+  await payout.locator('[data-recipient="0"]').click();
+  await payout.locator("#send-sips").click();
+  await settled(payout);
+  await payout.locator(".waive-button").click();
+  await settled(payout);
+  assert.equal(await payout.locator("#next").isEnabled(), false);
+  const pendingButtons = payout.locator(".confirm-drink");
+  while (await pendingButtons.count()) {
+    await pendingButtons.first().click();
+    await settled(payout);
+  }
+  assert.equal(await payout.locator("#next").isEnabled(), true);
+  await payout.locator("#next").click();
+  await settled(payout);
+  assert.deepEqual(
+    await payout.evaluate(
+      () =>
+        JSON.parse(localStorage.getItem("bustrinker.roulette.v1")).state
+          .transfers,
+    ),
+    [],
+  );
+  console.log(
+    "PASS reward panel, direct recipients, source receipts, self allocation, new-sip confirmation and reload",
   );
   assert.deepEqual(errors, []);
   console.log(

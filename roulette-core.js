@@ -110,6 +110,7 @@ export function createGame(names, options) {
     startedAt: null,
     settlement: null,
     history: [],
+    transfers: [],
   };
 }
 export function validGame(s) {
@@ -124,6 +125,17 @@ export function validGame(s) {
     )
       return false;
     settings(s.settings);
+    if (
+      s.transfers !== undefined &&
+      (!Array.isArray(s.transfers) ||
+        !s.transfers.every(
+          (t) =>
+            integer(t.from, 0, s.players?.length - 1) &&
+            integer(t.to, 0, s.players?.length - 1) &&
+            integer(t.amount, 1),
+        ))
+    )
+      return false;
     if (
       !Array.isArray(s.players) ||
       !s.players.length ||
@@ -323,6 +335,8 @@ export function transition(input, command) {
       const result = s.settlement[c.from];
       if (!integer(c.amount, 1, result.remaining))
         throw Error("Die Menge muss innerhalb des offenen Gewinns liegen.");
+      s.transfers ??= [];
+      s.transfers.push({ from: c.from, to: c.to, amount: c.amount });
       result.remaining -= c.amount;
       s.players[c.from].given += c.amount;
       s.players[c.to].drank += c.amount;
@@ -357,6 +371,7 @@ export function transition(input, command) {
       s.outcome = null;
       s.startedAt = null;
       s.settlement = null;
+      s.transfers = [];
       break;
     default:
       throw Error("Unbekannte Spielaktion.");

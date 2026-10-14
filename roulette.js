@@ -23,6 +23,31 @@ let busy = false;
 $("main").setAttribute("aria-busy", "false");
 const numberFormat = new Intl.NumberFormat("de-DE");
 const fmt = (n) => numberFormat.format(n);
+const sipWord = (n) => (n === 1 ? "Schluck" : "Schlücke");
+let allocationChoice = { key: null, from: null, to: null, amount: null };
+let feedbackTimer;
+function roundFeedback(command) {
+  let message;
+  if (command.type === "give")
+    message = `${state.players[command.from].name} → ${state.players[command.to].name} · +${fmt(command.amount)} ${sipWord(command.amount)}`;
+  else if (command.type === "confirm")
+    message = `${state.players[command.player].name} · Schlücke bestätigt ✓`;
+  else return;
+  const feedback = $("round-feedback");
+  clearTimeout(feedbackTimer);
+  feedback.textContent = message;
+  feedback.hidden = false;
+  feedback.classList.remove("feedback-pop");
+  void feedback.offsetWidth;
+  feedback.classList.add("feedback-pop");
+  if (command.type === "give")
+    document
+      .querySelector(`[data-receipt-player="${command.to}"]`)
+      ?.classList.add("receipt-arrival");
+  feedbackTimer = setTimeout(() => {
+    feedback.hidden = true;
+  }, 2300);
+}
 function notice(message = "") {
   $("notice").textContent = message;
   $("notice").hidden = !message;
@@ -65,6 +90,7 @@ async function act(command) {
     busy = false;
     render();
     $("main").setAttribute("aria-busy", "false");
+    if (succeeded) roundFeedback(command);
     if (succeeded && command.type === "bet") {
       document
         .querySelectorAll(".just-placed")
@@ -79,6 +105,12 @@ async function act(command) {
       $("results").classList.remove("result-reveal");
       void $("results").offsetWidth;
       $("results").classList.add("result-reveal");
+      $("results").scrollIntoView({
+        block: "start",
+        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+          ? "instant"
+          : "smooth",
+      });
     }
     if (succeeded && command.type === "spin" && window.innerWidth <= 760) {
       document.querySelector(".wheel-panel").scrollIntoView({
@@ -332,115 +364,326 @@ function renderAllBets() {
     }),
   );
 }
+function avatar(index, cls = "round-avatar") {
+  const node = element("span", cls, initials(state.players[index].name));
+  node.style.setProperty("--player-color", playerColor(index));
+  return node;
+}
 function renderResults() {
+  const results = state.settlement,
+    key = `${state.gameId}:${state.round}`;
+  const open = results
+    .map((r, i) => (r.remaining ? i : null))
+    .filter((i) => i !== null);
+  if (allocationChoice.key !== key)
+    allocationChoice = { key, from: null, to: null, amount: null };
+  if (!open.includes(allocationChoice.from)) {
+    allocationChoice.from = open[0] ?? null;
+    allocationChoice.to = null;
+    allocationChoice.amount = null;
+  }
   $("result-number").textContent = state.outcome;
   $("result-number").className = `result-number ${color(state.outcome)}`;
   $("result-title").textContent =
     `${state.outcome} · ${{ red: "Rot", black: "Schwarz", green: "Zero" }[color(state.outcome)]}`;
-  $("settlements").replaceChildren(
-    ...state.players.map((player, index) => {
-      const r = state.settlement[index],
-        section = element("article", "settlement");
-      section.append(element("h3", "", player.name));
-      const won = state.bets.filter(
-        (b) =>
-          b.player === index &&
-          betById.get(b.id).numbers.includes(state.outcome),
-      );
-      if (won.length)
-        section.append(
-          element(
-            "p",
-            "payout",
-            won
-              .map(
-                (b) =>
-                  `${betById.get(b.id).label}: ${fmt(b.amount)} × ${betById.get(b.id).odds} = ${fmt(b.amount * betById.get(b.id).odds)}`,
-              )
-              .join(" · "),
-          ),
-        );
-      section.append(
+  $("round-prize-total").textContent = fmt(
+    results.reduce((sum, r) => sum + r.give, 0),
+  );
+  const sparks = document.querySelector(".prize-sparks");
+  if (!sparks.children.length)
+    for (let i = 0; i < 16; i++) {
+      const spark = element("i", "");
+      spark.style.setProperty("--i", i);
+      sparks.append(spark);
+    }
+  sparks.hidden = !results.some((r) => r.give);
+  const layout = element("div", "settlement-layout"),
+    payout = element("section", "payout-panel"),
+    receipts = element("section", "receipt-panel");
+  payout.setAttribute("aria-label", "Gewinne verteilen");
+  receipts.setAttribute("aria-label", "Erhaltene Schlücke");
+  payout.append(element("p", "eyebrow", "VERTEILEN"));
+  const selectors = element("div", "winner-selectors");
+  results.forEach((r, i) => {
+    if (!r.give) return;
+    const select = button(
+      `${state.players[i].name} · ${r.remaining ? fmt(r.remaining) : "✓"}`,
+      `winner-pill${allocationChoice.from === i ? " active" : ""}`,
+      () => {
+        allocationChoice.from = i;
+        allocationChoice.to = null;
+        allocationChoice.amount = null;
+        renderResults();
+      },
+    );
+    select.prepend(avatar(i, "winner-avatar"));
+    select.disabled = !r.remaining;
+    select.setAttribute("aria-pressed", String(allocationChoice.from === i));
+    selectors.append(select);
+  });
+  payout.append(selectors);
+  if (allocationChoice.from === null) {
+    payout.append(
+      element(
+        "span",
+        "payout-done-icon",
+        results.some((r) => r.give) ? "✓" : "—",
+      ),
+      element(
+        "h3",
+        "",
+        results.some((r) => r.give) ? "Alles verteilt." : "Keine Gewinne.",
+      ),
+      element(
+        "p",
+        "payout-done-copy",
+        results.some((r) => r.give)
+          ? "Jetzt die offenen Schlücke bestätigen."
+          : "Bestätigt die verlorenen Einsätze.",
+      ),
+    );
+  } else {
+    const from = allocationChoice.from,
+      r = results[from];
+    if (!Number.isInteger(allocationChoice.to))
+      allocationChoice.to =
+        state.players.length > 1 ? (from + 1) % state.players.length : from;
+    allocationChoice.amount = Math.max(
+      1,
+      Math.min(r.remaining, allocationChoice.amount ?? state.settings.minimum),
+    );
+    const bank = element("div", "winner-bank"),
+      ring = element("div", "prize-ring");
+    ring.style.setProperty(
+      "--progress",
+      `${(1 - r.remaining / r.give) * 360}deg`,
+    );
+    ring.append(
+      element("strong", "prize-count", fmt(r.remaining)),
+      element("span", "", "noch offen"),
+    );
+    const bankCopy = element("div", "bank-copy");
+    bankCopy.append(
+      avatar(from),
+      element("h3", "", `${state.players[from].name} verteilt`),
+      element(
+        "p",
+        "",
+        `${fmt(r.give - r.remaining)} von ${fmt(r.give)} verteilt oder freigegeben`,
+      ),
+    );
+    bank.append(ring, bankCopy);
+    payout.append(bank);
+    if (r.rawWin > r.give)
+      payout.append(
         element(
           "p",
-          "",
-          `${fmt(r.drink)} Schlücke zugeteilt (${fmt(r.drink - r.acknowledged)} offen) · ${fmt(r.remaining)} noch zu verteilen`,
+          "cap-note",
+          `Gewinngrenze: ${fmt(r.give)} statt ${fmt(r.rawWin)} Schlücke.`,
         ),
       );
-      if (r.rawWin > r.give || r.rawLoss > (state.settings.lossCap || Infinity))
-        section.append(
-          element(
-            "p",
-            "muted",
-            `Eure Grenzen wurden angewandt. Regulärer Gewinn: ${fmt(r.rawWin)}, Verlust: ${fmt(r.rawLoss)}.`,
-          ),
-        );
-      if (r.remaining) {
-        const form = element("form", "allocation");
-        const recipientLabel = element("label", "", "Empfänger"),
-          recipient = element("select", "");
-        recipient.setAttribute("aria-label", `Empfänger für ${player.name}`);
-        recipient.append(
-          ...state.players.map((p, j) => {
-            const o = element(
-              "option",
-              "",
-              p.name + (j === index ? " (selbst)" : ""),
-            );
-            o.value = j;
-            return o;
-          }),
-        );
-        recipient.value =
-          state.players.length > 1 ? (index + 1) % state.players.length : index;
-        recipientLabel.append(recipient);
-        const amountLabel = element("label", "", "Schlücke"),
-          amount = element("input", "");
-        amount.type = "number";
-        amount.min = "1";
-        amount.max = r.remaining;
-        amount.step = "1";
-        amount.value = Math.min(state.settings.minimum, r.remaining);
-        amount.required = true;
-        amount.setAttribute("aria-label", `Menge von ${player.name}`);
-        amountLabel.append(amount);
-        const give = element("button", "secondary", "Schlücke zuteilen");
-        give.type = "submit";
-        form.append(recipientLabel, amountLabel, give);
-        form.addEventListener("submit", (e) => {
-          e.preventDefault();
-          act({
-            type: "give",
-            from: index,
-            to: Number(recipient.value),
-            amount: Number(amount.value),
-          });
-        });
-        section.append(form);
-        section.append(
+    payout.append(
+      element("p", "recipient-label", "Wem gibst du die Schlücke?"),
+    );
+    const targets = element("div", "recipient-grid");
+    targets.setAttribute("role", "group");
+    targets.setAttribute(
+      "aria-label",
+      `Empfänger für ${state.players[from].name}`,
+    );
+    state.players.forEach((p, i) => {
+      const target = button(
+        "",
+        `recipient-card${allocationChoice.to === i ? " selected" : ""}`,
+        () => {
+          allocationChoice.to = i;
+          renderResults();
+        },
+      );
+      target.dataset.recipient = i;
+      target.setAttribute(
+        "aria-label",
+        `${p.name}${i === from ? " (selbst)" : ""}`,
+      );
+      target.setAttribute("aria-pressed", String(allocationChoice.to === i));
+      target.append(
+        avatar(i),
+        element("strong", "", p.name),
+        element(
+          "small",
+          "",
+          i === from
+            ? "Selbst übernehmen"
+            : `${fmt(results[i].drink - results[i].acknowledged)} offen`,
+        ),
+      );
+      targets.append(target);
+    });
+    payout.append(targets);
+    const form = element("form", "allocation allocation-modern"),
+      label = element("label", "amount-label", "Wie viele?"),
+      counter = element("div", "sip-counter");
+    const amount = element("input", "");
+    amount.id = "give-amount";
+    amount.type = "number";
+    amount.min = 1;
+    amount.max = r.remaining;
+    amount.step = 1;
+    amount.value = allocationChoice.amount;
+    amount.required = true;
+    amount.setAttribute("aria-label", `Menge von ${state.players[from].name}`);
+    const send = element("button", "gold-button send-sips");
+    send.id = "send-sips";
+    send.type = "submit";
+    const update = () => {
+      allocationChoice.amount = Number(amount.value);
+      const n = allocationChoice.amount;
+      send.textContent = `${fmt(Number.isFinite(n) ? n : 0)} → ${state.players[allocationChoice.to].name} verteilen`;
+      send.disabled = !Number.isSafeInteger(n) || n < 1 || n > r.remaining;
+    };
+    counter.append(
+      button("−", "amount-step", () => {
+        amount.value = Math.max(1, Number(amount.value) - 1);
+        update();
+      }),
+      amount,
+      button("+", "amount-step", () => {
+        amount.value = Math.min(r.remaining, Number(amount.value) + 1);
+        update();
+      }),
+    );
+    amount.addEventListener("input", update);
+    label.append(counter);
+    const presets = element("div", "amount-presets");
+    [...new Set([1, state.settings.minimum, 5, r.remaining])]
+      .filter((n) => n <= r.remaining)
+      .forEach((n) =>
+        presets.append(
           button(
-            `Restliche ${fmt(r.remaining)} verfallen lassen`,
-            "text-button",
-            () => act({ type: "waive", player: index }),
+            n === r.remaining ? "Alle" : String(n),
+            "amount-preset",
+            () => {
+              amount.value = n;
+              update();
+            },
           ),
-        );
-      }
-      if (r.drink) {
-        const confirm = button(
-          r.confirmed
-            ? "✓ Bestätigt"
-            : `${fmt(r.drink - r.acknowledged)} Schlücke bestätigen`,
-          "secondary confirm-drink",
-          () => act({ type: "confirm", player: index }),
-        );
-        confirm.disabled = r.confirmed;
-        section.append(confirm);
-      }
-      return section;
-    }),
+        ),
+      );
+    form.append(label, presets, send);
+    update();
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      act({
+        type: "give",
+        from,
+        to: allocationChoice.to,
+        amount: Number(amount.value),
+      });
+    });
+    payout.append(form);
+    payout.append(
+      button(
+        `Restliche ${fmt(r.remaining)} verfallen lassen`,
+        "text-button waive-button",
+        () => act({ type: "waive", player: from }),
+      ),
+    );
+  }
+  const pending = results.reduce((sum, r) => sum + r.drink - r.acknowledged, 0);
+  const receiptTitle = element("div", "receipt-heading");
+  receiptTitle.append(
+    element("p", "eyebrow", "ERHALTEN"),
+    element("h3", "", `${fmt(pending)} ${sipWord(pending)} offen`),
   );
-  $("next").disabled = state.settlement.some(
-    (r) => r.remaining || !r.confirmed,
+  receipts.append(receiptTitle);
+  state.players.forEach((player, i) => {
+    const r = results[i],
+      left = r.drink - r.acknowledged,
+      card = element(
+        "article",
+        `receipt-card${left ? " pending" : " cleared"}`,
+      );
+    card.dataset.receiptPlayer = i;
+    const header = element("div", "receipt-card-heading");
+    header.append(
+      avatar(i),
+      element("strong", "", player.name),
+      element("span", "receipt-count", left ? fmt(left) : "✓"),
+    );
+    card.append(header);
+    const loss = state.settings.lossCap
+      ? Math.min(r.rawLoss, state.settings.lossCap)
+      : r.rawLoss;
+    const sources = element("ul", "receipt-sources");
+    if (loss) {
+      const line = element("li", "");
+      line.append(
+        element("span", "", "Eigener verlorener Einsatz"),
+        element("strong", "", String(loss)),
+      );
+      sources.append(line);
+    }
+    const grouped = new Map();
+    for (const t of state.transfers ?? [])
+      if (t.to === i)
+        grouped.set(t.from, (grouped.get(t.from) ?? 0) + t.amount);
+    for (const [from, n] of grouped) {
+      const line = element("li", "");
+      line.append(
+        element(
+          "span",
+          "",
+          from === i ? "Selbst übernommen" : `Von ${state.players[from].name}`,
+        ),
+        element("strong", "", fmt(n)),
+      );
+      sources.append(line);
+    }
+    const earlier =
+      r.drink - loss - [...grouped.values()].reduce((a, b) => a + b, 0);
+    if (earlier > 0) {
+      const line = element("li", "");
+      line.append(
+        element("span", "", "Frühere Zuteilungen"),
+        element("strong", "", fmt(earlier)),
+      );
+      sources.append(line);
+    }
+    if (r.acknowledged)
+      card.append(
+        element("p", "receipt-ack", `${fmt(r.acknowledged)} bereits bestätigt`),
+      );
+    card.append(sources);
+    if (left) {
+      const confirm = button(
+        `${fmt(left)} ${sipWord(left)} bestätigen`,
+        "confirm-drink",
+        () => act({ type: "confirm", player: i }),
+      );
+      card.append(confirm);
+    } else
+      card.append(
+        element(
+          "span",
+          "receipt-clear-note",
+          r.drink ? "Alles bestätigt" : "Keine Schlücke offen",
+        ),
+      );
+    receipts.append(card);
+  });
+  layout.append(payout, receipts);
+  $("settlements").replaceChildren(layout);
+  const remaining = results.reduce((sum, r) => sum + r.remaining, 0),
+    confirmations = results.filter((r) => !r.confirmed).length;
+  $("next").disabled = !!remaining || !!confirmations;
+  $("round-progress").textContent = remaining
+    ? `${fmt(remaining)} noch verteilen · ${confirmations} Bestätigungen offen`
+    : confirmations
+      ? `${confirmations} Bestätigungen offen`
+      : "✓ Runde abgeschlossen";
+  $("results").classList.toggle(
+    "round-is-complete",
+    !remaining && !confirmations,
   );
 }
 function stopSound() {

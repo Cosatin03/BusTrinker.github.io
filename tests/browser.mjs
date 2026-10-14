@@ -611,7 +611,7 @@ try {
     return Math.abs(minus.top - plus.top) < 2 && minus.right < plus.left;
   });
   assert.ok(counterInline, "Amount stepper buttons must share one row");
-  assert.equal(await payout.locator(".prize-count").innerText(), "105");
+  assert.equal(await payout.locator(".prize-count").innerText(), "30");
   assert.equal(await payout.locator(".recipient-card").count(), 3);
   const resultOrder = await payout.evaluate(
     () =>
@@ -656,7 +656,7 @@ try {
   );
   await payout.reload();
   await payout.locator("#send-sips").waitFor();
-  assert.equal(await payout.locator(".prize-count").innerText(), "101");
+  assert.equal(await payout.locator(".prize-count").innerText(), "26");
   assert.ok(
     (await payout.locator('[data-receipt-player="1"]').innerText()).includes(
       "Von Alex",

@@ -20,7 +20,7 @@ function add(id, label, numbers, odds, kind) {
   BETS.push({ id, label, numbers, odds, kind });
 }
 const range = (a, b) => Array.from({ length: b - a + 1 }, (_, i) => a + i);
-for (let n = 0; n <= 36; n++) add(`n${n}`, String(n), [n], 35, "straight");
+for (let n = 0; n <= 36; n++) add(`n${n}`, String(n), [n], 10, "straight");
 for (const [id, label, test] of [
   ["red", "Rot", (n) => RED.has(n)],
   ["black", "Schwarz", (n) => !RED.has(n)],

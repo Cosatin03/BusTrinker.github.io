@@ -16,13 +16,13 @@ function spin(s, n = 0) {
   s = act(s, { type: "spin", outcome: n, now: 1000 });
   return act(s, { type: "settle", now: 14000 });
 }
-test("European wheel and all standard coverage/payouts, including zero combinations", () => {
+test("European wheel, 10:1 straight bets and standard combination payouts", () => {
   assert.equal(new Set(WHEEL).size, 37);
   assert.equal(WHEEL.length, 37);
   assert.equal(WHEEL.filter((n) => color(n) === "red").length, 18);
   assert.equal(BETS.length, new Set(BETS.map((b) => b.id)).size);
   for (const b of BETS) {
-    assert.equal(b.odds, 36 / b.numbers.length - 1);
+    assert.equal(b.odds, b.kind === "straight" ? 10 : 36 / b.numbers.length - 1);
     assert.equal(new Set(b.numbers).size, b.numbers.length);
     assert.ok(b.numbers.every((n) => WHEEL.includes(n)));
     for (let outcome = 0; outcome <= 36; outcome++) {
@@ -79,7 +79,7 @@ test("net odds, caps, losses, split allocation, confirmations and next round", (
   s = act(s, { type: "bet", id: "n1", amount: 3 });
   s = act(s, { type: "bet", id: "black", amount: 3 });
   s = spin(s, 1);
-  assert.equal(s.settlement[0].rawWin, 105);
+  assert.equal(s.settlement[0].rawWin, 30);
   assert.equal(s.settlement[0].give, 20);
   assert.equal(s.settlement[0].drink, 4);
   assert.throws(() => act(s, { type: "next" }));
@@ -105,7 +105,7 @@ test("solo self allocation and waiving winnings; zero loses even/red", () => {
   s = act(s, { type: "bet", id: "n0", amount: 3 });
   s = act(s, { type: "bet", id: "even", amount: 3 });
   s = spin(s, 0);
-  assert.equal(s.settlement[0].give, 105);
+  assert.equal(s.settlement[0].give, 30);
   assert.equal(s.settlement[0].drink, 3);
   s = act(s, { type: "give", from: 0, to: 0, amount: 2 });
   s = act(s, { type: "waive", player: 0 });

@@ -190,7 +190,7 @@ for (const [kind, id] of [
   );
 }
 $("zero").addEventListener("click", () => place("n0"));
-$("zero").setAttribute("aria-label", "0, Gewinn 35 zu 1");
+$("zero").setAttribute("aria-label", "0, Gewinn 10 zu 1");
 function combinations() {
   $("combination").replaceChildren(
     ...BETS.filter((b) => b.kind === $("combination-type").value).map((b) => {

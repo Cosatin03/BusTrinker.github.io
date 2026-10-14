@@ -65,7 +65,7 @@ Ein Hostwechsel ist nach zwei Minuten ohne Präsenzsignal möglich. Präsenz wir
 
 ## Roulette
 
-`roulette.html` ist ein lokales Spiel für mindestens eine Person ohne feste Spielergrenze. `roulette-core.js` enthält die vollständigen europäischen Setzfelder und Zustandsübergänge, `roulette.js` Bedienung und Speicherung, `roulette-scene.js` die feste Three.js-Kamera, Rad, Kugel und Jetons. Gewinne sind Nettoquoten (35:1 bis 1:1); gewonnene Einsätze werden nicht als zusätzliche Schlücke gezählt. Zero verliert auf allen Außenwetten. Gewinn- und Verlustgrenzen sind optional und standardmäßig aus.
+`roulette.html` ist ein lokales Spiel für mindestens eine Person ohne feste Spielergrenze. `roulette-core.js` enthält die vollständigen europäischen Setzfelder und Zustandsübergänge, `roulette.js` Bedienung und Speicherung, `roulette-scene.js` die feste Three.js-Kamera, Rad, Kugel und Jetons. Einzelne Zahlen einschließlich Zero gewinnen 10:1; die übrigen Wetten verwenden die üblichen Nettoquoten von 17:1 bis 1:1; gewonnene Einsätze werden nicht als zusätzliche Schlücke gezählt. Zero verliert auf allen Außenwetten. Gewinn- und Verlustgrenzen sind optional und standardmäßig aus.
 
 Die zufällige Zahl wird vor der Animation mit Web Crypto und Rejection Sampling gleichverteilt gewählt und zusammen mit dem Startzeitpunkt gespeichert. Animation und Ergebnis benutzen dieselbe Zahl. Neuladen würfelt nicht erneut; das Abrechnen und Zuteilen ist revisionsgesichert. Web Locks serialisieren Aktionen mehrerer Tabs, soweit vom Browser unterstützt. Spielerzahl ist nur durch Gerätespeicher/Browser begrenzt. Der Zahlenbereich ist endlich; Einsätze sind auf 10.000 je Feld begrenzt.
 

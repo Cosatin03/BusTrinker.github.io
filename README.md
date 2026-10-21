@@ -82,3 +82,19 @@ Rad und Setzfeld stehen übereinander auf derselben Filzfläche. Das Setzfeld bl
 Die Ergebnisphase steht vor dem Setzfeld. Ein Gewinnpanel zeigt den verbleibenden Betrag und den Verteilfortschritt. Empfänger werden direkt als Spielerkarten ausgewählt; Mengen lassen sich über Zähler, Schnellwerte oder freie Eingabe bestimmen. Daneben zeigen Empfangskarten offene Schlücke getrennt von bereits bestätigten Mengen, eigenen verlorenen Einsätzen und Zuteilungen anderer Spieler. Jede Verteilung erzeugt eine visuelle Rückmeldung.
 
 Ein optionales `transfers`-Protokoll speichert pro Runde Absender, Empfänger und Menge. Alte Spielstände bleiben gültig; vorherige Zuteilungen ohne Protokoll werden als solche angezeigt. Nach einem Neuladen bleiben Verteilreste, Quellen und Bestätigungen erhalten. Beim Rundenwechsel wird das Protokoll geleert.
+
+### Rutschen & Leitern
+
+`ladders.html` ist ein lokales Spiel ab einer Person: 20–120 Felder, bis zu je
+zehn Rutschen und Leitern, drei Zielregeln und optionaler Extrazug bei einer Sechs.
+102 Aufgaben aus vier Kategorien werden ohne Wiederholung innerhalb des jeweiligen
+Pools gezogen. Eigene Zeilen ersetzen einen Kategoriepool; feste Feldaufgaben
+überschreiben den zufälligen Aufgabenbezug. Aufgaben und Duelle werden am Tisch
+beurteilt. Sie verändern Positionen nicht automatisch und können übersprungen werden.
+
+Die reine Logik liegt in `ladders-core.js`; die lokal geladene Three.js-Szene in
+`ladders-scene.js` verwendet eine feste orthografische Kamera. Ergebnisse werden
+vor der Animation gespeichert. Ohne WebGL ist ein bedienbares Ersatzbrett verfügbar.
+`tests/ladders.test.js` prüft Bewegung, Endbedingungen und Aufgabenstapel;
+`tests/ladders-browser.mjs` prüft 3D, mobile Darstellung, Wiederaufnahme,
+Tab-Synchronisierung, eigene Aufgaben, Sammlung und einen vollständigen Spielabschluss.

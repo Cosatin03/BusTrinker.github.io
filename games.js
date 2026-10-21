@@ -1,6 +1,44 @@
 // Add another entry here to make a game discoverable in the collection.
 export const games = [
-  {id: 'ring-of-fire', title: 'Ring of Fire', subtitle: 'HALTET DEN KREIS.', mode: 'local', players: 'Ab 2 Spieler', duration: 'Ein Gerät', href: 'ring-of-fire.html', rules: 'rules.html#ring-of-fire', description: '52 Karten, euer Königsbecher und jede Menge eigene Regeln. Welche Karte ziehst du?', tags: ['Karten', 'Reihum', 'Eigene Regeln'], illustration: 'ring-of-fire', color: 'peach', cta: 'An den Feuerkreis'},
+  {
+    id: "ladders",
+    title: "Rutschen & Leitern",
+    subtitle: "HOCH HINAUS. ABER REIHUM.",
+    mode: "local",
+    players: "Ab 1 Person",
+    duration: "Ein Gerät",
+    href: "ladders.html",
+    rules: "rules.html#ladders",
+    description:
+      "Würfle dich nach oben. Rutsche zurück. Jedes Feld bringt eine Aufgabe – auf eurem eigenen 3D-Spielbrett.",
+    tags: [
+      "Brettspiel",
+      "Würfel",
+      "3D",
+      "Eigene Aufgaben",
+      "Rutschen",
+      "Leitern",
+    ],
+    illustration: "ladders",
+    color: "mint",
+    cta: "Aufs Spielbrett",
+  },
+  {
+    id: "ring-of-fire",
+    title: "Ring of Fire",
+    subtitle: "HALTET DEN KREIS.",
+    mode: "local",
+    players: "Ab 2 Spieler",
+    duration: "Ein Gerät",
+    href: "ring-of-fire.html",
+    rules: "rules.html#ring-of-fire",
+    description:
+      "52 Karten, euer Königsbecher und jede Menge eigene Regeln. Welche Karte ziehst du?",
+    tags: ["Karten", "Reihum", "Eigene Regeln"],
+    illustration: "ring-of-fire",
+    color: "peach",
+    cta: "An den Feuerkreis",
+  },
   {
     id: "bustrinker",
     title: "BusTrinker",

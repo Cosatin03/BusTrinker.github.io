@@ -1762,3 +1762,5 @@ dialog .muted {
 .game-art.roulette { display: flex; align-items: center; justify-content: center; }
 
 .catalog-fire-ring{position:relative;width:210px;height:210px;display:grid;place-items:center}.catalog-fire-ring span{position:absolute;width:34px;height:50px;display:grid;place-items:center;background:#254039;color:#dafa7a;border:2px solid #f7f4e8;border-radius:4px;transform:rotate(var(--angle)) translateY(-75px);box-shadow:0 3px 6px #0004}.catalog-fire-ring b{font-size:52px;color:#ecc2a8}
+
+.catalog-board{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;width:205px;transform:rotate(-12deg);margin:auto}.catalog-board span{display:grid;place-content:center;aspect-ratio:1;background:#dafa7a;color:#173128;font-size:20px;font-weight:700;border-radius:7px;box-shadow:0 4px 0 #849858}.catalog-board span:nth-child(even){background:#ecc2a8;box-shadow:0 4px 0 #a88c73}.catalog-board span:nth-child(5){font-size:40px;background:#a8c9ec;transform:translateY(-8px)}

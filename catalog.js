@@ -29,6 +29,10 @@ function render() {
         art.append(row);
       }
       art.append(element("span", "art-stamp", "ALLE AN BORD"));
+    } else if (game.illustration === "ring-of-fire") {
+      const ring = element('div', 'catalog-fire-ring');
+      for(let i=0;i<13;i++){const c=element('span','','♧');c.style.setProperty('--angle', `${i*360/13}deg`);ring.append(c);}
+      ring.append(element('b','','♛'));art.append(ring,element('span','art-stamp','HALTET DEN KREIS'));
     } else if (game.illustration === "roulette") {
       art.append(
         element("div", "catalog-wheel", "0"),
@@ -82,11 +86,14 @@ search.addEventListener("input", render);
 render();
 const session = loadSession(),
   local = readSaved("bustrinker.higher-lower.v1"),
-  roulette = readSaved("bustrinker.roulette.v1");
-if (session || local?.state || roulette?.state) {
+  roulette = readSaved("bustrinker.roulette.v1"),
+  ring = readSaved("bustrinker.ring-of-fire.v1");
+if (session || local?.state || roulette?.state || (ring && ring.phase !== "finished")) {
   document.querySelector("#resume-area").hidden = false;
   document.querySelector("#resume-label").textContent = session
     ? `BusTrinker · ${session.roomCode}`
+    : ring && ring.phase !== "finished"
+      ? "Ring of Fire"
     : roulette?.state
       ? "Roulette"
       : "Höher / Tiefer";
@@ -95,6 +102,8 @@ if (session || local?.state || roulette?.state) {
     : "Euer Spielstand ist auf diesem Gerät gespeichert.";
   document.querySelector("#resume-link").href = session
     ? "bustrinker.html"
+    : ring && ring.phase !== "finished"
+      ? "ring-of-fire.html"
     : roulette?.state
       ? "roulette.html"
       : "HoeherTiefer.html";

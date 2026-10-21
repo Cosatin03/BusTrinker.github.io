@@ -137,7 +137,7 @@ try {
   const menu = await pageAt(1440);
   await menu.goto(base);
   await menu.locator(".game-tile").first().waitFor();
-  assert.equal(await menu.locator(".game-tile").count(), 3);
+  assert.equal(await menu.locator(".game-tile").count(), 4);
   await noOverflow(menu);
   await menu.screenshot({
     path: resolve(results, "menu-desktop.png"),
@@ -150,10 +150,29 @@ try {
     fullPage: true,
   });
   await menu.getByRole("button", { name: "Ein Gerät", exact: true }).click();
-  assert.equal(await menu.locator(".game-tile").count(), 2);
+  assert.equal(await menu.locator(".game-tile").count(), 3);
   await menu.locator("#game-search").fill("nichts");
   await menu.locator("#no-games").waitFor();
   console.log("PASS collection filters, mobile/desktop layout");
+
+  const fire = await pageAt();
+  await fire.goto(base + '/ring-of-fire.html');
+  await fire.locator('#names').fill('Alex\nSam\nKim');
+  await fire.locator('#setup details summary').click();
+  for (const select of await fire.locator('#mapping select').all()) await select.selectOption('custom');
+  await fire.locator('#setup-form button[type=submit]').click();
+  await noOverflow(fire);
+  await fire.locator('.rof-card').last().click();
+  await fire.reload();
+  await fire.locator('#action-form').waitFor({state:'visible'});
+  assert.equal(await fire.locator('#task-title').textContent(), 'Eigene Aufgabe');
+  await fire.locator('#action-form button[type=submit]').click();
+  assert.equal(await fire.locator('#turn').textContent(), 'Sam');
+  await fire.screenshot({path:resolve(results,'ring-of-fire-mobile.png'),fullPage:true});
+  await fire.setViewportSize({width:1440,height:900});
+  await noOverflow(fire);
+  await fire.screenshot({path:resolve(results,'ring-of-fire-desktop.png'),fullPage:true});
+  console.log('PASS Ring of Fire setup, draw, restore and turn order');
 
   const host = await pageAt(),
     guest = await pageAt(),

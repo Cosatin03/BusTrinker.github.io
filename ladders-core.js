@@ -219,13 +219,40 @@ export function createGame(names, input, rng = Math.random) {
     names.length
   )
     throw Error("Bitte unterschiedliche Namen verwenden.");
-  const ends = shuffle(
+  // Prefer short, separate connections instead of long diagonals across the board.
+  const available = new Set(
     Array.from({ length: options.size - 2 }, (_, i) => i + 2),
-    rng,
   );
   const links = [];
+  const cross = (a, b, c) =>
+    (b.x - a.x) * (c.z - a.z) - (b.z - a.z) * (c.x - a.x);
   for (let i = 0; i < options.ladders + options.slides; i++) {
-    const [a, b] = [ends.pop(), ends.pop()].sort((a, b) => a - b);
+    let best = null,
+      score = Infinity;
+    for (const a of available)
+      for (const b of available) {
+        if (b <= a) continue;
+        const pa = fieldPosition(a, options.size),
+          pb = fieldPosition(b, options.size);
+        let cost = Math.hypot(pa.x - pb.x, pa.z - pb.z) + rng() * 0.7;
+        if (pa.z === pb.z) cost += 3;
+        for (const l of links) {
+          const pc = fieldPosition(l.from, options.size),
+            pd = fieldPosition(l.to, options.size);
+          if (
+            cross(pa, pb, pc) * cross(pa, pb, pd) <= 0 &&
+            cross(pc, pd, pa) * cross(pc, pd, pb) <= 0
+          )
+            cost += 1000;
+        }
+        if (cost < score) {
+          score = cost;
+          best = [a, b];
+        }
+      }
+    const [a, b] = best;
+    available.delete(a);
+    available.delete(b);
     links.push(
       i < options.ladders
         ? { from: a, to: b, type: "ladder" }
@@ -251,25 +278,45 @@ export function createGame(names, input, rng = Math.random) {
     phase: "roll",
     links,
     fields: categories.slice(0, options.size),
-    bags: {},
+    bags: Object.fromEntries(
+      options.categories.map((c) => [c, shuffle(taskPool(options, c), rng)]),
+    ),
     lastTasks: {},
     task: null,
     move: null,
     history: [],
   };
 }
+export function prepareTasks(state, rng = Math.random) {
+  for (const category of state.settings.categories)
+    if (!state.bags[category]?.length) {
+      const tasks = shuffle(taskPool(state.settings, category), rng);
+      if (tasks.length > 1 && tasks.at(-1).id === state.lastTasks[category])
+        [tasks[0], tasks[tasks.length - 1]] = [tasks.at(-1), tasks[0]];
+      state.bags[category] = tasks;
+    }
+}
+export function previewTask(state, field) {
+  if (state.settings.fields[field]) return state.settings.fields[field];
+  const category = state.fields[field - 1];
+  const text =
+    state.settings.fields[field] ||
+    state.bags[category]?.at(-1)?.text ||
+    taskPool(state.settings, category)[0].text;
+  return text.replaceAll("{n}", String(state.settings.sips));
+}
+export function taskTitle(text) {
+  const words = text.replace(/[.,:;!?].*$/, "").split(/\s+/);
+  return words.slice(0, 5).join(" ") + (words.length > 5 ? " …" : "");
+}
 export function drawTask(state, field, rng) {
   if (state.settings.fields[field])
     return { category: "custom", text: state.settings.fields[field], field };
   const category = state.fields[field - 1];
-  if (!state.bags[category]?.length) {
-    const tasks = shuffle(taskPool(state.settings, category), rng);
-    if (tasks.length > 1 && tasks.at(-1).id === state.lastTasks[category])
-      [tasks[0], tasks[tasks.length - 1]] = [tasks.at(-1), tasks[0]];
-    state.bags[category] = tasks;
-  }
+  prepareTasks(state, rng);
   const task = state.bags[category].pop();
   state.lastTasks[category] = task.id;
+  prepareTasks(state, rng);
   return {
     ...task,
     text: task.text.replaceAll("{n}", String(state.settings.sips)),

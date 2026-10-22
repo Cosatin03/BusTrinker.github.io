@@ -1,5 +1,8 @@
 import {
   KEY,
+  prepareTasks,
+  previewTask,
+  taskTitle,
   CATEGORIES,
   DEFAULTS,
   TASKS,
@@ -32,6 +35,11 @@ let state = readSaved(KEY),
   overrides = {},
   pending = null;
 if (!validGame(state)) state = null;
+else {
+  prepareTasks(state);
+  save(KEY, state);
+}
+let roster = [];
 const reduced = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
 function notice(text = "") {
   $("notice").textContent = text;
@@ -71,11 +79,60 @@ for (const [id, c] of Object.entries(CATEGORIES)) {
   $("category-settings").append(wrap);
 }
 $("task-count").textContent = ` · ${TASKS.length} Vorlagen`;
+function renderRoster() {
+  $("setup-players").replaceChildren(
+    ...roster.map((name, i) => {
+      const li = element("li", "roster-player");
+      const badge = element("span", "roster-badge", String(i + 1));
+      badge.style.background = colors[i % colors.length];
+      const remove = button("×", () => {
+        roster.splice(i, 1);
+        renderRoster();
+      });
+      remove.setAttribute("aria-label", `${name} entfernen`);
+      li.append(badge, element("strong", "", name), remove);
+      return li;
+    }),
+  );
+  $("player-count").textContent = roster.length
+    ? `${roster.length} Personen · Zugfolge von oben nach unten`
+    : "Noch niemand dabei. Fügt die erste Person hinzu.";
+  document.querySelector(".start-board").disabled = !roster.length;
+}
+function addPlayer() {
+  const input = $("player-name"),
+    name = input.value.trim();
+  if (!name) {
+    input.focus();
+    return;
+  }
+  if (
+    roster.some(
+      (n) => n.toLocaleLowerCase("de") === name.toLocaleLowerCase("de"),
+    )
+  ) {
+    notice("Dieser Name ist schon dabei.");
+    return;
+  }
+  roster.push(name);
+  input.value = "";
+  renderRoster();
+  notice();
+  input.focus();
+}
+$("add-player").addEventListener("click", addPlayer);
+$("player-name").addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    addPlayer();
+  }
+});
 function loadSettings(s = DEFAULTS, names = []) {
   for (const id of ["size", "ladders", "slides", "finish", "sips", "speed"])
     $(id).value = s[id];
   $("extra-six").checked = s.extraSix;
-  $("names").value = names.join("\n");
+  roster = [...names];
+  renderRoster();
   for (const c of Object.keys(CATEGORIES)) {
     $(`cat-${c}`).checked = s.categories.includes(c);
     $(`pool-${c}`).value = s.custom[c] || "";
@@ -157,13 +214,7 @@ async function start(candidate) {
 $("setup-form").addEventListener("submit", (e) => {
   e.preventDefault();
   try {
-    const candidate = createGame(
-      $("names")
-        .value.split("\n")
-        .map((n) => n.trim())
-        .filter(Boolean),
-      inputSettings(),
-    );
+    const candidate = createGame(roster, inputSettings());
     if (state && state.phase !== "won") {
       pending = candidate;
       $("restart-dialog").showModal();
@@ -200,6 +251,7 @@ $("cancel-setup").addEventListener("click", () => {
 });
 async function act(type) {
   if (busy || !state) return;
+  let diceTimer;
   busy = true;
   const expected = state.revision,
     id = state.id;
@@ -221,6 +273,12 @@ async function act(type) {
     render(false);
     if (changed && type === "roll") {
       $("dice").classList.add("rolling");
+      if (!reduced()) {
+        let face = 0;
+        diceTimer = setInterval(() => {
+          $("dice").textContent = ["⚀", "⚁", "⚂", "⚃", "⚄", "⚅"][face++ % 6];
+        }, 85);
+      }
       $("task-card").hidden = true;
       $("task-actions").hidden = true;
       $("move-label").textContent = "Der Würfel fällt …";
@@ -233,6 +291,7 @@ async function act(type) {
     notice(error.message);
   } finally {
     busy = false;
+    clearInterval(diceTimer);
     $("dice").classList.remove("rolling");
     render();
   }
@@ -243,7 +302,7 @@ $("skip").addEventListener("click", () => act("skip"));
 function fieldDescription(n) {
   const c = CATEGORIES[state.fields[n - 1]],
     link = state.links.find((l) => l.from === n);
-  return `Feld ${n}${n === state.settings.size ? " · Ziel" : ""} · ${state.settings.fields[n] ? "Eigene Aufgabe: " + state.settings.fields[n] : c.label}${link ? ` · ${link.type === "ladder" ? "Leiter" : "Rutsche"} zu Feld ${link.to}` : ""}`;
+  return `Feld ${n}${n === state.settings.size ? " · Ziel" : ""} · ${state.settings.fields[n] ? "Eigene Aufgabe: " + state.settings.fields[n] : c.label + ": " + previewTask(state, n)}${link ? ` · ${link.type === "ladder" ? "Leiter" : "Rutsche"} zu Feld ${link.to}` : ""}`;
 }
 function selectField(n) {
   $("field-info").hidden = false;
@@ -270,6 +329,7 @@ function renderFlat() {
         `${n}${link ? ` ${link.type === "ladder" ? "↑" : "↓"}${link.to}` : ""}${players.length ? ` · ♟${players.join(",")}` : ""}`,
         () => selectField(n),
       );
+      b.append(element("small", "", taskTitle(previewTask(state, n))));
       b.style.setProperty("--tile-color", CATEGORIES[c].color);
       b.classList.toggle("occupied", !!players.length);
       b.setAttribute(

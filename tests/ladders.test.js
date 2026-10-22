@@ -5,6 +5,11 @@ import {
   transition,
   validGame,
   TASKS,
+  MODES,
+  TERM_POOLS,
+  variantCount,
+  taskPool,
+  prepareTasks,
   previewTask,
   settings,
   fieldPosition,
@@ -27,7 +32,7 @@ test("boards reserve unique internal link endpoints and assign every field", () 
   assert.throws(() => createGame(["A"], { ...basic, ladders: 10, slides: 10 }));
   assert.throws(() => createGame(["A", "a"], basic));
   assert.throws(() => settings({ categories: [] }));
-  assert.equal(TASKS.length, 102);
+  assert.ok(TASKS.length > 200);
 });
 test("exact, reach and bounce resolve overshoot, then confirm victory", () => {
   for (const finish of ["exact", "reach", "bounce"]) {
@@ -169,4 +174,75 @@ test("field preview matches the drawn task and advances with its category", () =
   assert.equal(previewTask(s, 1), previewTask(s, 2));
   s.settings.fields[2] = "Feste Aufgabe";
   assert.equal(previewTask(s, 2), "Feste Aufgabe");
+});
+
+test("each mode has 500 distinct variants; templates do not crowd the deck", () => {
+  assert.equal(TERM_POOLS.rhymes.length, 100);
+  assert.equal(TERM_POOLS.categories.length, 100);
+  for (const pool of Object.values(TERM_POOLS))
+    assert.equal(new Set(pool).size, pool.length);
+  assert.equal(new Set(TASKS.map((t) => t.id)).size, TASKS.length);
+  for (const mode of Object.keys(MODES)) {
+    const tasks = TASKS.filter((t) => t.mode === mode);
+    const expanded = tasks.flatMap((t) =>
+      t.pool
+        ? TERM_POOLS[t.pool].map((term) => t.text.replaceAll("{term}", term))
+        : [t.text],
+    );
+    assert.ok(new Set(expanded).size >= 500, mode);
+    assert.equal(variantCount(tasks), expanded.length);
+    assert.equal(tasks.filter((t) => t.pool === "rhymes").length, 1);
+    assert.equal(
+      tasks.filter((t) => t.id === `template:${mode}:category`).length,
+      1,
+    );
+    for (const c of ["talk", "challenge", "duel", "sip"])
+      assert.ok(tasks.some((t) => t.category === c));
+  }
+});
+test("mode decks are separate and sexy requires adult confirmation", () => {
+  assert.throws(() => settings({ mode: "other" }));
+  assert.throws(() => createGame(["A"], { ...basic, mode: "sexy" }));
+  for (const mode of Object.keys(MODES)) {
+    const s = createGame(["A"], {
+      ...basic,
+      mode,
+      adultConfirmed: mode === "sexy",
+    });
+    assert.ok(validGame(s));
+    for (const c of s.settings.categories)
+      assert.ok(taskPool(s.settings, c).every((t) => t.mode === mode));
+    assert.deepEqual(JSON.parse(JSON.stringify(s)), s);
+  }
+});
+test("term bags exhaust independently and avoid immediate repeat on refill", () => {
+  const s = createGame(["A"], { ...basic, categories: ["duel"] });
+  s.termBags = {};
+  s.lastTerms = {};
+  const template = TASKS.find((t) => t.id === "template:normal:rhymes"),
+    seen = [];
+  for (let i = 0; i < 101; i++) {
+    s.bags.duel = [{ ...template }];
+    prepareTasks(s);
+    seen.push(s.bags.duel[0].term);
+  }
+  assert.equal(new Set(seen.slice(0, 100)).size, 100);
+  assert.notEqual(seen[99], seen[100]);
+});
+test("template preview survives reload and legacy saves still play", () => {
+  let s = createGame(["A"], { ...basic, categories: ["duel"], mode: "crazy" });
+  s.bags.duel = [{ ...TASKS.find((t) => t.id === "template:crazy:category") }];
+  prepareTasks(s);
+  const text = previewTask(s, 1);
+  s = action(JSON.parse(JSON.stringify(s)), "roll", 1);
+  assert.equal(s.task.text, text);
+  assert.ok(s.task.term);
+  assert.ok(!text.includes("{term}"));
+  const old = createGame(["A"], basic);
+  delete old.settings.mode;
+  delete old.settings.adultConfirmed;
+  delete old.termBags;
+  delete old.lastTerms;
+  assert.ok(validGame(old));
+  assert.ok(validGame(action(old, "roll", 1)));
 });

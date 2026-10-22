@@ -55,6 +55,18 @@ async function overflow(p) {
     "horizontal overflow",
   );
 }
+async function inViewport(page, selector) {
+  const r = await page.locator(selector).boundingBox(),
+    size = page.viewportSize();
+  assert.ok(
+    r &&
+      r.y >= -1 &&
+      r.y + r.height <= size.height + 1 &&
+      r.x >= -1 &&
+      r.x + r.width <= size.width + 1,
+    `${selector}: ${JSON.stringify(r)}`,
+  );
+}
 try {
   const context = await browser.newContext({
     viewport: { width: 1440, height: 1000 },
@@ -77,9 +89,13 @@ try {
     path: resolve(root, "test-results/ladders-setup-desktop.png"),
     fullPage: true,
   });
+  await page.click('[data-mode="hardcore"]');
   await page.click(".start-board");
   await page.waitForSelector("#scene-host canvas");
   assert.equal(await page.locator("#fallback").isVisible(), false);
+  assert.equal((await saved(page)).settings.mode, "hardcore");
+  await inViewport(page, "#roll");
+  await inViewport(page, "#scene-host");
   await overflow(page);
   await page.screenshot({
     path: resolve(root, "test-results/ladders-desktop.png"),
@@ -119,7 +135,23 @@ try {
     path: resolve(root, "test-results/ladders-mobile.png"),
     fullPage: true,
   });
+  for (const viewport of [
+    { width: 360, height: 640 },
+    { width: 320, height: 568 },
+    { width: 844, height: 390 },
+  ]) {
+    await page.setViewportSize(viewport);
+    await inViewport(page, "#roll");
+    await inViewport(page, "#scene-host");
+    await overflow(page);
+  }
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.click("#board-info");
+  await page.waitForSelector("#board-info-dialog[open]");
+  await page.click("#close-info");
   await page.click("#edit");
+  await page.click('[data-mode="sexy"]');
+  await page.check("#adult-confirmed");
   await page.fill("#size", "20");
   await page.fill("#ladders", "0");
   await page.fill("#slides", "0");
@@ -142,6 +174,7 @@ try {
   await page.click("#replace-game");
   assert.equal((await saved(page)).settings.size, 20);
   assert.equal((await saved(page)).settings.fields[20], "Zielfeier");
+  assert.equal((await saved(page)).settings.mode, "sexy");
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.click("#roll");
   await page.waitForFunction(() => !document.querySelector("#done").disabled);
@@ -149,6 +182,10 @@ try {
     await page.locator("#task-text").innerText(),
     "Eine eigene Aufgabe 2",
   );
+  await inViewport(page, "#done");
+  await inViewport(page, "#skip");
+  await inViewport(page, "#task-text");
+  assert.equal(await page.evaluate(() => scrollY), 0);
   await page.screenshot({
     path: resolve(root, "test-results/ladders-task-mobile.png"),
     fullPage: true,

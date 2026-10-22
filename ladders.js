@@ -1,5 +1,8 @@
 import {
   KEY,
+  MODES,
+  variantCount,
+  previewTitle,
   prepareTasks,
   previewTask,
   taskTitle,
@@ -40,6 +43,7 @@ else {
   save(KEY, state);
 }
 let roster = [];
+let selectedMode = "normal";
 const reduced = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
 function notice(text = "") {
   $("notice").textContent = text;
@@ -78,7 +82,38 @@ for (const [id, c] of Object.entries(CATEGORIES)) {
   wrap.append(label, custom);
   $("category-settings").append(wrap);
 }
-$("task-count").textContent = ` · ${TASKS.length} Vorlagen`;
+function renderModes() {
+  $("mode-options").replaceChildren(
+    ...Object.entries(MODES).map(([id, m]) => {
+      const b = button("", () => {
+        selectedMode = id;
+        renderModes();
+      });
+      b.className = "mode-card" + (selectedMode === id ? " selected" : "");
+      b.dataset.mode = id;
+      b.setAttribute("aria-pressed", String(selectedMode === id));
+      b.append(
+        element("strong", "", `${m.icon} ${m.label}`),
+        element("span", "", m.description),
+        element(
+          "small",
+          "",
+          `${variantCount(TASKS.filter((t) => t.mode === id))} Varianten`,
+        ),
+      );
+      return b;
+    }),
+  );
+  $("adult-setting").hidden = selectedMode !== "sexy";
+  $("adult-confirmed").required = selectedMode === "sexy";
+  $("adult-confirmed").disabled = selectedMode !== "sexy";
+  const tasks = TASKS.filter((t) => t.mode === selectedMode);
+  $("task-count").textContent =
+    ` · ${tasks.length} Typen / ${variantCount(tasks)} Varianten`;
+  for (const [id, c] of Object.entries(CATEGORIES))
+    $(`cat-${id}`).parentNode.lastChild.textContent =
+      `${c.icon} ${c.label} · ${tasks.filter((t) => t.category === id).length} Typen`;
+}
 function renderRoster() {
   $("setup-players").replaceChildren(
     ...roster.map((name, i) => {
@@ -128,6 +163,9 @@ $("player-name").addEventListener("keydown", (e) => {
   }
 });
 function loadSettings(s = DEFAULTS, names = []) {
+  selectedMode = s.mode || "normal";
+  $("adult-confirmed").checked = !!s.adultConfirmed;
+  renderModes();
   for (const id of ["size", "ladders", "slides", "finish", "sips", "speed"])
     $(id).value = s[id];
   $("extra-six").checked = s.extraSix;
@@ -170,6 +208,8 @@ $("assign-field").addEventListener("click", () => {
 });
 function inputSettings() {
   return settings({
+    mode: selectedMode,
+    adultConfirmed: $("adult-confirmed").checked,
     size: Number($("size").value),
     ladders: Number($("ladders").value),
     slides: Number($("slides").value),
@@ -307,6 +347,7 @@ function fieldDescription(n) {
 function selectField(n) {
   $("field-info").hidden = false;
   $("field-info").textContent = fieldDescription(n);
+  if (!$("field-dialog").open) $("field-dialog").showModal();
 }
 function fallback() {
   sceneFailed = true;
@@ -329,7 +370,7 @@ function renderFlat() {
         `${n}${link ? ` ${link.type === "ladder" ? "↑" : "↓"}${link.to}` : ""}${players.length ? ` · ♟${players.join(",")}` : ""}`,
         () => selectField(n),
       );
-      b.append(element("small", "", taskTitle(previewTask(state, n))));
+      b.append(element("small", "", previewTitle(state, n)));
       b.style.setProperty("--tile-color", CATEGORIES[c].color);
       b.classList.toggle("occupied", !!players.length);
       b.setAttribute(
@@ -364,6 +405,7 @@ async function ensureScene() {
   }
 }
 function render(syncScene = true) {
+  document.body.classList.toggle("playing", !!state && !editing);
   $("setup").hidden = !!state && !editing;
   $("game").hidden = !state || editing;
   $("cancel-setup").hidden = !state;
@@ -373,7 +415,7 @@ function render(syncScene = true) {
     task = state.phase === "task",
     move = state.move;
   $("turn-number").textContent =
-    `ZUG ${state.turn} · ${state.players.length} ${state.players.length === 1 ? "PERSON" : "PERSONEN"}`;
+    `${MODES[state.settings.mode || "normal"].label.toUpperCase()} · ZUG ${state.turn}`;
   $("board-size").textContent =
     `${state.settings.size} FELDER · ${state.links.length} VERBINDUNGEN`;
   $("phase-label").textContent = won
@@ -404,6 +446,7 @@ function render(syncScene = true) {
     const c = CATEGORIES[state.task.category];
     $("task-category").textContent =
       `FELD ${state.task.field} · ${c?.label || "EIGENE AUFGABE"}`;
+    $("task-title").textContent = state.task.title || "Eure Aufgabe";
     $("task-text").textContent = state.task.text;
     $("task-card").style.setProperty("--task-color", c?.color || "#dafa7a");
   }
@@ -429,6 +472,18 @@ function render(syncScene = true) {
       ? `${p.name} darf nach der Aufgabe noch einmal würfeln.`
       : `Danach: ${state.players[(state.current + 1) % state.players.length].name}`;
   document.querySelector(".turn-panel").classList.toggle("winner", won);
+  document.querySelector(".turn-panel").classList.toggle("has-task", task);
+  $("quick-players").replaceChildren(
+    ...state.players.map((player, i) => {
+      const pill = element(
+        "span",
+        `quick-player${i === state.current ? " current" : ""}`,
+        `${i + 1}. ${player.name} · ${player.position}`,
+      );
+      pill.style.setProperty("--player-color", colors[i % colors.length]);
+      return pill;
+    }),
+  );
   $("standings").replaceChildren(
     ...state.players.map((player, i) => {
       const li = element(
@@ -465,11 +520,8 @@ function render(syncScene = true) {
   $("field-list").replaceChildren(
     ...state.fields.map((_, i) =>
       button(fieldDescription(i + 1), () => {
+        $("board-info-dialog").close();
         selectField(i + 1);
-        $("field-info").scrollIntoView({
-          block: "center",
-          behavior: reduced() ? "instant" : "smooth",
-        });
       }),
     ),
   );
@@ -528,3 +580,8 @@ window.addEventListener("pagehide", () => {
 window.addEventListener("pageshow", () => {
   if (state && !editing) ensureScene();
 });
+$("board-info").addEventListener("click", () =>
+  $("board-info-dialog").showModal(),
+);
+$("close-info").addEventListener("click", () => $("board-info-dialog").close());
+$("close-field").addEventListener("click", () => $("field-dialog").close());

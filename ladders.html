@@ -52,6 +52,14 @@
             </p>
           </div>
           <form id="setup-form">
+            <fieldset class="mode-picker">
+              <legend>Wie spielt ihr heute?</legend>
+              <div id="mode-options" aria-label="Spielmodus"></div>
+            </fieldset>
+            <label id="adult-setting" class="check-label" hidden
+              ><input id="adult-confirmed" type="checkbox" /> Alle sind
+              mindestens 18. Nähe nur, wenn beide sie möchten.</label
+            >
             <h2>Wer würfelt mit?</h2>
             <p class="muted">Fügt eure Runde in Sitzreihenfolge hinzu.</p>
             <label for="player-name">Spielername</label>
@@ -179,12 +187,12 @@
         </section>
         <section id="game" hidden>
           <div class="board-topline">
+            <a class="board-home" href="index.html">← Spiele</a>
             <div>
               <span class="status-dot"></span><span id="turn-number"></span>
             </div>
-            <button id="edit" class="text-button">
-              Neue Partie / Einstellungen
-            </button>
+            <button id="board-info" class="text-button">Stand & Regeln</button>
+            <button id="edit" class="text-button">Einstellungen</button>
           </div>
           <div class="board-layout">
             <div class="board-table">
@@ -204,7 +212,6 @@
                 ><span>↘ Rutsche <b>nach unten</b></span
                 ><span>Feld antippen: Details</span>
               </div>
-              <div id="field-info" role="status" hidden></div>
             </div>
             <aside class="turn-panel" aria-label="Aktueller Zug">
               <p id="phase-label" class="eyebrow">DU BIST DRAN</p>
@@ -214,6 +221,7 @@
               <p id="move-label" aria-live="polite"></p>
               <div id="task-card" class="task-card" hidden>
                 <p id="task-category" class="eyebrow"></p>
+                <h3 id="task-title"></h3>
                 <p id="task-text"></p>
               </div>
               <button id="roll" class="primary roll-button">
@@ -231,37 +239,54 @@
               <p id="next-player" class="small muted"></p>
             </aside>
           </div>
-          <section class="standings-panel">
-            <div class="section-heading">
-              <h2>Eure Positionen</h2>
-              <span id="progress-label" class="muted"></span>
+          <div id="quick-players" aria-label="Spielerpositionen"></div>
+          <dialog id="board-info-dialog">
+            <div class="dialog-heading">
+              <h2>Eure Partie</h2>
+              <button id="close-info" aria-label="Übersicht schließen">
+                ×
+              </button>
             </div>
-            <ol id="standings"></ol>
-          </section>
-          <div class="board-details">
-            <details>
-              <summary>Alle Felder & Aufgaben</summary>
-              <p class="muted">
-                Auf den Feldern steht die nächste Aufgabe der Kategorie. Nach
-                dem Ziehen rückt für diese Kategorie die nächste Aufgabe nach.
-                Bei einer Leiter oder Rutsche zählt die Aufgabe auf dem
-                Zielfeld.
-              </p>
-              <div id="field-list"></div>
-            </details>
-            <details>
-              <summary>Letzte Züge</summary>
-              <ol id="history"></ol>
-            </details>
-            <details>
-              <summary>Eure Spielregeln</summary>
-              <p id="active-rules"></p>
-            </details>
-          </div>
-          <p id="save-status" class="small muted" role="status"></p>
+            <section class="standings-panel">
+              <div class="section-heading">
+                <h2>Eure Positionen</h2>
+                <span id="progress-label" class="muted"></span>
+              </div>
+              <ol id="standings"></ol>
+            </section>
+            <div class="board-details">
+              <details>
+                <summary>Alle Felder & Aufgaben</summary>
+                <p class="muted">
+                  Auf den Feldern steht die nächste Aufgabe der Kategorie. Nach
+                  dem Ziehen rückt für diese Kategorie die nächste Aufgabe nach.
+                  Bei einer Leiter oder Rutsche zählt die Aufgabe auf dem
+                  Zielfeld.
+                </p>
+                <div id="field-list"></div>
+              </details>
+              <details>
+                <summary>Letzte Züge</summary>
+                <ol id="history"></ol>
+              </details>
+              <details>
+                <summary>Eure Spielregeln</summary>
+                <p id="active-rules"></p>
+              </details>
+            </div>
+            <p id="save-status" class="small muted" role="status"></p>
+          </dialog>
         </section>
         <details id="rules" class="board-rules">
           <summary>So spielt ihr Rutschen & Leitern</summary>
+          <p>
+            Vier Modi mit jeweils über 500 Varianten: Normal, Hardcore, Sexy (ab
+            18) und Verrückt. Aufgabentypen und Begriffe werden getrennt
+            gezogen. Reimduelle nutzen 100 Reimwörter, die normale
+            Kategorienrunde 100 Themen. Hardcore erhöht die Schluckmenge nicht
+            automatisch. Jede Aufgabe kann ohne Strafe übersprungen werden; Nähe
+            im Sexy-Modus ist freiwillig.
+          </p>
           <p>
             Alle starten vor Feld 1 und würfeln in der eingetragenen Reihenfolge
             mit einem sechsseitigen Würfel. Die Figur zieht Feld für Feld
@@ -304,6 +329,13 @@
         <button id="keep-game" class="secondary">Abbrechen</button
         ><button id="replace-game" class="primary">Neue Partie starten</button>
       </div>
+    </dialog>
+    <dialog id="field-dialog">
+      <div class="dialog-heading">
+        <h2>Feld ansehen</h2>
+        <button id="close-field" aria-label="Felddetails schließen">×</button>
+      </div>
+      <p id="field-info"></p>
     </dialog>
     <script type="module" src="ladders.js"></script>
   </body>

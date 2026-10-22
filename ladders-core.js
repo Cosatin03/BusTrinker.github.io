@@ -1,3 +1,11 @@
+import {
+  MODES,
+  MODE_TASKS,
+  TEMPLATES,
+  TERM_POOLS,
+  variantCount,
+} from "./ladders-tasks.js";
+export { MODES, TERM_POOLS, variantCount };
 export const KEY = "bustrinker.ladders.v1";
 export const CATEGORIES = {
   talk: { label: "Runde & Geschichten", icon: "✦", color: "#ecc2a8" },
@@ -65,16 +73,11 @@ const prompts = {
     "Beschreibe eine Banane, ohne Farbe, Form oder Obst zu erwähnen.",
     "Erfinde einen Handschlag ohne Berührung und zeige ihn vor.",
     "Summ einen bekannten Song. Die Runde rät.",
-    ...topics.map(
-      (t) =>
-        `Nenne in 15 Sekunden fünf Beispiele für ${t}. Die Runde zählt mit.`,
-    ),
   ],
   duel: [
     "Wähle jemanden: Schere, Stein, Papier. Wer zuerst zwei Punkte hat, gewinnt.",
     "Blickduell mit einer freiwilligen Person: Wer zuerst lacht, verliert.",
     "Alle zeigen gleichzeitig 0–5 Finger. Wer die Summe am nächsten schätzt, gewinnt.",
-    "Wähle jemanden. Nennt abwechselnd Reime auf „Haus“. Wiederholung oder fünf Sekunden Pause verliert.",
     "Alle tippen auf die nächste Würfelzahl. Merkt euch die Tipps bis zum nächsten Zug.",
     "Eine Person zeichnet mit dem Finger eine Form in die Luft. Du errätst sie.",
     "Wähle jemanden. Zählt abwechselnd hoch; ersetzt Vielfache von drei durch „Bus“. Erster Fehler verliert.",
@@ -83,10 +86,6 @@ const prompts = {
     "Du und eine freiwillige Person nennt gleichzeitig eine Farbe. Schafft ihr es in drei Versuchen, dieselbe zu sagen?",
     "Die Runde gibt euch drei Wörter. Du und eine freiwillige Person erfindet je einen Satz damit.",
     "Spiegelt zu zweit fünf Handbewegungen. Danach wechselt ihr die Rollen.",
-    ...topics.map(
-      (t) =>
-        `Reihum ${t} nennen, du beginnst. Wiederholung oder fünf Sekunden Pause beendet die Runde.`,
-    ),
   ],
   sip: [
     "Verteile {n} Schlücke frei in der Runde, auch auf mehrere Personen.",
@@ -115,10 +114,21 @@ const prompts = {
     "Wer auf einem ungeraden Feld steht, darf gemeinsam {n} Schlücke verteilen.",
   ],
 };
-export const TASKS = Object.entries(prompts).flatMap(([category, texts]) =>
-  texts.map((text, i) => ({ id: `${category}-${i}`, category, text })),
-);
+export const TASKS = [
+  ...Object.entries(prompts).flatMap(([category, texts]) =>
+    texts.map((text, i) => ({
+      id: `legacy:normal:${category}:${i}`,
+      mode: "normal",
+      category,
+      text,
+    })),
+  ),
+  ...MODE_TASKS,
+  ...TEMPLATES,
+];
 export const DEFAULTS = {
+  mode: "normal",
+  adultConfirmed: false,
   size: 64,
   ladders: 5,
   slides: 5,
@@ -140,6 +150,10 @@ export function shuffle(values, rng = Math.random) {
 }
 export function settings(input = {}) {
   const s = { ...DEFAULTS, ...input };
+  if (!Object.hasOwn(MODES, s.mode))
+    throw Error("Bitte einen gültigen Modus wählen.");
+  if (s.mode === "sexy" && s.adultConfirmed !== true)
+    throw Error("Bitte bestätigt für Sexy, dass alle mindestens 18 sind.");
   for (const [key, lo, hi] of [
     ["size", 20, 120],
     ["ladders", 0, 10],
@@ -202,7 +216,9 @@ export function taskPool(s, category) {
         category,
         text,
       }))
-    : TASKS.filter((t) => t.category === category);
+    : TASKS.filter(
+        (t) => t.category === category && t.mode === (s.mode || "normal"),
+      );
 }
 export function createGame(names, input, rng = Math.random) {
   const options = settings(input);
@@ -262,7 +278,7 @@ export function createGame(names, input, rng = Math.random) {
   let categories = [];
   while (categories.length < options.size)
     categories.push(...shuffle(options.categories, rng));
-  return {
+  const game = {
     version: 1,
     id: globalThis.crypto.randomUUID(),
     revision: 0,
@@ -285,16 +301,48 @@ export function createGame(names, input, rng = Math.random) {
     task: null,
     move: null,
     history: [],
+    termBags: {},
+    lastTerms: {},
   };
+  prepareTasks(game, rng);
+  return game;
 }
 export function prepareTasks(state, rng = Math.random) {
-  for (const category of state.settings.categories)
+  state.termBags ||= {};
+  state.lastTerms ||= {};
+  for (const category of state.settings.categories) {
     if (!state.bags[category]?.length) {
       const tasks = shuffle(taskPool(state.settings, category), rng);
       if (tasks.length > 1 && tasks.at(-1).id === state.lastTasks[category])
         [tasks[0], tasks[tasks.length - 1]] = [tasks.at(-1), tasks[0]];
       state.bags[category] = tasks;
     }
+    const i = state.bags[category].length - 1,
+      task = state.bags[category][i];
+    if (task.pool && !task.term) {
+      if (!state.termBags[task.pool]?.length) {
+        const terms = shuffle(TERM_POOLS[task.pool], rng);
+        if (terms.length > 1 && terms.at(-1) === state.lastTerms[task.pool])
+          [terms[0], terms[terms.length - 1]] = [terms.at(-1), terms[0]];
+        state.termBags[task.pool] = terms;
+      }
+      const term = state.termBags[task.pool].pop();
+      state.lastTerms[task.pool] = term;
+      state.bags[category][i] = {
+        ...task,
+        term,
+        text: task.text.replaceAll("{term}", term),
+      };
+    }
+  }
+}
+export function previewTitle(state, field) {
+  if (state.settings.fields[field])
+    return taskTitle(state.settings.fields[field]);
+  return (
+    state.bags[state.fields[field - 1]]?.at(-1)?.title ||
+    taskTitle(previewTask(state, field))
+  );
 }
 export function previewTask(state, field) {
   if (state.settings.fields[field]) return state.settings.fields[field];
@@ -453,11 +501,26 @@ export function validGame(s) {
     )
       return false;
     if (!s.bags || !s.lastTasks || !Array.isArray(s.history)) return false;
+    if (
+      s.termBags &&
+      Object.entries(s.termBags).some(
+        ([pool, terms]) =>
+          !TERM_POOLS[pool] ||
+          !Array.isArray(terms) ||
+          terms.some((t) => !TERM_POOLS[pool].includes(t)),
+      )
+    )
+      return false;
     for (const [c, bag] of Object.entries(s.bags))
       if (
         !CATEGORIES[c] ||
         !Array.isArray(bag) ||
-        bag.some((t) => typeof t.text !== "string" || t.category !== c)
+        bag.some(
+          (t) =>
+            typeof t.text !== "string" ||
+            t.category !== c ||
+            (t.pool && !TERM_POOLS[t.pool]),
+        )
       )
         return false;
     if (

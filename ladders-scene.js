@@ -3,6 +3,7 @@ import {
   CATEGORIES,
   fieldPosition,
   previewTask,
+  previewTitle,
   taskTitle,
 } from "./ladders-core.js";
 export const COLORS = [
@@ -132,7 +133,7 @@ export function createBoard(host, state, selectField, failed) {
               : state.settings.fields[n]
                 ? "EIGEN"
                 : c.icon,
-          taskTitle(previewTask(state, n)),
+          previewTitle(state, n),
         ),
       }),
       root,
@@ -338,7 +339,7 @@ export function createBoard(host, state, selectField, failed) {
             : item.link
               ? `${item.link.type === "ladder" ? "↑" : "↓"} ${item.link.to}`
               : item.c.icon,
-          taskTitle(text),
+          previewTitle(s, item.n),
         );
         item.text = text;
       }

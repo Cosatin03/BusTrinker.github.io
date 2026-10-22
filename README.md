@@ -87,8 +87,12 @@ Ein optionales `transfers`-Protokoll speichert pro Runde Absender, Empfänger un
 
 `ladders.html` ist ein lokales Spiel ab einer Person: 20–120 Felder, bis zu je
 zehn Rutschen und Leitern, drei Zielregeln und optionaler Extrazug bei einer Sechs.
-102 Aufgaben aus vier Kategorien werden ohne Wiederholung innerhalb des jeweiligen
-Pools gezogen. Eigene Zeilen ersetzen einen Kategoriepool; feste Feldaufgaben
+Fünf Modi bieten jeweils über 500 Varianten: Normal, Hardcore, Hot (ab 18),
+Verrückt und Weird. Hot enthält Flirts und freiwillige Nähe, Verrückt Performance
+und Improtheater, Weird skurrile Fragen und Denkduelle. Der gespeicherte Modusschlüssel
+`sexy` bleibt für Hot erhalten. Aufgabentypen und Begriffe werden getrennt gezogen. Reimduelle
+haben 100 Reimwörter, die normale Kategorienrunde 100 Themen; der Typ bleibt jeweils
+eine Karte im Aufgabenstapel. Eigene Zeilen ersetzen einen Kategoriepool; feste Feldaufgaben
 überschreiben den zufälligen Aufgabenbezug. Aufgaben und Duelle werden am Tisch
 beurteilt. Sie verändern Positionen nicht automatisch und können übersprungen werden.
 
@@ -98,3 +102,8 @@ vor der Animation gespeichert. Ohne WebGL ist ein bedienbares Ersatzbrett verfü
 `tests/ladders.test.js` prüft Bewegung, Endbedingungen und Aufgabenstapel;
 `tests/ladders-browser.mjs` prüft 3D, mobile Darstellung, Wiederaufnahme,
 Tab-Synchronisierung, eigene Aufgaben, Sammlung und einen vollständigen Spielabschluss.
+
+Die Spielansicht nutzt den verfügbaren Bildschirm für Brett, Aufgabe und Zugaktionen.
+Positionen stehen in einer kompakten Leiste; Listen und Feldinformationen öffnen sich
+in Dialogen. Inhalte und Begriffspools stehen in `ladders-tasks.js`. Hardcore erhöht
+die Schluckmenge nicht automatisch. Alle Aufgaben lassen sich ohne Strafe überspringen.

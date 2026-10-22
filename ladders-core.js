@@ -153,7 +153,7 @@ export function settings(input = {}) {
   if (!Object.hasOwn(MODES, s.mode))
     throw Error("Bitte einen gültigen Modus wählen.");
   if (s.mode === "sexy" && s.adultConfirmed !== true)
-    throw Error("Bitte bestätigt für Sexy, dass alle mindestens 18 sind.");
+    throw Error("Bitte bestätigt für Hot, dass alle mindestens 18 sind.");
   for (const [key, lo, hi] of [
     ["size", 20, 120],
     ["ladders", 0, 10],

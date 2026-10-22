@@ -176,6 +176,20 @@ test("field preview matches the drawn task and advances with its category", () =
   assert.equal(previewTask(s, 2), "Feste Aufgabe");
 });
 
+test("Hot and Weird have distinct themed tasks, not only different labels", () => {
+  assert.equal(MODES.sexy.label, "Hot");
+  assert.equal(MODES.weird.label, "Weird");
+  const hot = TASKS.filter((t) => t.mode === "sexy"),
+    weird = TASKS.filter((t) => t.mode === "weird"),
+    crazy = TASKS.filter((t) => t.mode === "crazy");
+  assert.ok(hot.some((t) => t.title === "Flirtduell"));
+  assert.ok(weird.some((t) => t.title === "Schattenleben"));
+  assert.ok(crazy.some((t) => t.title === "Nudeloper"));
+  assert.ok(
+    !weird.some((t) => t.title === "Flirtduell" || t.title === "Nudeloper"),
+  );
+});
+
 test("each mode has 500 distinct variants; templates do not crowd the deck", () => {
   assert.equal(TERM_POOLS.rhymes.length, 100);
   assert.equal(TERM_POOLS.categories.length, 100);
@@ -200,7 +214,7 @@ test("each mode has 500 distinct variants; templates do not crowd the deck", () 
       assert.ok(tasks.some((t) => t.category === c));
   }
 });
-test("mode decks are separate and sexy requires adult confirmation", () => {
+test("mode decks are separate and Hot requires adult confirmation", () => {
   assert.throws(() => settings({ mode: "other" }));
   assert.throws(() => createGame(["A"], { ...basic, mode: "sexy" }));
   for (const mode of Object.keys(MODES)) {

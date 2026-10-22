@@ -10,7 +10,7 @@ export const MODES = {
     description: "Zeitdruck, direkte Fragen und mutige Auftritte.",
   },
   sexy: {
-    label: "Sexy",
+    label: "Hot",
     icon: "♥",
     description: "Ab 18: Flirts, Herzklopfen und freiwillige Nähe.",
   },
@@ -18,6 +18,11 @@ export const MODES = {
     label: "Verrückt",
     icon: "✳",
     description: "Absurde Rollen, Improtheater und Chaos-Duelle.",
+  },
+  weird: {
+    label: "Weird",
+    icon: "◈",
+    description: "Skurrile Fragen, unmögliche Regeln und schräge Denkduelle.",
   },
 };
 const list = (text) =>
@@ -62,8 +67,37 @@ export const TERM_POOLS = {
   weirdCategories: list(
     "Berufe für Gespenster|Ausreden eines sprechenden Toasters|Luxusprobleme von Drachen|Schlechte Namen für einen Freizeitpark|Gerichte auf dem Mars|Produkte im Laden für Riesen|Superkräfte, die im Alltag nerven|Sportarten für Schnecken|Schlagzeilen aus dem Jahr 3020|Regeln in einem Hotel für Vampire|Möbel für Meerjungfrauen|Werbesprüche für unsichtbare Dinge|Lieder aus Sicht eines Kühlschranks|Schlechte Zaubersprüche|Beschwerden einer Topfpflanze|Feiertage für Roboter|Berufe für Einhörner|Tiere mit Bürojobs|Erfindungen, die niemand braucht|Namen für eine Band aus Kartoffeln|Geschenke für einen Vulkan|Schimpfwörter ohne beleidigende Wörter|Schlechte Apps für Dinosaurier|Gründe für eine Socken-Demonstration|Hobbys eines gelangweilten Mondes|Geräusche in einer Geisterküche|Jobs in einer Wolkenfabrik|Reisetipps für Zeitreisende|Absurd schlechte Superheldennamen|Unnötige Warnhinweise",
   ),
+  oddCategories: list(
+    "Dinge, die ein Spiegel verschweigt|Ausreden einer verschwundenen Minute|Gesetze in einem Traum|Gedanken eines leeren Stuhls|Gründe für einen beleidigten Schatten|Geheimnisse einer Zimmerdecke|Geräusche, die Farben machen könnten|Fragen an eine sprechende Tür|Dinge, die ein Kühlschrank nachts plant|Ängste einer Socke|Währungen für Erinnerungen|Hobbys der Schwerkraft|Dinge, die rückwärts besser funktionieren|Probleme unsichtbarer Nachbarn|Jobs für verlorene Gedanken|Geschenke für die Stille|Namen für unbekannte Gefühle|Regeln für ein Dorf ohne gestern|Gründe für eine Pause der Sonne|Dinge, die die Zeit sammeln könnte|Speisen für eine Idee|Wetterberichte aus einem Bücherregal|Gesetze im Land der Spiegel|Lügen eines sehr ehrlichen Weckers|Warnschilder für Träume|Dinge, die ein Loch besitzen könnte|Unnötige Rechte für Wochentage|Urlaubsziele für Zahlen|Streitpunkte zwischen links und rechts|Dinge, die die Farbe Blau vermisst",
+  ),
+  oddPairs: list(
+    "ein Staubsauger und ein König|eine Wolke und ein Passwort|eine Socke und ein Gerichtsurteil|ein Spiegel und ein Versprechen|ein Kaktus und ein Fahrplan|ein Kühlschrank und ein Geheimnis|ein Fahrstuhl und ein Gedicht|eine Schnecke und ein Feuerwerk|ein Schatten und ein Notizbuch|ein Wecker und ein Urlaub|eine Treppe und ein Gerücht|ein Pinguin und ein Taschenrechner|ein Löffel und ein Gewitter|ein Schuh und ein Traum|eine Münze und ein Regenbogen|ein Kompass und ein Kompliment|eine Tür und eine Erinnerung|ein Zahnrad und ein Liebesbrief|ein Luftballon und eine Steuererklärung|ein Staubkorn und eine Krone|ein Regenschirm und eine Ausrede|ein Vulkan und ein Kalender|eine Nudel und ein Denkmal|eine Brille und ein Verbot|ein Seepferdchen und ein Vertrag|ein Teebeutel und ein Planet|ein Ohrwurm und ein Schloss|eine Büroklammer und ein Gespenst|ein Kissen und ein Wahlplakat|eine Laterne und ein Zufall",
+  ),
+  oddLaws: list(
+    "Schatten dürfen einmal täglich kündigen|Mittwochs läuft die Zeit rückwärts|Spiegel zeigen die nächste Entscheidung|Erinnerungen lassen sich wiegen|Jeder Gedanke kostet einen Cent|Türen wählen ihre Besucher selbst|Farben wechseln mit der Stimmung|Schwerkraft macht Mittagspause|Jede Lüge verwandelt sich in Konfetti|Träume stehen morgens in der Zeitung|Verlorene Dinge gründen eine Stadt|Jeder Stuhl hat eine eigene Meinung|Namen dürfen nur ausgeliehen werden|Gähnen verschiebt den nächsten Montag|Stille kann in Flaschen verkauft werden|Regen fällt nur auf schlechte Ausreden|Der Mond nimmt Beschwerden entgegen|Uhren dürfen über die Uhrzeit abstimmen|Musik verändert die Form von Möbeln|Jede Zahl bekommt einen freien Tag|Lachen erzeugt kleine Wolken|Kalorien werden in Erinnerungen gemessen|Gefühle haben Öffnungszeiten|Links und rechts tauschen stündlich|Alle Pflanzen verstehen Ironie|Man kann Gerüche fotografieren|Jeder Mensch hat einen Untertitel|Leere Räume sammeln Geschichten|Das Wetter hört auf Mehrheitsentscheidungen|Wochentage können Urlaub tauschen",
+  ),
 };
 const cards = {
+  weird: `talk|Schattenleben|Was würde dein Schatten tun, wenn er heute einen freien Tag hätte?
+talk|Neue Erinnerung|Welche völlig erfundene Erinnerung würdest du einem Toaster geben?
+talk|Verdächtige Stille|Du hörst plötzlich die Gedanken deiner Zimmerdecke. Was ist ihr erster Satz?
+talk|Gefühl erfinden|Erfinde einen Namen für das Gefühl, wenn du weißt, dass du etwas vergessen hast, aber nicht was.
+talk|Das Recht auf Dienstag|Welches Grundrecht würdest du einem Wochentag geben?
+talk|Fragwürdiger Kauf|Du kannst für einen Euro eine Minute von morgen kaufen. Was würdest du damit machen?
+talk|Unmögliche Diagnose|Dein Spiegel behauptet, du seist eigentlich ein Möbelstück. Begründe, welches.
+talk|Lochbesitzer|Wem gehört ein Loch in einer Mauer? Erkläre deine sehr ernste Rechtsauffassung.
+challenge|Wort ohne Bedeutung|Erfinde ein Wort für etwas, das es nicht gibt. Gib Definition und Beispielsatz.
+challenge|Geruch übersetzen|Beschreibe den Geruch von Montag, ohne einen bekannten Geruch zu nennen.
+challenge|Unsichtbare Regel|Erfinde eine Regel, die jede Person bereits befolgt, ohne sie zu kennen.
+challenge|Zwei linke Seiten|Beschreibe ein Universum, in dem es kein rechts gibt. Drei Sätze.
+challenge|Falsches Wörterbuch|Definiere „Wasser“ so, als hättest du noch nie Wasser gesehen.
+challenge|Anleitung zur Stille|Erkläre in drei Schritten, wie man Stille repariert.
+duel|Wer bin ich nicht|Zwei Freiwillige beschreiben denselben Gegenstand nur durch Dinge, die er nicht ist. Die Runde rät.
+duel|Unmögliche Abstimmung|Stimmt ab: Hat eine Erinnerung ein Gewicht? Zwei Personen dürfen je ein Argument erfinden.
+duel|Falscher Zusammenhang|Eine Person nennt zwei zufällige Dinge. Du erklärst, warum das eine offensichtlich das andere verursacht.
+duel|Erfundene Logik|Erfindet zu zweit ein unmögliches Naturgesetz und danach je eine logische Folge daraus.
+sip|Merkwürdige Begründung|Begründe, warum eine Büroklammer genau {n} Schlücke verteilen dürfte. Du darfst sie symbolisch verteilen oder auslassen.
+sip|Abstimmung im Kopf|Die Runde stimmt ab, welche Farbe die Stille hätte. Wer seine Wahl begründen möchte, darf {n} Schlücke verteilen.`,
   normal: `talk|Unpopuläre Meinung|Verteidige eine unpopuläre Meinung über Essen.
 talk|Erster Eindruck|Was denken Leute beim ersten Treffen oft falsch über dich?
 talk|Kleine Rebellion|Welche harmlose Regel brichst du regelmäßig?
@@ -178,6 +212,7 @@ for (const mode of Object.keys(MODES)) {
       hardcore: "hardCategories",
       sexy: "sexyCategories",
       crazy: "weirdCategories",
+      weird: "oddCategories",
     }[mode];
   add(
     mode,
@@ -502,6 +537,110 @@ add(
   "Romantischer Trailer",
   "flirtTopics",
   "Sprich einen 15-sekündigen Filmtrailer über {term}. Mit dramatischem Flüstern und einem hoffnungsvollen Ende.",
+);
+add(
+  "weird",
+  "talk",
+  "law",
+  "Unmögliches Gesetz",
+  "oddLaws",
+  "Angenommen: {term}. Welche unerwartete Folge hätte das in deinem Alltag?",
+);
+add(
+  "weird",
+  "talk",
+  "pair",
+  "Geheimer Zusammenhang",
+  "oddPairs",
+  "Diese zwei Dinge sind in Wahrheit eng verwandt: {term}. Erfinde die Erklärung.",
+);
+add(
+  "weird",
+  "talk",
+  "object",
+  "Ding mit Innenleben",
+  "objects",
+  "Dieser Gegenstand entwickelt ein Bewusstsein: {term}. Was ist seine erste Sorge?",
+);
+add(
+  "weird",
+  "talk",
+  "word",
+  "Vergessene Bedeutung",
+  "words",
+  "„{term}“ war früher der Name eines Gefühls. Erfinde, welches, und wann man es empfindet.",
+);
+add(
+  "weird",
+  "talk",
+  "category-story",
+  "Nachts im Unmöglichen",
+  "oddCategories",
+  "Wähle ein Beispiel für „{term}“ und erzähle seine seltsamste Geschichte.",
+);
+add(
+  "weird",
+  "challenge",
+  "manual",
+  "Verkehrte Funktion",
+  "objects",
+  "Beschreibe einen neuen Alltagsnutzen für „{term}“, der nichts mit seiner üblichen Funktion zu tun hat.",
+);
+add(
+  "weird",
+  "challenge",
+  "dictionary",
+  "Alternatives Wörterbuch",
+  "words",
+  "Definiere „{term}“ komplett falsch, aber so überzeugend wie ein Wörterbuch.",
+);
+add(
+  "weird",
+  "challenge",
+  "emotion",
+  "Gefühl als Gegenstand",
+  "emotions",
+  "Das Gefühl „{term}“ ist plötzlich ein Gegenstand. Beschreibe Form, Geräusch und Gebrauch.",
+);
+add(
+  "weird",
+  "duel",
+  "similarity",
+  "Seltsame Gemeinsamkeit",
+  "oddPairs",
+  "Nennt zu zweit abwechselnd Gemeinsamkeiten für: {term}. Drei pro Person, auch erfundene zählen mit Begründung.",
+);
+add(
+  "weird",
+  "duel",
+  "lawdebate",
+  "Parlament der Träume",
+  "oddLaws",
+  "Debattiert zu zweit: Sollte dieses Gesetz gelten? {term}. Jede Person hat zwei Argumente, dann stimmt die Runde ab.",
+);
+add(
+  "weird",
+  "duel",
+  "objectvoice",
+  "Ding spricht zurück",
+  "objects",
+  "Eine Person stellt drei Fragen an „{term}“. Eine andere antwortet aus Sicht des Gegenstands.",
+);
+add(
+  "weird",
+  "sip",
+  "objectquestion",
+  "Sehr wichtige Frage",
+  "objects",
+  "Was wäre die seltsamste Frage an „{term}“? Für eine freiwillige Antwort darfst du {n} Schlücke verteilen.",
+);
+add(
+  "weird",
+  "sip",
+  "wordprophecy",
+  "Wörterorakel",
+  "words",
+  "„{term}“ ist das Zeichen für euren Abend. Erfinde seine Bedeutung und verteile {n} Schlücke oder lass sie verfallen.",
 );
 export const TEMPLATES = templates;
 export function variantCount(tasks) {

@@ -75,6 +75,14 @@ try {
   const page = await context.newPage();
   page.on("pageerror", (e) => errors.push(e.message));
   await page.goto(base + "/ladders.html");
+  assert.equal(await page.locator("#mode-options button").count(), 5);
+  await page.getByRole("button", { name: /Weird/ }).click();
+  assert.equal(
+    await page.locator('[data-mode="weird"]').getAttribute("aria-pressed"),
+    "true",
+  );
+  await page.getByRole("button", { name: /Hot/ }).click();
+  assert.equal(await page.locator("#adult-setting").isVisible(), true);
   for (const name of ["Alex", "Sam", "Kim", "Test"]) {
     await page.fill("#player-name", name);
     await page.click("#add-player");
@@ -150,7 +158,7 @@ try {
   await page.waitForSelector("#board-info-dialog[open]");
   await page.click("#close-info");
   await page.click("#edit");
-  await page.click('[data-mode="sexy"]');
+  await page.getByRole("button", { name: /Hot/ }).click();
   await page.check("#adult-confirmed");
   await page.fill("#size", "20");
   await page.fill("#ladders", "0");

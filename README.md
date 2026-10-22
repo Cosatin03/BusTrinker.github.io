@@ -87,8 +87,10 @@ Ein optionales `transfers`-Protokoll speichert pro Runde Absender, Empfänger un
 
 `ladders.html` ist ein lokales Spiel ab einer Person: 20–120 Felder, bis zu je
 zehn Rutschen und Leitern, drei Zielregeln und optionaler Extrazug bei einer Sechs.
-Vier Modi bieten jeweils über 500 Varianten: Normal, Hardcore, Sexy (ab 18) und
-Verrückt. Aufgabentypen und Begriffe werden in getrennten Stapeln gezogen. Reimduelle
+Fünf Modi bieten jeweils über 500 Varianten: Normal, Hardcore, Hot (ab 18),
+Verrückt und Weird. Hot enthält Flirts und freiwillige Nähe, Verrückt Performance
+und Improtheater, Weird skurrile Fragen und Denkduelle. Der gespeicherte Modusschlüssel
+`sexy` bleibt für Hot erhalten. Aufgabentypen und Begriffe werden getrennt gezogen. Reimduelle
 haben 100 Reimwörter, die normale Kategorienrunde 100 Themen; der Typ bleibt jeweils
 eine Karte im Aufgabenstapel. Eigene Zeilen ersetzen einen Kategoriepool; feste Feldaufgaben
 überschreiben den zufälligen Aufgabenbezug. Aufgaben und Duelle werden am Tisch

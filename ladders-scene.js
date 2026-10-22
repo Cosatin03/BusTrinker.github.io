@@ -1,5 +1,10 @@
 import * as THREE from "./vendor/three/three.module.min.js";
-import { CATEGORIES, fieldPosition } from "./ladders-core.js";
+import {
+  CATEGORIES,
+  fieldPosition,
+  previewTask,
+  taskTitle,
+} from "./ladders-core.js";
 export const COLORS = [
   "#dafa7a",
   "#ecc2a8",
@@ -35,6 +40,7 @@ export function createBoard(host, state, selectField, failed) {
   const textures = [],
     clickable = [],
     tokens = [];
+  const labels = [];
   let stopped = false,
     raf = 0,
     animation = null,
@@ -47,7 +53,7 @@ export function createBoard(host, state, selectField, failed) {
     parent.add(m);
     return m;
   };
-  function textTexture(text, bg, fg, small = "") {
+  function textTexture(text, bg, fg, small = "", title = "") {
     const canvas = document.createElement("canvas");
     canvas.width = 256;
     canvas.height = 256;
@@ -57,11 +63,25 @@ export function createBoard(host, state, selectField, failed) {
     ctx.fillStyle = fg;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.font = "bold 105px system-ui";
-    ctx.fillText(text, 128, small ? 105 : 128);
+    ctx.font = title ? "bold 74px system-ui" : "bold 105px system-ui";
+    ctx.fillText(text, 128, title ? 52 : small ? 105 : 128);
+    if (title) {
+      ctx.font = "600 27px system-ui";
+      const words = title.split(/\s+/);
+      let line = "",
+        lines = [];
+      for (const w of words) {
+        if (ctx.measureText((line + " " + w).trim()).width > 225) {
+          lines.push(line);
+          line = w;
+        } else line = (line + " " + w).trim();
+      }
+      lines.push(line);
+      lines.slice(0, 3).forEach((l, i) => ctx.fillText(l, 128, 110 + i * 31));
+    }
     if (small) {
       ctx.font = "bold 30px system-ui";
-      ctx.fillText(small, 128, 202);
+      ctx.fillText(small, 128, title ? 230 : 202);
     }
     const texture = new THREE.CanvasTexture(canvas);
     texture.colorSpace = THREE.SRGBColorSpace;
@@ -112,6 +132,7 @@ export function createBoard(host, state, selectField, failed) {
               : state.settings.fields[n]
                 ? "EIGEN"
                 : c.icon,
+          taskTitle(previewTask(state, n)),
         ),
       }),
       root,
@@ -119,6 +140,7 @@ export function createBoard(host, state, selectField, failed) {
       0.166,
       p.z,
     );
+    labels.push({ label, n, c, link, text: previewTask(state, n) });
     label.rotation.x = -Math.PI / 2;
     label.userData.field = n;
     clickable.push(label);
@@ -142,7 +164,7 @@ export function createBoard(host, state, selectField, failed) {
       b = fieldPosition(link.to, state.settings.size);
     return new THREE.Vector3(
       a.x + (b.x - a.x) * t,
-      0.27 + Math.sin(Math.PI * t) * (link.type === "slide" ? 0.45 : 0.2),
+      0.22 + Math.sin(Math.PI * t) * (link.type === "slide" ? 0.12 : 0.08),
       a.z + (b.z - a.z) * t,
     );
   }
@@ -152,22 +174,22 @@ export function createBoard(host, state, selectField, failed) {
       delta = b.clone().sub(a),
       side = new THREE.Vector3(-delta.z, 0, delta.x)
         .normalize()
-        .multiplyScalar(0.15);
+        .multiplyScalar(0.065);
     if (link.type === "ladder") {
       const gold = mat("#f5db82", { metalness: 0.55 });
-      rod(a.clone().add(side), b.clone().add(side), 0.035, gold);
-      rod(a.clone().sub(side), b.clone().sub(side), 0.035, gold);
+      rod(a.clone().add(side), b.clone().add(side), 0.016, gold);
+      rod(a.clone().sub(side), b.clone().sub(side), 0.016, gold);
       const steps = Math.max(3, Math.ceil(delta.length() * 3));
       for (let i = 0; i <= steps; i++) {
         const c = a.clone().lerp(b, i / steps);
-        rod(c.clone().add(side), c.clone().sub(side), 0.025, gold);
+        rod(c.clone().add(side), c.clone().sub(side), 0.012, gold);
       }
     } else {
       const curve = new THREE.CatmullRomCurve3(
         Array.from({ length: 25 }, (_, i) => linkPoint(link, i / 24)),
       );
       mesh(
-        new THREE.TubeGeometry(curve, 32, 0.1, 10, false),
+        new THREE.TubeGeometry(curve, 32, 0.035, 10, false),
         mat("#f19485", { metalness: 0.15 }),
         root,
       );
@@ -176,11 +198,11 @@ export function createBoard(host, state, selectField, failed) {
           Array.from({ length: 25 }, (_, i) =>
             linkPoint(link, i / 24)
               .add(side.clone().multiplyScalar(sign))
-              .add(new THREE.Vector3(0, 0.08, 0)),
+              .add(new THREE.Vector3(0, 0.025, 0)),
           ),
         );
         mesh(
-          new THREE.TubeGeometry(rail, 32, 0.022, 6, false),
+          new THREE.TubeGeometry(rail, 32, 0.012, 6, false),
           mat("#f9cab0"),
           root,
         );
@@ -295,6 +317,32 @@ export function createBoard(host, state, selectField, failed) {
     return [Math.cos(angle) * 0.26, Math.sin(angle) * 0.26];
   }
   function place(s) {
+    die.position.set(cols / 2 - 0.3, 0.5, rows / 2 + 0.8);
+    die.scale.setScalar(1);
+    for (const t of tokens) {
+      t.rotation.set(0, 0, 0);
+      t.scale.setScalar(1);
+    }
+    for (const item of labels) {
+      const text = previewTask(s, item.n);
+      if (text !== item.text) {
+        const old = item.label.material.map;
+        old.dispose();
+        textures.splice(textures.indexOf(old), 1);
+        item.label.material.map = textTexture(
+          String(item.n),
+          item.c.color,
+          "#19362e",
+          item.n === s.settings.size
+            ? "ZIEL"
+            : item.link
+              ? `${item.link.type === "ladder" ? "↑" : "↓"} ${item.link.to}`
+              : item.c.icon,
+          taskTitle(text),
+        );
+        item.text = text;
+      }
+    }
     s.players.forEach((p, i) => {
       const point = fieldPosition(p.position, s.settings.size),
         o = offset(i, p.position, s.players);
@@ -339,9 +387,9 @@ export function createBoard(host, state, selectField, failed) {
     return new Promise((resolve) => {
       resolveAnimation = resolve;
       const speed = s.settings.speed,
-        rollDuration = 900 / speed,
-        stepDuration = 180 / speed,
-        linkDuration = 1000 / speed;
+        rollDuration = 1450 / speed,
+        stepDuration = 260 / speed,
+        linkDuration = 1350 / speed;
       const path = [move.from, ...move.path];
       const started = performance.now(),
         finalRot = faceRotations[move.die];
@@ -357,10 +405,21 @@ export function createBoard(host, state, selectField, failed) {
             finalRot[1] + Math.PI * 4 * e,
             finalRot[2] + Math.PI * 6 * e,
           );
-          die.position.y = 0.5 + Math.sin(t * Math.PI) * 1.1;
+          die.position.y =
+            0.5 + Math.abs(Math.sin(t * Math.PI * 3)) * 1.6 * (1 - t);
+          die.position.x =
+            cols / 2 - 0.3 + Math.sin(t * Math.PI * 2) * 0.6 * (1 - t);
+          die.position.z = rows / 2 + 0.8 - Math.sin(t * Math.PI) * 0.45;
+          const squash = Math.abs(Math.sin(t * Math.PI * 3));
+          die.scale.set(
+            1 + (1 - squash) * 0.12,
+            1 - (1 - squash) * 0.12,
+            1 + (1 - squash) * 0.12,
+          );
         } else {
           setDie(move.die);
-          die.position.y = 0.5;
+          die.position.set(cols / 2 - 0.3, 0.5, rows / 2 + 0.8);
+          die.scale.setScalar(1);
           const travel = elapsed - rollDuration,
             walk = (path.length - 1) * stepDuration;
           if (travel < walk) {
@@ -370,14 +429,29 @@ export function createBoard(host, state, selectField, failed) {
               b = fieldPosition(path[k + 1], s.settings.size);
             tokens[move.player].position.set(
               a.x + (b.x - a.x) * t,
-              0.2 + Math.sin(t * Math.PI) * 0.35,
+              0.2 + Math.sin(t * Math.PI) * 0.55,
               a.z + (b.z - a.z) * t,
+            );
+            tokens[move.player].rotation.z = Math.sin(t * Math.PI * 2) * 0.13;
+            tokens[move.player].scale.set(
+              1 + 0.14 * Math.cos(t * Math.PI * 2),
+              1 - 0.14 * Math.cos(t * Math.PI * 2),
+              1 + 0.14 * Math.cos(t * Math.PI * 2),
             );
           } else if (move.link && travel < walk + linkDuration) {
             const t = (travel - walk) / linkDuration,
               e = t * t * (3 - 2 * t),
               p = linkPoint(move.link, e);
             tokens[move.player].position.copy(p);
+            tokens[move.player].rotation.z =
+              move.link.type === "slide"
+                ? Math.sin(t * Math.PI) * 0.5
+                : Math.sin(t * Math.PI * 10) * 0.15;
+            tokens[move.player].position.y +=
+              move.link.type === "ladder"
+                ? Math.abs(Math.sin(t * Math.PI * 8)) * 0.12
+                : 0;
+            tokens[move.player].scale.setScalar(1);
           } else {
             place(s);
             render();

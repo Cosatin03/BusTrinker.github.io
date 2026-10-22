@@ -63,7 +63,14 @@ try {
   const page = await context.newPage();
   page.on("pageerror", (e) => errors.push(e.message));
   await page.goto(base + "/ladders.html");
-  await page.fill("#names", "Alex\nSam\nKim");
+  for (const name of ["Alex", "Sam", "Kim", "Test"]) {
+    await page.fill("#player-name", name);
+    await page.click("#add-player");
+  }
+  await page
+    .getByRole("button", { name: "Test entfernen", exact: true })
+    .click();
+  assert.equal(await page.locator("#setup-players li").count(), 3);
   await overflow(page);
   await page.screenshot({
     path: resolve(root, "test-results/ladders-setup-desktop.png"),
@@ -169,7 +176,8 @@ try {
   const fb = await fallbackContext.newPage();
   fb.on("pageerror", (e) => errors.push(e.message));
   await fb.goto(base + "/ladders.html");
-  await fb.fill("#names", "Solo");
+  await fb.fill("#player-name", "Solo");
+  await fb.click("#add-player");
   await fb.fill("#size", "20");
   await fb.fill("#ladders", "0");
   await fb.fill("#slides", "0");

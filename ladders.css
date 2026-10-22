@@ -569,3 +569,75 @@
     transition: none !important;
   }
 }
+
+.add-player-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 18px;
+}
+.add-player-row input {
+  flex: 1;
+  min-width: 0;
+}
+.add-player-row button {
+  flex-shrink: 0;
+  padding: 12px;
+}
+.ladders-page #setup-players {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 8px;
+}
+.roster-player {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--bg);
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  animation: task-arrive 0.2s ease-out;
+}
+.roster-player strong {
+  flex: 1;
+  overflow-wrap: anywhere;
+}
+.roster-badge {
+  display: grid;
+  place-content: center;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  color: var(--ink);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.roster-player button {
+  padding: 8px;
+  min-width: 44px;
+}
+.ladders-page #flat-board small {
+  font-size: 9px;
+  color: var(--ink);
+  line-height: 1.25;
+}
+#flat-board button {
+  min-height: 80px;
+}
+.dice-display.rolling {
+  animation: dice-juggle 0.38s infinite alternate;
+}
+@keyframes dice-juggle {
+  0% {
+    transform: translate(-12px, -8px) rotate(-24deg) scale(1.05, 0.95);
+  }
+  50% {
+    transform: translate(8px, -20px) rotate(25deg) scale(0.96, 1.05);
+  }
+  100% {
+    transform: translate(0, 2px) rotate(-8deg) scale(1.12, 0.88);
+  }
+}

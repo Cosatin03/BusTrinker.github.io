@@ -5,6 +5,7 @@ import {
   transition,
   validGame,
   TASKS,
+  previewTask,
   settings,
   fieldPosition,
 } from "../ladders-core.js";
@@ -153,4 +154,19 @@ test("complete simulated games reach a winner with serializable valid states", (
     assert.equal(s.phase, "won");
     assert.equal(s.players[s.current].position, 30);
   }
+});
+
+test("field preview matches the drawn task and advances with its category", () => {
+  let s = createGame(["A"], {
+    ...basic,
+    categories: ["talk"],
+    custom: { talk: "Erste Aufgabe\nZweite Aufgabe\nDritte Aufgabe" },
+  });
+  const first = previewTask(s, 1);
+  s = action(s, "roll", 1);
+  assert.equal(s.task.text, first);
+  assert.notEqual(previewTask(s, 1), first);
+  assert.equal(previewTask(s, 1), previewTask(s, 2));
+  s.settings.fields[2] = "Feste Aufgabe";
+  assert.equal(previewTask(s, 2), "Feste Aufgabe");
 });

@@ -53,14 +53,20 @@
           </div>
           <form id="setup-form">
             <h2>Wer würfelt mit?</h2>
-            <label for="names"
-              >Namen in Sitzreihenfolge, eine Person pro Zeile</label
-            ><textarea
-              id="names"
-              rows="3"
-              placeholder="Alex&#10;Sam&#10;Kim"
-              required
-            ></textarea>
+            <p class="muted">Fügt eure Runde in Sitzreihenfolge hinzu.</p>
+            <label for="player-name">Spielername</label>
+            <div class="add-player-row">
+              <input
+                id="player-name"
+                maxlength="24"
+                autocomplete="off"
+                placeholder="Name eingeben"
+              /><button id="add-player" type="button" class="secondary">
+                + Hinzufügen
+              </button>
+            </div>
+            <ol id="setup-players" aria-label="Spieler in Zugreihenfolge"></ol>
+            <p id="player-count" class="small muted" aria-live="polite"></p>
             <details open>
               <summary>Spielbrett & Regeln</summary>
               <div class="board-settings">
@@ -236,7 +242,8 @@
             <details>
               <summary>Alle Felder & Aufgaben</summary>
               <p class="muted">
-                Die Kategorie steht fest, die Aufgabe wechselt bei jedem Besuch.
+                Auf den Feldern steht die nächste Aufgabe der Kategorie. Nach
+                dem Ziehen rückt für diese Kategorie die nächste Aufgabe nach.
                 Bei einer Leiter oder Rutsche zählt die Aufgabe auf dem
                 Zielfeld.
               </p>

@@ -137,7 +137,7 @@ try {
   const menu = await pageAt(1440);
   await menu.goto(base);
   await menu.locator(".game-tile").first().waitFor();
-  assert.equal(await menu.locator(".game-tile").count(), 4);
+  assert.equal(await menu.locator(".game-tile").count(), 5);
   await noOverflow(menu);
   await menu.screenshot({
     path: resolve(results, "menu-desktop.png"),
@@ -150,7 +150,7 @@ try {
     fullPage: true,
   });
   await menu.getByRole("button", { name: "Ein Gerät", exact: true }).click();
-  assert.equal(await menu.locator(".game-tile").count(), 3);
+  assert.equal(await menu.locator(".game-tile").count(), 4);
   await menu.locator("#game-search").fill("nichts");
   await menu.locator("#no-games").waitFor();
   console.log("PASS collection filters, mobile/desktop layout");

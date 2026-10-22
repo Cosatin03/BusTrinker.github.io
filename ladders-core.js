@@ -297,6 +297,7 @@ export function prepareTasks(state, rng = Math.random) {
     }
 }
 export function previewTask(state, field) {
+  if (state.settings.fields[field]) return state.settings.fields[field];
   const category = state.fields[field - 1];
   const text =
     state.settings.fields[field] ||

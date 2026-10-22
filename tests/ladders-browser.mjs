@@ -72,6 +72,7 @@ try {
     .click();
   assert.equal(await page.locator("#setup-players li").count(), 3);
   await overflow(page);
+  assert.ok((await page.locator("#player-name").boundingBox()).width > 120);
   await page.screenshot({
     path: resolve(root, "test-results/ladders-setup-desktop.png"),
     fullPage: true,

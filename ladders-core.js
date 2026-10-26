@@ -305,7 +305,17 @@ export function createGame(names, input, rng = Math.random) {
     lastTerms: {},
   };
   prepareTasks(game, rng);
+  pinFields(game, rng);
   return game;
+}
+export function pinFields(state, rng = Math.random) {
+  if (state.fieldTasks) return;
+  const tasks = Array.from({ length: state.settings.size }, (_, i) =>
+    drawTask(state, i + 1, rng),
+  );
+  if (state.phase === "task" && state.task)
+    tasks[state.task.field - 1] = state.task;
+  state.fieldTasks = tasks;
 }
 export function prepareTasks(state, rng = Math.random) {
   state.termBags ||= {};
@@ -337,6 +347,11 @@ export function prepareTasks(state, rng = Math.random) {
   }
 }
 export function previewTitle(state, field) {
+  if (state.fieldTasks?.[field - 1])
+    return (
+      state.fieldTasks[field - 1].title ||
+      taskTitle(state.fieldTasks[field - 1].text)
+    );
   if (state.settings.fields[field])
     return taskTitle(state.settings.fields[field]);
   return (
@@ -345,6 +360,7 @@ export function previewTitle(state, field) {
   );
 }
 export function previewTask(state, field) {
+  if (state.fieldTasks?.[field - 1]) return state.fieldTasks[field - 1].text;
   if (state.settings.fields[field]) return state.settings.fields[field];
   const category = state.fields[field - 1];
   const text =
@@ -358,6 +374,7 @@ export function taskTitle(text) {
   return words.slice(0, 5).join(" ") + (words.length > 5 ? " …" : "");
 }
 export function drawTask(state, field, rng) {
+  if (state.fieldTasks?.[field - 1]) return { ...state.fieldTasks[field - 1] };
   if (state.settings.fields[field])
     return { category: "custom", text: state.settings.fields[field], field };
   const category = state.fields[field - 1];

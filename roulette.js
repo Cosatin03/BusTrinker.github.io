@@ -130,13 +130,14 @@ function button(label, cls, fn) {
 }
 function loadSettings(options = DEFAULTS) {
   for (const [key, id] of [
+    ["startBalance", "start-balance"],
     ["minimum", "minimum"],
     ["lossMultiplier", "loss-multiplier"],
     ["winCap", "win-cap"],
     ["lossCap", "loss-cap"],
     ["duration", "duration"],
   ])
-    $(id).value = options[key];
+    $(id).value = options[key] ?? DEFAULTS[key];
   $("sound").checked = options.sound;
 }
 function setupPlayers() {
@@ -227,7 +228,12 @@ $("stake").addEventListener("input", () => {
   if (state) renderChips();
 });
 function renderBetting() {
-  const editable = state.phase === "betting" && !state.ready[state.current];
+  const editable =
+    state.phase === "betting" &&
+    !state.ready[state.current] &&
+    (state.players[state.current].balance ??
+      state.settings.startBalance ??
+      100) >= state.settings.minimum;
   const mine = state.bets.filter((b) => b.player === state.current);
   document.querySelectorAll("[data-bet]").forEach((field) => {
     const rule = betById.get(field.dataset.bet);
@@ -273,7 +279,7 @@ function renderBetting() {
   $("stake").min = state.settings.minimum;
   renderChips();
   $("bet-total").textContent =
-    `${fmt(mine.reduce((sum, b) => sum + b.amount, 0))} Schlücke gesetzt`;
+    `${fmt(mine.reduce((sum, b) => sum + b.amount, 0))} gesetzt · ${fmt((state.players[state.current].balance ?? state.settings.startBalance ?? 100) - mine.reduce((sum, b) => sum + b.amount, 0))} verfügbar`;
   $("bet-list").replaceChildren(
     ...mine.map((b) => {
       const rule = betById.get(b.id),
@@ -761,11 +767,21 @@ function render() {
       ? "Alle Einsätze sind geschlossen."
       : "Gewinne verteilen, selbst übernehmen oder verfallen lassen. Danach die zugeteilten Schlücke bestätigen.";
   $("edit").disabled = spinning;
+  if (
+    betting &&
+    state.players.every(
+      (p) =>
+        (p.balance ?? state.settings.startBalance ?? 100) <
+        state.settings.minimum,
+    )
+  )
+    $("instruction").textContent =
+      "Alle Guthaben liegen unter dem Mindesteinsatz. Beendet die Runde oder startet über Einstellungen eine neue Partie.";
   $("player-tabs").hidden = false;
   $("player-tabs").replaceChildren(
     ...state.players.map((p, index) => {
       const b = button(
-        `${state.ready[index] ? "✓ " : ""}${p.name}`,
+        `${state.ready[index] ? "✓ " : ""}${p.name} · ${fmt(p.balance ?? state.settings.startBalance ?? 100)} Schlücke`,
         `player-tab${state.current === index ? " active" : ""}`,
         () => act({ type: "select", player: index }),
       );
@@ -795,7 +811,7 @@ function render() {
         element(
           "span",
           "",
-          `${fmt(p.drank)} zugeteilt · ${fmt(p.given)} verteilt · ${p.wins} Gewinnrunden`,
+          `${fmt(p.balance ?? state.settings.startBalance ?? 100)} Guthaben · ${fmt(p.drank)} zugeteilt · ${fmt(p.given)} verteilt`,
         ),
       );
       return li;
@@ -841,6 +857,7 @@ $("settings-form").addEventListener("submit", (e) => {
   e.preventDefault();
   try {
     state = createGame(names, {
+      startBalance: Number($("start-balance").value),
       minimum: Number($("minimum").value),
       lossMultiplier: Number($("loss-multiplier").value),
       winCap: Number($("win-cap").value),

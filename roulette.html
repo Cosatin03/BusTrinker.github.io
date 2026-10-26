@@ -107,6 +107,7 @@
               <details open>
                 <summary>Spieleinstellungen</summary>
                 <div class="settings-grid">
+                  <label>Startguthaben / Leben<input id="start-balance" type="number" min="1" max="1000000" step="1" value="100" required><small>Schlücke zum Setzen. Gewinne erhöhen das Guthaben, verlorene Einsätze werden abgezogen. Ohne ausreichendes Guthaben setzt ihr aus.</small></label>
                   <label
                     >Mindesteinsatz je Feld<input
                       id="minimum"
@@ -353,5 +354,6 @@
       hidden
     ></div>
     <script type="module" src="roulette.js"></script>
+    <script type="module" src="game-exit.js"></script>
   </body>
 </html>

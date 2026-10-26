@@ -110,7 +110,7 @@ test("task bags exhaust before reuse, substitute quantity and replace defaults",
   });
   const seen = [];
   for (let i = 0; i < 4; i++) {
-    s.players[0].position = 0;
+    s.players[0].position = i;
     s = action(s, "roll", 1);
     seen.push(s.task.text);
     s = action(s, "done");
@@ -161,7 +161,7 @@ test("complete simulated games reach a winner with serializable valid states", (
   }
 });
 
-test("field preview matches the drawn task and advances with its category", () => {
+test("field assignments survive drawing and reloading unchanged", () => {
   let s = createGame(["A"], {
     ...basic,
     categories: ["talk"],
@@ -170,10 +170,11 @@ test("field preview matches the drawn task and advances with its category", () =
   const first = previewTask(s, 1);
   s = action(s, "roll", 1);
   assert.equal(s.task.text, first);
-  assert.notEqual(previewTask(s, 1), first);
-  assert.equal(previewTask(s, 1), previewTask(s, 2));
-  s.settings.fields[2] = "Feste Aufgabe";
-  assert.equal(previewTask(s, 2), "Feste Aufgabe");
+  assert.equal(previewTask(s, 1), first);
+  const all = structuredClone(s.fieldTasks);
+  s = action(s, "done");
+  s = action(s, "roll", 2);
+  assert.deepEqual(JSON.parse(JSON.stringify(s)).fieldTasks, all);
 });
 
 test("Hot and Weird have distinct themed tasks, not only different labels", () => {
@@ -250,7 +251,7 @@ test("template preview survives reload and legacy saves still play", () => {
   const text = previewTask(s, 1);
   s = action(JSON.parse(JSON.stringify(s)), "roll", 1);
   assert.equal(s.task.text, text);
-  assert.ok(s.task.term);
+  assert.equal(s.task.text, s.fieldTasks[0].text);
   assert.ok(!text.includes("{term}"));
   const old = createGame(["A"], basic);
   delete old.settings.mode;

@@ -415,7 +415,7 @@ try {
   await settled(roulette);
   assert.equal(
     await roulette.locator("#bet-total").innerText(),
-    "3 Schlücke gesetzt",
+    "3 gesetzt · 97 verfügbar",
   );
   await roulette.locator("#ready").click();
   await settled(roulette);

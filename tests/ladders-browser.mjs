@@ -238,6 +238,9 @@ try {
     await fb.click("#done");
   }
   assert.equal((await saved(fb)).phase, "won");
+  await fb.getByRole('button',{name:'Runde beenden',exact:true}).click();
+  await fb.getByRole('button',{name:'Weiterspielen',exact:true}).click();
+  assert.equal((await saved(fb)).phase,'won');
   await fb.screenshot({
     path: resolve(root, "test-results/ladders-winner-fallback.png"),
     fullPage: true,

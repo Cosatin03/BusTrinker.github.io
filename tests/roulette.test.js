@@ -11,6 +11,20 @@ import {
   validGame,
 } from "../roulette-core.js";
 const act = (s, c) => transition(s, { ...c, revision: s.revision });
+test("wallet reserves stakes, refunds removed bets and settles net winnings once", () => {
+  let s = createGame(["A"], { startBalance: 10 });
+  s = act(s, { type: "bet", id: "red", amount: 6 });
+  assert.throws(() => act(s, { type: "bet", id: "black", amount: 6 }));
+  s = act(s, { type: "remove", id: "red" });
+  s = act(s, { type: "bet", id: "red", amount: 6 });
+  s = spin(s, 1);
+  assert.equal(s.players[0].balance, 16);
+  assert.throws(() => act(s, { type: "settle", now: 14000 }));
+  let loser = createGame(["B"], { startBalance: 3 });
+  loser = act(loser, { type: "bet", id: "red", amount: 3 });
+  loser = spin(loser, 0);
+  assert.equal(loser.players[0].balance, 0);
+});
 function spin(s, n = 0) {
   while (s.ready.some((v) => !v)) s = act(s, { type: "ready" });
   s = act(s, { type: "spin", outcome: n, now: 1000 });
@@ -22,7 +36,10 @@ test("European wheel, 10:1 straight bets and standard combination payouts", () =
   assert.equal(WHEEL.filter((n) => color(n) === "red").length, 18);
   assert.equal(BETS.length, new Set(BETS.map((b) => b.id)).size);
   for (const b of BETS) {
-    assert.equal(b.odds, b.kind === "straight" ? 10 : 36 / b.numbers.length - 1);
+    assert.equal(
+      b.odds,
+      b.kind === "straight" ? 10 : 36 / b.numbers.length - 1,
+    );
     assert.equal(new Set(b.numbers).size, b.numbers.length);
     assert.ok(b.numbers.every((n) => WHEEL.includes(n)));
     for (let outcome = 0; outcome <= 36; outcome++) {

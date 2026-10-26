@@ -8,6 +8,7 @@ const RED = new Set([
 ]);
 export const color = (n) => (n === 0 ? "green" : RED.has(n) ? "red" : "black");
 export const DEFAULTS = {
+  startBalance: 100,
   minimum: 3,
   lossMultiplier: 1,
   winCap: 0,
@@ -76,6 +77,7 @@ export function settings(input = {}) {
   const s = { ...DEFAULTS, ...input };
   if (
     !integer(s.minimum, 1, 1000) ||
+    !integer(s.startBalance, s.minimum, 1000000) ||
     !integer(s.lossMultiplier, 0, 10) ||
     !integer(s.winCap, 0, 10000) ||
     !integer(s.lossCap, 0, 10000) ||
@@ -100,7 +102,13 @@ export function createGame(names, options) {
     gameId: globalThis.crypto.randomUUID(),
     revision: 0,
     settings: settings(options),
-    players: clean.map((name) => ({ name, drank: 0, given: 0, wins: 0 })),
+    players: clean.map((name) => ({
+      name,
+      balance: settings(options).startBalance,
+      drank: 0,
+      given: 0,
+      wins: 0,
+    })),
     round: 1,
     phase: "betting",
     current: 0,
@@ -144,6 +152,7 @@ export function validGame(s) {
           typeof p.name === "string" &&
           p.name.trim() &&
           p.name.length <= 24 &&
+          (p.balance === undefined || integer(p.balance)) &&
           ["drank", "given", "wins"].every((k) => integer(p[k])),
       )
     )
@@ -229,6 +238,9 @@ export function transition(input, command) {
     );
   const s = structuredClone(input),
     c = command;
+  // Older saved rounds acquire a wallet without invalidating open bets.
+  for (const p of s.players)
+    p.balance ??= s.settings.startBalance ?? DEFAULTS.startBalance;
   const betting = () => {
     if (s.phase !== "betting") throw Error("Die Einsätze sind geschlossen.");
   };
@@ -250,6 +262,11 @@ export function transition(input, command) {
       const previous = s.bets.find(
         (b) => b.player === s.current && b.id === c.id,
       );
+      const reserved = s.bets
+        .filter((b) => b.player === s.current)
+        .reduce((n, b) => n + b.amount, 0);
+      if (reserved + c.amount > s.players[s.current].balance)
+        throw Error("Nicht genug Schluckguthaben für diesen Einsatz.");
       if (previous) {
         if (previous.amount + c.amount > 10000)
           throw Error("Höchstens 10000 Schlücke pro Feld.");
@@ -297,11 +314,15 @@ export function transition(input, command) {
         throw Error("Das Rad dreht noch.");
       s.settlement = s.players.map((_, player) => {
         let rawWin = 0,
-          rawLoss = 0;
+          rawLoss = 0,
+          walletLoss = 0;
         for (const b of s.bets.filter((b) => b.player === player)) {
           const rule = betById.get(b.id);
           if (rule.numbers.includes(s.outcome)) rawWin += b.amount * rule.odds;
-          else rawLoss += b.amount * s.settings.lossMultiplier;
+          else {
+            rawLoss += b.amount * s.settings.lossMultiplier;
+            walletLoss += b.amount;
+          }
         }
         const give = s.settings.winCap
           ? Math.min(rawWin, s.settings.winCap)
@@ -310,6 +331,7 @@ export function transition(input, command) {
           ? Math.min(rawLoss, s.settings.lossCap)
           : rawLoss;
         if (rawWin) s.players[player].wins++;
+        s.players[player].balance += rawWin - walletLoss;
         s.players[player].drank += drink;
         return {
           give,
@@ -366,7 +388,11 @@ export function transition(input, command) {
       s.phase = "betting";
       s.round++;
       s.current = 0;
-      s.ready.fill(false);
+      s.ready = s.players.map((p) => p.balance < s.settings.minimum);
+      s.current = Math.max(
+        0,
+        s.ready.findIndex((v) => !v),
+      );
       s.bets = [];
       s.outcome = null;
       s.startedAt = null;

@@ -4,6 +4,7 @@ import {
   variantCount,
   previewTitle,
   prepareTasks,
+  pinFields,
   previewTask,
   taskTitle,
   CATEGORIES,
@@ -40,6 +41,7 @@ let state = readSaved(KEY),
 if (!validGame(state)) state = null;
 else {
   prepareTasks(state);
+  pinFields(state);
   save(KEY, state);
 }
 let roster = [];
@@ -297,8 +299,10 @@ async function act(type) {
     id = state.id;
   let changed = false;
   try {
+    if (type === "roll") await ensureScene();
     await lock(() => {
       const latest = readSaved(KEY);
+      if(!validGame(latest)) throw Error('Diese Runde wurde beendet. Wähle eine neue Partie.');
       if (validGame(latest)) state = latest;
       state = transition(state, {
         type,
@@ -383,7 +387,11 @@ function renderFlat() {
   );
 }
 async function ensureScene() {
-  if (loadingScene || sceneFailed || !state || editing) return;
+  if (loadingScene) {
+    await new Promise((resolve) => setTimeout(resolve, 30));
+    return ensureScene();
+  }
+  if (sceneFailed || !state || editing) return;
   if (scene?.id === state.id) return;
   loadingScene = true;
   const id = state.id;

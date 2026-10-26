@@ -55,5 +55,5 @@ jobs:
           REMOTE="${DEPLOY_USER}@${DEPLOY_HOST}"
           RELEASE="/var/www/bustrinker/releases/${SHA}"
           "${SSH[@]}" "$REMOTE" "mkdir -p '$RELEASE'"
-          rsync -az --delete --exclude='.git/' --exclude='.github/' --exclude='node_modules/' --exclude='tests/' --exclude='test-results/' --exclude='docs/' --exclude='.env*' --exclude='*.key' --exclude='*.pem' -e "ssh -i $HOME/.ssh/deploy_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes" ./ "$REMOTE:$RELEASE/"
+          rsync -az --delete --exclude='.git/' --exclude='.github/' --exclude='node_modules/' --exclude='tests/' --exclude='test-results/' --exclude='docs/' --exclude='deploy/' --exclude='.env*' --exclude='*.key' --exclude='*.pem' -e "ssh -i $HOME/.ssh/deploy_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes" ./ "$REMOTE:$RELEASE/"
           "${SSH[@]}" "$REMOTE" "test -f '$RELEASE/index.html' && ln -s '$RELEASE' /var/www/bustrinker/current.next && mv -Tf /var/www/bustrinker/current.next /var/www/bustrinker/current"

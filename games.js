@@ -1,5 +1,6 @@
 // Add another entry here to make a game discoverable in the collection.
 export const games = [
+  { id: "cshake", title: "C-Shake", subtitle: "SCHÜTTEL DICH AN DIE SPITZE", mode: "online", players: "Solo (Multiplayer in Arbeit)", duration: "10–30 Sekunden", href: "cshake.html", rules: "cshake.html", description: "Bewegungssensor aktivieren, Smartphone schütteln und deinen Rekord knacken. Solo ist spielbar.", tags: ["Shake", "Sensor", "Arcade", "Rekord"], illustration: "cshake", color: "mint", cta: "Solo spielen" },
   {
     id: "ladders",
     title: "Rutschen & Leitern",

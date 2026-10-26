@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#09121c"><title>C‑Shake · BusTrinker</title><link rel="icon" href="Icon.jpeg"><link rel="stylesheet" href="cshake.css"></head>
+<body><main class="shell"><header><a href="index.html" class="back">← Spielesammlung</a><span class="tag">MOTION ARCADE</span></header>
+<div class="logo"><span class="bolt">ϟ</span><h1>C<span>‑</span>SHAKE</h1><p>Schüttel dein Handy. Schlag deinen Rekord.</p></div>
+<section id="setup" class="panel">
+  <p class="eyebrow">SOLO CHALLENGE</p><h2>Bereit für 10 Sekunden Vollgas?</h2>
+  <div class="durations" role="group" aria-label="Rundendauer"><button data-duration="10" class="chosen">10 s</button><button data-duration="20">20 s</button><button data-duration="30">30 s</button></div>
+  <button id="permission" class="primary">Bewegungssensor aktivieren</button><p id="sensor-info" class="hint" role="status">Zum Spielen brauchst du ein Smartphone mit Bewegungssensor. Am iPhone fragt Safari nach deiner Erlaubnis.</p>
+  <button id="start" class="primary secondary" disabled>Solo starten →</button>
+  <div class="stats"><span>Dein Rekord <strong id="record">0</strong></span><span>Runden <strong id="rounds">0</strong></span></div>
+</section>
+<section id="game" class="panel game" hidden><div class="topline"><span id="phase">START IN</span><span id="timer">3</span></div><div class="track"><div id="progress"></div></div><div id="score-wrap" class="score-wrap"><span>DEINE SHAKES</span><output id="score">0</output><span id="feedback">SHAKE IT!</span></div><p class="hint">Halte das Smartphone fest und achte auf genügend Platz.</p></section>
+<section id="result" class="panel" hidden><p class="eyebrow">RUNDE BEENDET</p><h2 id="result-heading">GESCHAFFT!</h2><div class="final-score" id="final-score">0</div><p id="result-message"></p><button id="again" class="primary">Nochmal spielen</button><button id="share" class="primary secondary">Ergebnis teilen</button><a href="index.html" class="footer-link">Zur Spielesammlung</a></section>
+<section class="panel modes"><h2>Mehrspieler</h2><p>Private Räume, Quick Match und globale Bestenlisten erfordern die serverseitige Firebase-Spielverwaltung. Bis zu deren Einrichtung ist ausschließlich Solo freigeschaltet.</p></section>
+<footer><label><input type="checkbox" id="sound"> Sound</label><label><input type="checkbox" id="haptics"> Vibration</label></footer></main><script type="module" src="cshake.js"></script></body></html>

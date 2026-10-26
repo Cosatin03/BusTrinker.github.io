@@ -34,4 +34,7 @@ if (document.querySelector(".board-topline")) {
     "position:fixed;bottom:8px;right:8px;z-index:5;background:#783b38;color:white;border-radius:50%;width:36px;height:36px;min-height:36px;font-size:24px;padding:0";
   document.querySelector("#quick-players").style.paddingRight = "44px";
   document.body.append(exit);
-} else document.querySelector(".site-header nav").append(exit);
+} else {
+  exit.style.cssText='position:fixed;bottom:10px;right:12px;z-index:5;background:#783b38;color:white;border-radius:12px;padding:10px;font-size:12px;min-height:44px';
+  document.body.append(exit);
+}

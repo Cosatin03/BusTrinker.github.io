@@ -22,7 +22,9 @@ function render() {
     const tile = element("article", `game-tile ${game.color}`);
     const art = element("div", `game-art ${game.illustration}`);
     art.setAttribute("aria-hidden", "true");
-    if (game.illustration === "ladders") {
+    if (game.illustration === "cshake") {
+      art.append(element("div", "catalog-shake", "ϟ"), element("span", "art-stamp", "SHAKE IT!"));
+    } else if (game.illustration === "ladders") {
       const board = element("div", "catalog-board");
       ["08", "09 ↗", "10", "07", "♟", "11 ↘", "06", "05", "04"].forEach(
         (n) => board.append(element("span", "", n)),

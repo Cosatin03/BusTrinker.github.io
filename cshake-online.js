@@ -186,7 +186,8 @@ function tick(){
   if(now<start){
     state.phase="countdown";$("phase").textContent="START IN";$("timer").textContent=String(Math.ceil((start-now)/1000));
   }else if(remaining>0){
-    if(!state.roundStarted) {detector.reset();state.score=0;$("score").textContent="0";state.roundStarted=true;beep(880,.15);}\n    state.phase="playing";
+    if(!state.roundStarted) {detector.reset();state.score=0;$("score").textContent="0";state.roundStarted=true;beep(880,.15);}
+    state.phase="playing";
     $("phase").textContent="ZEIT";$("timer").textContent=remaining.toFixed(1);
     if(performance.now()-state.lastPublish>650 && state.score!==state.published){state.lastPublish=performance.now();void publish();}
   }else {void finish();return;}

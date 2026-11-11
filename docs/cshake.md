@@ -1,6 +1,6 @@
 # C-Shake: Implementierungsstand
 
-Das bestehende BusTrinker-Repository ist eine statische ES-Module-Anwendung (HTML, CSS, JavaScript, GitHub Pages). C-Shake ist derzeit als **Solo-Prototyp** eingebunden, nicht als vollständiges Firebase-Multiplayer-Spiel. Die Oberfläche zeigt diesen Status explizit an. Keine Mock-Daten geben Multiplayer vor.
+Das bestehende BusTrinker-Repository ist eine statische ES-Module-Anwendung (HTML, CSS, JavaScript, GitHub Pages). C-Shake bietet einen **Solo-Modus** und einen lokalen **Party Battle** für 2–10 Personen auf einem weitergereichten Smartphone. Beide Modi laufen ohne Firebase. Online-Multiplayer und globale Bestenlisten sind weiterhin nicht implementiert.
 
 ## Solo starten
 
@@ -12,7 +12,11 @@ Das bestehende BusTrinker-Repository ist eine statische ES-Module-Anwendung (HTM
 
 `npm test` führt auch `tests/cshake.test.js` aus.
 
-## Für die Multiplayer-Abnahme noch erforderlich
+## Party Battle
+
+Im Spielmodus Party Battle werden 2–10 unterschiedliche Spielernamen zeilenweise eingetragen. Jede Person bekommt nacheinander dieselbe Zeit (10, 20 oder 30 Sekunden), einschließlich 3-Sekunden-Countdown. Währenddessen zählen nur Sensorschüttler im aktiven Zeitfenster. Danach erscheinen Ergebnis und Zwischenstand, am Ende der Sieger. Der lokale Rekord bleibt separat auf dem jeweiligen Gerät. Bei Browser-/App-Wechsel wird die laufende Runde abgebrochen. Es gibt keine Netzwerk-Synchronisation, Serverwertung oder manipulationssichere Bestenliste. Bei ausbleibenden Sensordaten muss die Berechtigung erneut aktiviert werden.
+
+## Für eine spätere Online-Multiplayer-Version noch erforderlich
 
 1. Eigenständiges Next.js/TypeScript-Modul oder abgesprochene Integration des Stacks in das bestehende Projekt.
 2. Firebase Authentication (anonymous), Realtime Database, Firestore, App Check und Emulator-Konfiguration.

@@ -1,11 +1,33 @@
 import { ShakeDetector } from "./cshake-core.js";
 const $ = s => document.querySelector(s);
 const detector = new ShakeDetector();
-const state = { duration: 10, sensorReady: false, phase: "setup", start: 0, end: 0, samples: 0, lastSample: 0, raf: 0, audio: null };
+const state = { party: true, players: [], current: 0, scores: [], duration: 10, sensorReady: false, phase: "setup", start: 0, end: 0, samples: 0, lastSample: 0, raf: 0, audio: null };
 const read = (key) => { try { return Number(localStorage.getItem(key)) || 0; } catch { return 0; } };
 const save = (key,value) => { try { localStorage.setItem(key,String(value)); } catch {} };
 const updateStats = () => { $("#record").textContent = read("cshake.record"); $("#rounds").textContent = read("cshake.rounds"); };
 updateStats();
+const escapeHtml = value => String(value).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function setMode(party) {
+  if (state.phase === "playing" || state.phase === "countdown") return;
+  state.party = party;
+  $("#party-mode").classList.toggle("chosen",party);
+  $("#solo-mode").classList.toggle("chosen",!party);
+  $("#party-setup").hidden = !party;
+  $("#start").textContent = party ? "Battle starten →" : "Solo starten →";
+}
+$("#party-mode").addEventListener("click",()=>setMode(true));
+$("#solo-mode").addEventListener("click",()=>setMode(false));
+function playerNames() {
+  return [...new Set($("#player-names").value.split(/\n/).map(n=>n.trim().slice(0,24)).filter(Boolean))].slice(0,10);
+}
+function rankings() {
+  return state.scores.map((score,i)=>({name:state.players[i],score,index:i}))
+    .sort((a,b)=>b.score-a.score || a.index-b.index);
+}
+function standingsHtml() {
+  if (!state.party) return "";
+  return '<h3>Rangliste</h3><ol>'+rankings().map((p,i)=>'<li><span>'+ (i===0?"👑 ":"") +escapeHtml(p.name)+'</span><strong>'+p.score+' Shakes</strong></li>').join("")+'</ol>';
+}
 document.querySelectorAll("[data-duration]").forEach(b => b.addEventListener("click",()=>{ state.duration=Number(b.dataset.duration); document.querySelectorAll("[data-duration]").forEach(x=>x.classList.toggle("chosen",x===b)); updateStats(); }));
 const error = msg => { $("#sensor-info").textContent=msg; $("#sensor-info").classList.add("error"); };
 const motionHandler = e => {
@@ -52,8 +74,27 @@ function finish() {
   if(state.phase==="finished") return;
   state.phase="finished";cancelAnimationFrame(state.raf);
   const score=detector.score, old=read("cshake.record"), record=Math.max(score,old);
+  if(state.party) state.scores[state.current]=score;
   save("cshake.record",record);save("cshake.rounds",read("cshake.rounds")+1);updateStats();
-  screen("result");$("#final-score").textContent=score;$("#result-heading").textContent=score>old?"NEUER REKORD!":"GESCHAFFT!";$("#result-message").textContent=`Dein Bestwert: ${record} Shakes in ${state.duration} Sekunden.`;beep(score>old?880:520,.22);
+  screen("result");$("#final-score").textContent=score;
+  if(state.party) {
+    const remaining=state.current<state.players.length-1;
+    const leader=rankings()[0];
+    $("#result-heading").textContent=remaining?"HANDWECHSEL!": "🏆 "+leader.name+" GEWINNT!";
+    $("#result-message").textContent=remaining
+      ? state.players[state.current]+" hat "+score+" Shakes geschafft. Als Nächstes: "+state.players[state.current+1]+"."
+      : "Party Battle beendet! "+leader.score+" Shakes in "+state.duration+" Sekunden sind der Spitzenwert.";
+    $("#standings").innerHTML=standingsHtml();
+    $("#next").hidden=!remaining;
+    $("#again").hidden=remaining;
+    $("#share").hidden=remaining;
+  } else {
+    $("#result-heading").textContent=score>old?"NEUER REKORD!":"GESCHAFFT!";
+    $("#result-message").textContent="Dein Bestwert: "+record+" Shakes in "+state.duration+" Sekunden.";
+    $("#standings").innerHTML="";
+    $("#next").hidden=true;$("#again").hidden=false;$("#share").hidden=false;
+  }
+  beep(score>old?880:520,.22);
 }
 function tick(){
   const now=performance.now();
@@ -67,8 +108,23 @@ function tick(){
 }
 function start() {
   if(!state.sensorReady || performance.now()-state.lastSample>4000){error("Keine aktuellen Sensordaten. Aktiviere den Sensor erneut.");$("#start").disabled=true;state.sensorReady=false;return;}
-  detector.reset();$("#score").textContent="0";state.phase="countdown";state.start=performance.now()+3000;state.end=state.start+state.duration*1000;screen("game");tick();
+  detector.reset();$("#score").textContent="0";
+  $("#current-player").textContent=state.party ? state.players[state.current]+" ist dran!" : "";
+  $("#feedback").textContent=["SCHÜTTEL, ALS WÄR'S DEIN JOB!","ZEIG, WAS DU DRAUFHAST!","VOLLGAS!"][state.current%3];
+  state.phase="countdown";state.start=performance.now()+3000;state.end=state.start+state.duration*1000;screen("game");tick();
 }
-$("#start").addEventListener("click",start);
-$("#again").addEventListener("click",()=>{screen("setup");state.phase="setup";});
-$("#share").addEventListener("click",async()=>{const text=`Ich habe bei C-Shake ${detector.score} Shakes in ${state.duration} Sekunden geschafft!`;try{if(navigator.share)await navigator.share({title:"C-Shake",text,url:location.href});else if(navigator.clipboard){await navigator.clipboard.writeText(text);$("#share").textContent="Kopiert!";}}catch{}});
+$("#start").addEventListener("click",()=>{
+  if(state.party){
+    const names=playerNames();
+    if(names.length<2) { error("Trage mindestens zwei verschiedene Namen ein."); return; }
+    state.players=names;state.scores=[];state.current=0;
+  }
+  start();
+});
+$("#next").addEventListener("click",()=>{
+  if(!state.party || state.current>=state.players.length-1) return;
+  state.current++;
+  start();
+});
+$("#again").addEventListener("click",()=>{screen("setup");state.phase="setup";state.current=0;state.scores=[];$("#share").textContent="Ergebnis teilen";});
+$("#share").addEventListener("click",async()=>{const text=state.party ? `C-Shake Party Battle (${state.duration}s):\n${rankings().map((p,i)=>`${i+1}. ${p.name}: ${p.score} Shakes`).join("\n")}` : `Ich habe bei C-Shake ${detector.score} Shakes in ${state.duration} Sekunden geschafft!`;try{if(navigator.share)await navigator.share({title:"C-Shake",text,url:location.href});else if(navigator.clipboard){await navigator.clipboard.writeText(text);$("#share").textContent="Kopiert!";}}catch{}});

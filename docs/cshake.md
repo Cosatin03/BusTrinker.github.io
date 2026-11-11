@@ -28,3 +28,13 @@ Im Spielmodus Party Battle werden 2–10 unterschiedliche Spielernamen zeilenwei
 8. Firebase-Projektkonfiguration, Secrets und Deployment von Rules/Functions. **Keine neuen Firebase-Regeln wurden live deployt.**
 
 Die vorhandene BusTrinker-Firestore-Lobby bleibt unangetastet. Niemals pauschal bestehende Firebase-Regeln durch offene Entwicklungsregeln ersetzen.
+
+## Gleichzeitiges Online Battle (1–4 Geräte)
+
+`cshake-online.html` und `cshake-online.js` nutzen dieselbe öffentliche Firebase-Webkonfiguration aus `config.js` und den Firestore-Dienst, aber getrennte Dokumente in `cshakeRooms/{code}` mit Spielern unter `players/{authUid}`. Die vorhandenen BusTrinker-Lobbys unter `rooms` werden nicht verändert.
+
+Ein Host erstellt einen sechsstelligen Raum, weitere Personen treten per Code oder Link bei. Jeder aktiviert seinen Bewegungssensor und signalisiert Bereitschaft. Der Host startet eine Runde erst, wenn alle bereit sind. Firestore `serverTimestamp()` bestimmt den gemeinsamen Start mit vier Sekunden Vorlauf; die Geräte rechnen die Anzeige mit ihrer lokalen Uhr. Diese Methode ist für Partyspiele geeignet, aber **keine millisekundengenaue serverautorisierte Synchronisierung** bei falsch eingestellten Geräteuhren. Jeder Browser erkennt die Schüttler lokal und sendet den aktuellen Punktestand ungefähr alle 650 ms per Firestore-Transaktion. Abschluss und Neustart der Lobby erfolgen über Transaktionen. Ausgefallene Geräte können die Abschlussphase aufhalten; ein Server-Timeout ist noch nicht implementiert.
+
+**Für den produktiven Einsatz ist eine einmalige Firebase-Konfiguration außerhalb des Repositories nötig:** In Firebase Authentication den Anbieter „Anonym“ aktivieren und Firestore-Regeln für `cshakeRooms` und deren `players` erstellen. Die bestehenden Regeln für `rooms` dürfen nicht ersetzt oder gelockert werden. Eine reine öffentliche API-Konfiguration gibt keine Zugriffsrechte. Für `cshakeRooms` dürfen nur authentifizierte Nutzer Räume erstellen, Beitritte müssen auf vier Mitglieder und auf die Lobbyphase beschränkt sein, Raumstart/Rematch nur für den Host erlaubt sein und Spieler dürfen nur ihr eigenes `players/{authUid}`-Dokument beschreiben. Eine serverseitig überprüfte Punktwertung erfordert zusätzliche Cloud Functions und ist hier **nicht** vorhanden; browserbasierte Sensorwerte können manipuliert werden. Firestore-Regeln und Firebase Authentication wurden nicht ausgerollt oder auf einer produktiven Firebase-Instanz getestet.
+
+Den Test mit mindestens zwei physischen Handys unter HTTPS durchführen, insbesondere iOS Safari (Berechtigungsdialog), Android Chrome, Hintergrundwechsel, Netzverlust und mehrere gleichzeitig sendende Spieler.

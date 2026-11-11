@@ -41,6 +41,10 @@ const motionHandler = e => {
   if (timestamp < state.start || timestamp >= state.end) return;
   if (detector.sample({x:source.x,y:source.y,z:source.z,time:timestamp,includesGravity:source===g})) {
     $("#score").textContent=String(detector.score);
+    if(detector.score % 10 === 0) {
+      $("#feedback").textContent=["10ER-KOMBO! 🔥","UNAUFHALTSAM! ⚡","DAS WIRD ENG! 🚀"][Math.floor(detector.score/10-1)%3];
+      beep(940,.09);
+    }
     const el=$("#score-wrap");el.classList.remove("pulse");void el.offsetWidth;el.classList.add("pulse");
     if ($("#haptics").checked) navigator.vibrate?.(12);
     beep(680,.045);
@@ -107,7 +111,7 @@ function tick(){
   state.raf=requestAnimationFrame(tick);
 }
 function start() {
-  if(!state.sensorReady || performance.now()-state.lastSample>4000){error("Keine aktuellen Sensordaten. Aktiviere den Sensor erneut.");$("#start").disabled=true;state.sensorReady=false;return;}
+  if(!state.sensorReady || performance.now()-state.lastSample>4000){error("Keine aktuellen Sensordaten. Aktiviere den Sensor erneut.");$("#start").disabled=true;state.sensorReady=false;state.phase="setup";screen("setup");return;}
   detector.reset();$("#score").textContent="0";
   $("#current-player").textContent=state.party ? state.players[state.current]+" ist dran!" : "";
   $("#feedback").textContent=["SCHÜTTEL, ALS WÄR'S DEIN JOB!","ZEIG, WAS DU DRAUFHAST!","VOLLGAS!"][state.current%3];

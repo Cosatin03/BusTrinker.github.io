@@ -4,7 +4,7 @@ const $ = id => document.getElementById(id);
 const detector = new ShakeDetector();
 const state = { db:null, uid:null, code:null, room:null, people:[], duration:10, sensor:false,
   samples:0,lastSample:0, activeRound:0, score:0, published:0, lastPublish:0, tickId:0, offRoom:null,
-  offPeople:null, phase:"entry", audio:null, busy:false, finalizing:false };
+  offPeople:null, phase:"entry", audio:null, busy:false, finalizing:false, roundStarted:false };
 const STORAGE = "cshake.online.session";
 const show = id => ["entry","lobby","arena","result"].forEach(view=>$(view).hidden=view!==id);
 const message = value => { $("notice").textContent=value || ""; };
@@ -52,7 +52,7 @@ async function action(task) {
 function disconnect() {
   cancelAnimationFrame(state.tickId);
   state.offRoom?.(); state.offPeople?.();state.offRoom=null;state.offPeople=null;
-  state.room=null;state.people=[];state.activeRound=0;state.code=null;state.phase="entry";state.finalizing=false;
+  state.room=null;state.people=[];state.activeRound=0;state.code=null;state.phase="entry";state.finalizing=false;state.roundStarted=false;
 }
 async function create() {
   if(!nickname()) throw new Error("Trage deinen Namen ein.");
@@ -156,7 +156,7 @@ async function launch() {
 }
 let pending=false;
 async function publish(final=false) {
-  if(pending||!state.room||!members().includes(state.uid))return;
+  if(final){while(pending)await new Promise(resolve=>setTimeout(resolve,60));}\n  if(pending||!state.room||!members().includes(state.uid))return;
   pending=true;const round=state.activeRound,score=state.score;
   try{
     await state.db.runTransaction(async tx=>{
@@ -185,7 +185,7 @@ function tick(){
   if(now<start){
     state.phase="countdown";$("phase").textContent="START IN";$("timer").textContent=String(Math.ceil((start-now)/1000));
   }else if(remaining>0){
-    if(state.phase!=="playing") {detector.reset();state.score=0;$("score").textContent="0";state.phase="playing";beep(880,.15);}
+    if(!state.roundStarted) {detector.reset();state.score=0;$("score").textContent="0";state.roundStarted=true;beep(880,.15);}\n    state.phase="playing";
     $("phase").textContent="ZEIT";$("timer").textContent=remaining.toFixed(1);
     if(performance.now()-state.lastPublish>650 && state.score!==state.published){state.lastPublish=performance.now();void publish();}
   }else {void finish();return;}
@@ -207,7 +207,7 @@ function render() {
   if(room.phase==="countdown"){
     show("arena");$("live-scores").innerHTML=rankHtml();
     if(state.activeRound!==room.round && room.startedAt) {
-      state.activeRound=room.round;state.published=0;state.score=0;
+      state.activeRound=room.round;state.published=0;state.score=0;state.roundStarted=false;
       detector.reset();$("score").textContent="0";$("feedback").textContent="SCHAU DEINEN GEGNERN IN DIE AUGEN!";
       cancelAnimationFrame(state.tickId);state.phase="countdown";tick();
     }else if(!state.tickId && state.phase==="paused"){tick();}

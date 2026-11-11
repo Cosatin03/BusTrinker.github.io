@@ -156,7 +156,8 @@ async function launch() {
 }
 let pending=false;
 async function publish(final=false) {
-  if(final){while(pending)await new Promise(resolve=>setTimeout(resolve,60));}\n  if(pending||!state.room||!members().includes(state.uid))return;
+  if(final){while(pending)await new Promise(resolve=>setTimeout(resolve,60));}
+  if(pending||!state.room||!members().includes(state.uid))return;
   pending=true;const round=state.activeRound,score=state.score;
   try{
     await state.db.runTransaction(async tx=>{

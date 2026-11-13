@@ -1,5 +1,5 @@
 // Y-axis-only shake detector for continuous up/down motion.
-// Each alternating threshold crossing counts one stroke, without requiring a quiet valley.
+// A full up/down cycle (two opposite threshold crossings) counts one point.
 export const SHAKE_DEFAULTS = Object.freeze({
   threshold: 5.5, minIntervalMs: 65, maxGapMs: 500,
 });
@@ -7,7 +7,8 @@ export class ShakeDetector {
   constructor(options = {}) { this.settings = { ...SHAKE_DEFAULTS, ...options }; this.reset(); }
   reset() {
     this.lastTime = -Infinity;
-    this.lastShake = -Infinity;
+    this.lastImpulseTime = -Infinity;
+    this.halfCycle = false;
     this.lastDirection = 0;
     this.gravityBaseline = null;
     this.score = 0;
@@ -15,7 +16,10 @@ export class ShakeDetector {
   sample(data) {
     const t = Number(data.time);
     if (!Number.isFinite(t) || t <= this.lastTime) return false;
-    if (t - this.lastTime > this.settings.maxGapMs) this.lastDirection = 0;
+    if (t - this.lastTime > this.settings.maxGapMs) {
+      this.lastDirection = 0;
+      this.halfCycle = false;
+    }
     this.lastTime = t;
 
     // Ignore X and Z completely. Prefer acceleration without gravity.
@@ -30,10 +34,14 @@ export class ShakeDetector {
     if (Math.abs(y) < this.settings.threshold) return false;
     const direction = Math.sign(y);
     if (direction === this.lastDirection) return false;
-    // Remember the opposite direction even during a cooldown; don't count duplicates.
+    if (t - this.lastImpulseTime < this.settings.minIntervalMs) return false;
     this.lastDirection = direction;
-    if (t - this.lastShake < this.settings.minIntervalMs) return false;
-    this.lastShake = t;
+    this.lastImpulseTime = t;
+    if (!this.halfCycle) {
+      this.halfCycle = true;
+      return false;
+    }
+    this.halfCycle = false;
     this.score++;
     return true;
   }

@@ -1,8 +1,9 @@
 import { ShakeDetector } from "./cshake-core.js";
+import { getIdentity, normalizeCode } from "./session.js";
 
 const $ = id => document.getElementById(id);
 const detector = new ShakeDetector();
-const state = { db:null, uid:null, code:null, room:null, people:[], duration:10, sensor:false,
+const state = { db:null, uid:getIdentity().id, code:null, room:null, people:[], duration:10, sensor:false,
   samples:0,lastSample:0, activeRound:0, score:0, published:0, lastPublish:0, tickId:0, offRoom:null,
   offPeople:null, phase:"entry", audio:null, busy:false, finalizing:false, roundStarted:false };
 const STORAGE = "cshake.online.session";
@@ -33,11 +34,8 @@ async function backend() {
     if(!navigator.onLine) throw new Error("Für Online Battle wird eine Internetverbindung benötigt.");
     if(!window.firebase) await loadScript("https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js");
     if(!firebase.firestore) await loadScript("https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js");
-    if(!firebase.auth) await loadScript("https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js");
     if(!window.bustrinkerDb) await loadScript("config.js");
     state.db=window.bustrinkerDb;
-    const user=await firebase.auth().signInAnonymously();
-    state.uid=user.user.uid;
   })().catch(e=>{initialization=null;throw e;});
   return initialization;
 }
@@ -72,7 +70,7 @@ async function create() {
 }
 async function join(code) {
   if(!nickname()) throw new Error("Trage deinen Namen ein.");
-  if(!/^[A-Z2-9]{6}$/.test(code)) throw new Error("Ungültiger Raum-Code.");
+  if(!/^[A-HJ-NP-Z2-9]{6}$/.test(code)) throw new Error("Ungültiger Raum-Code.");
   await backend();
   const doc=state.db.collection("cshakeRooms").doc(code);
   await state.db.runTransaction(async tx=>{
@@ -254,7 +252,7 @@ async function leave(){
 }
 document.querySelectorAll("[data-duration]").forEach(btn=>btn.addEventListener("click",()=>{state.duration=Number(btn.dataset.duration);document.querySelectorAll("[data-duration]").forEach(b=>b.classList.toggle("chosen",b===btn));}));
 $("create").addEventListener("click",()=>action(create));
-$("join").addEventListener("click",()=>action(()=>join($("join-code").value.trim().toUpperCase())));
+$("join").addEventListener("click",()=>action(()=>join(normalizeCode($("join-code").value))));
 $("sensor").addEventListener("click",()=>action(sensor));
 $("ready").addEventListener("click",()=>action(ready));
 $("launch").addEventListener("click",()=>action(launch));

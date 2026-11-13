@@ -1,6 +1,6 @@
 import {getIdentity,normalizeCode,readSaved,save,removeSaved,newId} from './session.js';
-import {VALUES,rank,label,valueOf,commitment} from './maexchen-core.js';
-import {MaexchenStore} from './maexchen-store.js';
+import {VALUES,rank,label,valueOf,commitment} from './maexchen-core.js?v=20261113-rules2';
+import {MaexchenStore} from './maexchen-store.js?v=20261113-rules2';
 const $=id=>document.getElementById(id), id=getIdentity().id, KEY='maexchen.session.v1';
 let scenePromise;
 let store,initializing,code=null,room=null,off=null,connected=false,busy=false,scene,rolling=false;
@@ -84,7 +84,7 @@ function render(){
   if(room.phase==='claim'&&mine&&s?.hash===room.commitment)dice=s.dice;
   if(room.phase==='result'){
     dice=room.result.dice;const loser=room.players.find(p=>p.id===room.result.loser);
-    $('phase-info').textContent=`${loser?.name}: ${room.result.penalty} Schluck${room.result.penalty===1?'':'e'}. ${dice?`Ansage ${label(room.result.claim)}, gewürfelt ${label(room.result.actual)}. ${room.result.truthful?'Ansage stimmt.':'Bluff aufgedeckt.'}`:'Mäxchen akzeptiert, ohne aufzudecken.'}`;
+    $('phase-info').textContent=`${loser?.name}: ${room.result.penalty} Schluck${room.result.penalty===1?'':'e'}. ${dice?`Ansage ${label(room.result.claim)}, gewürfelt ${label(room.result.actual)}. ${room.result.truthful?'Ansage stimmt.':'Bluff aufgedeckt.'}`:'Mäxchen akzeptiert, ohne aufzudecken.'} Als Nächstes würfelt ${room.players[(room.players.findIndex(p=>p.id===room.result.loser)+1)%room.players.length].name}.`;
   }
   if(!rolling){$('dice-label').textContent=dice?`${dice.join(' + ')} → ${label(valueOf(dice))}${room.phase==='claim'?' · Nur du siehst diesen Wurf':''}`:'Würfel verdeckt';if(scene){if(dice)scene.show(dice);else scene.hide();}}
   if(!scene)initScene().then(()=>render()).catch(e=>{notice(e.message);$('roll').disabled=true;});

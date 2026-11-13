@@ -1,4 +1,4 @@
-import {createRoom,transition,commitment} from './maexchen-core.js';
+import {createRoom,transition,commitment} from './maexchen-core.js?v=20261113-rules2';
 export class MaexchenStore {
   constructor(db){this.db=db;}
   ref(code){return this.db.collection('maexchenRooms').doc(code);}

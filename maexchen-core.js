@@ -4,7 +4,8 @@ export function valueOf(dice) {
   if (!Array.isArray(dice) || dice.length !== 2 || dice.some(n => !Number.isInteger(n) || n < 1 || n > 6)) throw new Error('Ungültige Würfel.');
   return Math.max(...dice) * 10 + Math.min(...dice);
 }
-export const label = value => value === 21 ? '21 · Mäxchen' : String(value);
+export const label = value => value === 21 ? '21 · Mäxchen' :
+  VALUES.includes(value) && value % 11 === 0 ? `${value / 11}er-Pasch` : String(value);
 export function createRoom(id, name) {
   return {game:'maexchen',version:1,revision:0,host:id,players:[{id,name:name.trim().slice(0,24),penalty:0}],phase:'lobby',turn:id,claim:0,previous:null,commitment:null,result:null};
 }
@@ -54,6 +55,7 @@ export function transition(source, id, cmd) {
         member.penalty++;r.result={dice:null,actual:null,claim:21,loser:id,penalty:1,truthful:null};r.phase='result';
       } else if(cmd.type==='next') {
         require(r.phase==='result' && (id===r.turn||id===r.host));
+        r.turn=r.players[(r.players.findIndex(p=>p.id===r.result.loser)+1)%r.players.length].id;
         r.phase='roll';r.claim=0;r.previous=null;r.commitment=null;r.result=null;
       } else throw new Error('Unbekannte Aktion.');
     }

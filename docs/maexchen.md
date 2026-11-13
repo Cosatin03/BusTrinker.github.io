@@ -4,7 +4,7 @@
 
 ## Regeln
 
-Ansagen müssen strikt steigen: 31, 32, 41, 42, 43, 51, 52, 53, 54, 61, 62, 63, 64, 65, 11, 22, 33, 44, 55, 66, 21. Beim Anzweifeln reicht ein tatsächlicher Wurf mindestens in Höhe der Ansage. Die verlierende Person erhält einen Schluck und beginnt neu. Ein angezweifeltes Mäxchen zählt zwei; ein ohne Aufdecken akzeptiertes Mäxchen einen. Die Zähler lassen sich auch als alkoholfreie Punkte verwenden.
+Ansagen müssen strikt steigen: 31, 32, 41, 42, 43, 51, 52, 53, 54, 61, 62, 63, 64, 65, 1er-Pasch, 2er-Pasch, 3er-Pasch, 4er-Pasch, 5er-Pasch, 6er-Pasch, 21 (Mäxchen). Beim Anzweifeln reicht ein tatsächlicher Wurf mindestens in Höhe der Ansage. Die verlierende Person erhält einen Schluck. Anschließend beginnt die nächste Person in der Spielreihenfolge die neue Runde. Ein angezweifeltes Mäxchen zählt zwei; ein ohne Aufdecken akzeptiertes Mäxchen einen. Die Zähler lassen sich auch als alkoholfreie Punkte verwenden.
 
 ## Technik und Wiederverbindung
 

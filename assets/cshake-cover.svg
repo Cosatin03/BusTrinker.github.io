@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600" role="img" aria-labelledby="title desc">
+<title id="title">C-Shake Party Battle</title>
+<desc id="desc">Neon-Spielcover mit C-Shake-Schriftzug, drei schüttelnden Handys, Hoch- und Runterpfeilen sowie einer Punktzahl.</desc>
+<defs>
+<radialGradient id="bg"><stop stop-color="#173769"/><stop offset=".58" stop-color="#101633"/><stop offset="1" stop-color="#060a19"/></radialGradient>
+<linearGradient id="phone" x2="1" y2="1"><stop stop-color="#20ddff"/><stop offset=".48" stop-color="#aa2dff"/><stop offset="1" stop-color="#f92cb2"/></linearGradient>
+<linearGradient id="lime" x2="0" y2="1"><stop stop-color="#c4ff34"/><stop offset="1" stop-color="#3df363"/></linearGradient>
+<linearGradient id="screen" x2="0" y2="1"><stop stop-color="#162c47"/><stop offset="1" stop-color="#080d21"/></linearGradient>
+<filter id="glow"><feGaussianBlur stdDeviation="13" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+<filter id="soft"><feGaussianBlur stdDeviation="28"/></filter>
+</defs>
+<rect width="1200" height="600" fill="url(#bg)"/>
+<ellipse cx="600" cy="465" rx="490" ry="100" fill="#7620e9" opacity=".35" filter="url(#soft)"/>
+<ellipse cx="890" cy="250" rx="240" ry="160" fill="#009ef5" opacity=".22" filter="url(#soft)"/>
+<g opacity=".75" fill="none" stroke-width="8" stroke-linecap="round">
+<path d="M18 475 240 310M60 570 252 405M955 328 1184 174M955 436 1158 316" stroke="#ff2bc7"/>
+<path d="M34 210 257 326M1010 174 1178 45" stroke="#17dafe"/>
+</g>
+<g opacity=".85">
+<rect x="128" y="100" width="18" height="18" fill="#a3ff28" transform="rotate(25 137 109)"/>
+<rect x="976" y="71" width="15" height="15" fill="#ff3ca3" transform="rotate(28 983 78)"/>
+<rect x="91" y="348" width="12" height="24" fill="#21cbff" transform="rotate(19 97 360)"/>
+<rect x="1085" y="473" width="16" height="16" fill="#a9ff28"/>
+<rect x="312" y="547" width="17" height="10" fill="#ff43bf" transform="rotate(25 312 547)"/>
+<path d="m873 54 26 24-24 13 14 29-45-30 23-12z" fill="#a8ff27"/>
+<path d="m200 42 24 24-12 16 27 24-45-11 8-23z" fill="#f52bb3"/>
+</g>
+<!-- Rival players as playful shadow silhouettes -->
+<g opacity=".8">
+<circle cx="138" cy="293" r="48" fill="#223e75" stroke="#ff38c5" stroke-width="7"/>
+<path d="M22 575Q30 394 134 389Q254 386 273 580" fill="#111b3a" stroke="#24cffa" stroke-width="9"/>
+<circle cx="1060" cy="282" r="48" fill="#183763" stroke="#37e6ff" stroke-width="7"/>
+<path d="M931 580Q933 388 1056 386Q1174 391 1193 580" fill="#0e2141" stroke="#ef32b8" stroke-width="9"/>
+</g>
+<!-- Phone-shaking hands on sides -->
+<g transform="translate(258 346) rotate(-19)">
+<rect x="-53" y="-86" width="91" height="167" rx="18" fill="#081125" stroke="#22dfff" stroke-width="9" filter="url(#glow)"/>
+<rect x="-40" y="-68" width="65" height="129" rx="9" fill="#153257"/>
+<path d="m-13 -29 0 67 m-23 -34 23-33 22 33" stroke="#b5ff31" stroke-width="8" fill="none"/>
+</g>
+<g transform="translate(945 348) rotate(19)">
+<rect x="-42" y="-85" width="91" height="167" rx="18" fill="#081125" stroke="#ff41ca" stroke-width="9" filter="url(#glow)"/>
+<rect x="-28" y="-67" width="65" height="129" rx="9" fill="#16254b"/>
+<path d="m6 -30 0 65 m-24 -22 24 24 24-24" stroke="#b8ff30" stroke-width="8" fill="none"/>
+</g>
+<!-- Center hero phone -->
+<g transform="translate(600 345) rotate(-7)">
+<rect x="-144" y="-189" width="288" height="374" rx="45" fill="#060b1a" stroke="url(#phone)" stroke-width="13" filter="url(#glow)"/>
+<rect x="-122" y="-166" width="244" height="327" rx="27" fill="url(#screen)" stroke="#76e2f3" stroke-width="2"/>
+<rect x="-44" y="-179" width="88" height="14" rx="7" fill="#020611"/>
+<path d="m0 -127 55 57h-31v36h-48v-36h-31z" fill="#b9ff3a" filter="url(#glow)"/>
+<text x="0" y="49" fill="#fff" font-family="Arial,Helvetica,sans-serif" font-weight="900" font-size="96" text-anchor="middle">268</text>
+<path d="m-24 79h48v34h31l-55 54-55-54h31z" fill="#ff31b9" filter="url(#glow)"/>
+</g>
+<!-- Header deliberately behind foreground? prominent -->
+<g transform="translate(600 98)">
+<text x="0" y="0" fill="#081021" stroke="#061126" stroke-width="24" stroke-linejoin="round" font-family="Arial Black,Arial,sans-serif" font-size="121" font-style="italic" font-weight="900" text-anchor="middle" paint-order="stroke">C-SHAKE</text>
+<text x="0" y="0" fill="url(#lime)" stroke="#fc30af" stroke-width="4" stroke-linejoin="round" font-family="Arial Black,Arial,sans-serif" font-size="121" font-style="italic" font-weight="900" text-anchor="middle" paint-order="stroke">C-SHAKE</text>
+</g>
+<text x="600" y="568" text-anchor="middle" fill="#e5f9ff" letter-spacing="6" font-family="Arial,Helvetica,sans-serif" font-weight="900" font-size="21">PARTY BATTLE · LIVE</text>
+</svg>

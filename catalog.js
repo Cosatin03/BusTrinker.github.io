@@ -23,7 +23,12 @@ function render() {
     const art = element("div", `game-art ${game.illustration}`);
     art.setAttribute("aria-hidden", "true");
     if (game.illustration === "cshake") {
-      art.append(element("div", "catalog-shake", "ϟ"), element("span", "art-stamp", "SHAKE IT!"));
+      const cover = element("img", "cshake-cover");
+      cover.src = "assets/cshake-cover.svg";
+      cover.alt = "";
+      cover.loading = "lazy";
+      cover.decoding = "async";
+      art.append(cover);
     } else if (game.illustration === "ladders") {
       const board = element("div", "catalog-board");
       ["08", "09 ↗", "10", "07", "♟", "11 ↘", "06", "05", "04"].forEach(

@@ -22,7 +22,9 @@ function render() {
     const tile = element("article", `game-tile ${game.color}`);
     const art = element("div", `game-art ${game.illustration}`);
     art.setAttribute("aria-hidden", "true");
-    if (game.illustration === "cshake") {
+    if (game.illustration === "maexchen") {
+      art.append(element("span", "art-arrows", "⚁ ⚀"), element("span", "art-stamp", "GLAUBST DU MIR?"));
+    } else if (game.illustration === "cshake") {
       const cover = element("img", "cshake-cover");
       cover.src = "assets/cshake-cover.svg";
       cover.alt = "";

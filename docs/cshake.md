@@ -8,9 +8,11 @@ Das bestehende BusTrinker-Repository ist eine statische ES-Module-Anwendung (HTM
 
 ## Shake-Erkennung
 
-`cshake-core.js` exportiert `ShakeDetector` und die Standard-Schwellenwerte. Falls `acceleration` verfügbar ist, verwendet der Detektor gravitationsfreie Werte. Andernfalls wird `accelerationIncludingGravity` über einen zeitabhängigen Tiefpass von der Rohbeschleunigung getrennt. Ein Shake setzt einen Schwellenimpuls nach einer Ruhephase voraus. Ein Cooldown von 180 ms verhindert zusätzliche Zählungen in derselben schnellen Impulsfolge. Die Zeitstempel kommen aus einer monotonen Uhr, nicht aus der Zahl der Sensor-Callbacks. Die Schwellen sind noch **nicht auf iOS und Android kalibriert**; die lokale Solo-Punktzahl ist nicht manipulationssicher.
+`cshake-core.js` nutzt ausschließlich die **Y-Achse** (Handy aufrecht halten), direkt aus `DeviceMotionEvent.acceleration.y` in m/s². Ist dieser Wert nicht verfügbar, wird `accelerationIncludingGravity.y` mit einem beim ersten Sample erfassten festen Ausgangswert verwendet. Die X- und Z-Achsen werden ignoriert.
 
-`npm test` führt auch `tests/cshake.test.js` aus.
+Kontinuierliches schnelles Auf-und-ab-Schütteln wird über abwechselnde Richtungsimpulse gezählt: jedes Überschreiten von +5,5 bzw. -5,5 m/s² in der jeweils entgegengesetzten Richtung ist ein Shake. Es ist keine Ruhephase zwischen Impulsen nötig. Ein Abstand von mindestens 65 ms zwischen gewerteten Impulsen verhindert extreme Doppelzählung; gleichbleibende Beschleunigung erhöht den Zähler nicht. Bei längerer Sensorpause wird die Richtung neu initialisiert. Die Grenzwerte sind praktische Startwerte und noch nicht auf realen iOS-/Android-Geräten kalibriert; unterschiedliche Geräte können voneinander abweichen. Die Browserwerte sind nicht manipulationssicher.
+
+`npm test` prüft `tests/cshake.test.js`, einschließlich schneller Richtungswechsel, Achsenauswahl, Schwellenwert und Cooldown.
 
 ## Party Battle
 

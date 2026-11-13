@@ -1,6 +1,6 @@
 // Add another entry here to make a game discoverable in the collection.
 export const games = [
-  { id: "cshake", title: "C-Shake", subtitle: "SCHÜTTEL DICH AN DIE SPITZE", mode: "local", players: "2–10 Personen oder Solo", duration: "10–30 Sekunden", href: "cshake.html", rules: "cshake.html", description: "Party Battle: Handy weiterreichen, in 10–30 Sekunden um die Wette schütteln und die Rangliste stürmen. Auch solo spielbar.", tags: ["Shake", "Sensor", "Arcade", "Rekord"], illustration: "cshake", color: "mint", cta: "Battle starten" },
+  { id: "cshake", title: "C-Shake", subtitle: "SCHÜTTEL DICH AN DIE SPITZE", mode: "online", players: "1–4 gleichzeitig · lokal bis 10", duration: "10–30 Sekunden", href: "cshake.html", rules: "cshake.html", description: "Online Live Battle mit 1–4 eigenen Handys oder lokales Party Battle zum Weiterreichen. Wer schafft die meisten Shakes?", tags: ["Shake", "Sensor", "Arcade", "Rekord", "Multiplayer", "Live Battle"], illustration: "cshake", color: "mint", cta: "Battle starten" },
   {
     id: "ladders",
     title: "Rutschen & Leitern",

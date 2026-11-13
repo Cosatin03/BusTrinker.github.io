@@ -107,3 +107,7 @@ Die Spielansicht nutzt den verfügbaren Bildschirm für Brett, Aufgabe und Zugak
 Positionen stehen in einer kompakten Leiste; Listen und Feldinformationen öffnen sich
 in Dialogen. Inhalte und Begriffspools stehen in `ladders-tasks.js`. Hardcore erhöht
 die Schluckmenge nicht automatisch. Alle Aufgaben lassen sich ohne Strafe überspringen.
+
+### Mäxchen
+
+`maexchen.html`: Online-Mäxchen für 2–10 Personen mit Raum-ID, verdeckten 3D-Physikwürfeln, Bluffen und Anzweifeln. Regeln, technische Details und die vor Veröffentlichung erforderliche Firestore-Freigabe stehen in [docs/maexchen.md](docs/maexchen.md).

@@ -1,5 +1,6 @@
 // Add another entry here to make a game discoverable in the collection.
 export const games = [
+  { id: "maexchen", title: "Mäxchen", subtitle: "ZWEI WÜRFEL. EINE ANSAGE.", mode: "online", players: "2–10 Spieler", duration: "Eigene Handys", href: "maexchen.html", rules: "rules.html#maexchen", description: "Verdeckt würfeln, höher ansagen und bluffsicher bleiben. Mit 3D-Würfeln und gemeinsamer Raum-ID.", tags: ["Würfel", "3D", "Bluff", "Multiplayer", "Lobby"], illustration: "maexchen", color: "mint", cta: "An den Würfeltisch" },
   { id: "cshake", title: "C-Shake", subtitle: "SCHÜTTEL DICH AN DIE SPITZE", mode: "online", players: "1–4 gleichzeitig · lokal bis 10", duration: "10–30 Sekunden", href: "cshake.html", rules: "cshake.html", description: "Online Live Battle mit 1–4 eigenen Handys oder lokales Party Battle zum Weiterreichen. Wer schafft die meisten Shakes?", tags: ["Shake", "Sensor", "Arcade", "Rekord", "Multiplayer", "Live Battle"], illustration: "cshake", color: "mint", cta: "Battle starten" },
   {
     id: "ladders",

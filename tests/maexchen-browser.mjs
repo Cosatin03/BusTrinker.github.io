@@ -107,7 +107,15 @@ try {
   await b.fill('#nickname','Ben <img onerror=alert(1)>');await b.fill('#join-code',code);await b.click('#join');
   await a.waitForFunction(()=>document.querySelectorAll('#players li').length===2);
   await a.click('#start');await a.waitForSelector('#roll:not([disabled])');
-  await a.click('#roll');await a.waitForSelector('#claim-controls:not([hidden])',{timeout:35000});
+  await a.bringToFront();
+  // A physical throw may legitimately land cocked. Exercise the offered retry,
+  // rather than treating that documented outcome as a broken multiplayer flow.
+  for(let attempt=0;attempt<5;attempt++) {
+    await a.click('#roll');
+    await a.waitForFunction(()=>!document.querySelector('#claim-controls').hidden || /schräg|Ruhe/.test(document.querySelector('#notice').textContent),{},{timeout:60000});
+    if(await a.locator('#claim-controls').isVisible())break;
+  }
+  assert.equal(await a.locator('#claim-controls').isVisible(),true,'No valid throw after five attempts');
   assert.match(await a.textContent('#dice-label'),/Nur du/);assert.equal(await b.textContent('#dice-label'),'Würfel verdeckt');
   const savedLabel=await a.textContent('#dice-label');await a.reload();await a.waitForSelector('#claim-controls:not([hidden])');assert.equal(await a.textContent('#dice-label'),savedLabel);
   await a.selectOption('#claim-value','21');await a.click('#claim');await b.waitForSelector('#challenge:not([hidden])');await b.click('#challenge');

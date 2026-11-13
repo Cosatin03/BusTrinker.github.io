@@ -1,4 +1,4 @@
-import { ShakeDetector } from "./cshake-core.js";
+import { ShakeDetector } from "./cshake-core.js?v=20261113-cycle";
 import { getIdentity, normalizeCode } from "./session.js";
 
 const $ = id => document.getElementById(id);
@@ -44,7 +44,11 @@ async function action(task) {
   state.busy=true;message("");
   for(const id of ["create","join","launch","ready","rematch","leave","result-leave"]) $(id).disabled=true;
   try { await task(); }
-  catch(e) { message(e?.code==="permission-denied"?"Firestore verweigert den Zugriff. Für C-Shake Live werden eigene Sicherheitsregeln benötigt.":e.message||"Verbindung fehlgeschlagen."); }
+  catch(e) {
+    message(e?.code==="permission-denied"
+      ? "Firebase hat den Raumzugriff verweigert (permission-denied). Bitte Firestore-Regeln prüfen."
+      : (e?.message || "Verbindung fehlgeschlagen.") + (e?.code ? " (" + e.code + ")" : ""));
+  }
   finally {state.busy=false;render();}
 }
 function disconnect() {

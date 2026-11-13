@@ -35,11 +35,11 @@ const motionHandler = e => {
   state.lastSample = performance.now();
   if (state.phase!=="playing") return;
   const a = e.acceleration, g=e.accelerationIncludingGravity;
-  const source = a && [a.x,a.y,a.z].every(Number.isFinite) ? a : g;
+  const source = a && Number.isFinite(a.y) ? a : g;
   if (!source) return;
   const timestamp = performance.now();
   if (timestamp < state.start || timestamp >= state.end) return;
-  if (detector.sample({x:source.x,y:source.y,z:source.z,time:timestamp,includesGravity:source===g})) {
+  if (detector.sample({y:source.y,time:timestamp,includesGravity:source===g})) {
     $("#score").textContent=String(detector.score);
     if(detector.score % 10 === 0) {
       $("#feedback").textContent=["10ER-KOMBO! 🔥","UNAUFHALTSAM! ⚡","DAS WIRD ENG! 🚀"][Math.floor(detector.score/10-1)%3];

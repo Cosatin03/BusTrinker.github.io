@@ -105,9 +105,9 @@ function motion(e) {
   state.samples++;state.lastSample=performance.now();
   if(state.phase!=="playing")return;
   const a=e.acceleration, g=e.accelerationIncludingGravity;
-  const src=a&&[a.x,a.y,a.z].every(Number.isFinite)?a:g;
+  const src=a&&Number.isFinite(a.y)?a:g;
   if(!src)return;
-  if(detector.sample({x:src.x,y:src.y,z:src.z,time:performance.now(),includesGravity:src===g})){
+  if(detector.sample({y:src.y,time:performance.now(),includesGravity:src===g})){
     state.score=detector.score;$("score").textContent=String(state.score);
     const el=$("score-wrap");el.classList.remove("pulse");void el.offsetWidth;el.classList.add("pulse");
     if(state.score%10===0)$("feedback").textContent="🔥 "+state.score+" SHAKES!";
